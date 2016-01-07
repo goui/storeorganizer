@@ -16,6 +16,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextClock;
+import android.widget.Toast;
 
 public class DetailsActivity extends AppCompatActivity {
 
@@ -115,6 +117,16 @@ public class DetailsActivity extends AppCompatActivity {
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_details, container, false);
+
+            // Set the on click listener for the clock
+            final TextClock textClock = (TextClock) rootView.findViewById(R.id.fragment_details_text_clock);
+            textClock.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    // TODO
+                    Toast.makeText(getActivity(), "it is " + textClock.getText().toString(), Toast.LENGTH_SHORT).show();
+                }
+            });
 
             // Set up the list view with custom adapter
             RecyclerView recyclerView = (RecyclerView) rootView.findViewById(R.id.fragment_details_recycler_view);
