@@ -17,4 +17,14 @@
         android:icon="@drawable/ic_sync_black_24dp"
         android:title="@string/pref_header_data_sync"/>
 
+    <header
+        android:fragment="fr.goui.storeorganizer.SettingsActivity$WorkersPreferenceFragment"
+        android:icon="@drawable/ic_info_worker"
+        android:title="@string/pref_header_workers"/>
+
+    <header
+        android:fragment="fr.goui.storeorganizer.SettingsActivity$TasksPreferenceFragment"
+        android:icon="@drawable/ic_info_task"
+        android:title="@string/pref_header_tasks"/>
+
 </preference-headers>

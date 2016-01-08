@@ -19,6 +19,7 @@ import android.preference.PreferenceManager;
 import android.preference.RingtonePreference;
 import android.text.TextUtils;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.Toast;
 
@@ -125,25 +126,12 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_settings, menu);
-        return true;
-    }
-
-    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_add) {
-            // TODO
-            Toast.makeText(this, "Add", Toast.LENGTH_SHORT).show();
+        if (id == android.R.id.home) {
+            onBackPressed();
             return true;
         }
-
         return super.onOptionsItemSelected(item);
     }
 
@@ -183,7 +171,9 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
         return PreferenceFragment.class.getName().equals(fragmentName)
                 || GeneralPreferenceFragment.class.getName().equals(fragmentName)
                 || DataSyncPreferenceFragment.class.getName().equals(fragmentName)
-                || NotificationPreferenceFragment.class.getName().equals(fragmentName);
+                || NotificationPreferenceFragment.class.getName().equals(fragmentName)
+                || TasksPreferenceFragment.class.getName().equals(fragmentName)
+                || WorkersPreferenceFragment.class.getName().equals(fragmentName);
     }
 
     /**
@@ -276,4 +266,77 @@ public class SettingsActivity extends AppCompatPreferenceActivity {
             return super.onOptionsItemSelected(item);
         }
     }
+
+    public static class WorkersPreferenceFragment extends PreferenceFragment {
+
+        @Override
+        public void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            setHasOptionsMenu(true);
+        }
+
+        @Override
+        public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+            inflater.inflate(R.menu.menu_settings, menu);
+        }
+
+        @Override
+        public boolean onOptionsItemSelected(MenuItem item) {
+            // Handle action bar item clicks here. The action bar will
+            // automatically handle clicks on the Home/Up button, so long
+            // as you specify a parent activity in AndroidManifest.xml.
+            int id = item.getItemId();
+
+            //noinspection SimplifiableIfStatement
+            if (id == R.id.action_add) {
+                // TODO
+                Toast.makeText(getActivity(), "Add", Toast.LENGTH_SHORT).show();
+                return true;
+            }
+
+            if (id == android.R.id.home) {
+                getActivity().onBackPressed();
+                return true;
+            }
+
+            return super.onOptionsItemSelected(item);
+        }
+    }
+
+    public static class TasksPreferenceFragment extends PreferenceFragment {
+
+        @Override
+        public void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            setHasOptionsMenu(true);
+        }
+
+        @Override
+        public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+            inflater.inflate(R.menu.menu_settings, menu);
+        }
+
+        @Override
+        public boolean onOptionsItemSelected(MenuItem item) {
+            // Handle action bar item clicks here. The action bar will
+            // automatically handle clicks on the Home/Up button, so long
+            // as you specify a parent activity in AndroidManifest.xml.
+            int id = item.getItemId();
+
+            //noinspection SimplifiableIfStatement
+            if (id == R.id.action_add) {
+                // TODO
+                Toast.makeText(getActivity(), "Add", Toast.LENGTH_SHORT).show();
+                return true;
+            }
+
+            if (id == android.R.id.home) {
+                getActivity().onBackPressed();
+                return true;
+            }
+
+            return super.onOptionsItemSelected(item);
+        }
+    }
+
 }
