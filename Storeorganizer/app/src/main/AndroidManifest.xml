@@ -12,6 +12,7 @@
             android:name=".LauncherActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/app_name"
+            android:launchMode="singleInstance"
             android:theme="@style/FullscreenTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -22,6 +23,7 @@
         <activity
             android:name=".DetailsActivity"
             android:label="@string/title_activity_details"
+            android:launchMode="singleInstance"
             android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 

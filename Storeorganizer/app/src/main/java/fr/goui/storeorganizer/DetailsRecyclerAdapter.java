@@ -6,17 +6,22 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import java.util.List;
+
 public class DetailsRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
+    private static final int TYPE_INVALID = -1;
     private static final int TYPE_TIME = 0;
     private static final int TYPE_TASK = 1;
+
+    private List<Object> _items;
 
     class TimeViewHolder extends RecyclerView.ViewHolder {
         TextView txtTimeTextView;
 
-        public TimeViewHolder(View itemView) {
-            super(itemView);
-            txtTimeTextView = (TextView) itemView.findViewById(R.id.fragment_details_time_item_text_view);
+        public TimeViewHolder(View itemView_p) {
+            super(itemView_p);
+            txtTimeTextView = (TextView) itemView_p.findViewById(R.id.fragment_details_time_item_text_view);
         }
     }
 
@@ -24,29 +29,29 @@ public class DetailsRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vi
         TextView txtTaskUpperTextView;
         TextView txtTaskLowerTextView;
 
-        public TaskViewHolder(View itemView) {
-            super(itemView);
-            txtTaskUpperTextView = (TextView) itemView.findViewById(R.id.fragment_details_task_item_upper_text_view);
-            txtTaskLowerTextView = (TextView) itemView.findViewById(R.id.fragment_details_task_item_lower_text_view);
+        public TaskViewHolder(View itemView_p) {
+            super(itemView_p);
+            txtTaskUpperTextView = (TextView) itemView_p.findViewById(R.id.fragment_details_task_item_upper_text_view);
+            txtTaskLowerTextView = (TextView) itemView_p.findViewById(R.id.fragment_details_task_item_lower_text_view);
         }
     }
 
-    public DetailsRecyclerAdapter() {
-
+    public DetailsRecyclerAdapter(List<Object> items_p) {
+        _items = items_p;
     }
 
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent_p, int viewType_p) {
         RecyclerView.ViewHolder viewHolder = null;
-        LayoutInflater inflater = LayoutInflater.from(parent.getContext());
+        LayoutInflater inflater = LayoutInflater.from(parent_p.getContext());
 
-        switch (viewType) {
+        switch (viewType_p) {
             case TYPE_TIME:
-                View timeView = inflater.inflate(R.layout.fragment_details_time_item, parent, false);
+                View timeView = inflater.inflate(R.layout.fragment_details_time_item, parent_p, false);
                 viewHolder = new TimeViewHolder(timeView);
                 break;
             case TYPE_TASK:
-                View taskView = inflater.inflate(R.layout.fragment_details_task_item, parent, false);
+                View taskView = inflater.inflate(R.layout.fragment_details_task_item, parent_p, false);
                 viewHolder = new TaskViewHolder(taskView);
                 break;
         }
@@ -55,36 +60,48 @@ public class DetailsRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vi
     }
 
     @Override
-    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-        switch (holder.getItemViewType()) {
+    public void onBindViewHolder(RecyclerView.ViewHolder holder_p, int position_p) {
+        switch (holder_p.getItemViewType()) {
             case TYPE_TIME:
-                TimeViewHolder timeViewHolder = (TimeViewHolder) holder;
-                bindTimeViewHolder(timeViewHolder, position);
+                TimeViewHolder timeViewHolder = (TimeViewHolder) holder_p;
+                bindTimeViewHolder(timeViewHolder, position_p);
                 break;
             case TYPE_TASK:
-                TaskViewHolder taskViewHolder = (TaskViewHolder) holder;
-                bindTaskViewHolder(taskViewHolder, position);
+                TaskViewHolder taskViewHolder = (TaskViewHolder) holder_p;
+                bindTaskViewHolder(taskViewHolder, position_p);
                 break;
         }
     }
 
     private void bindTimeViewHolder(TimeViewHolder timeViewHolder_p, int position_p) {
-        // TODO
+        String strTime = (String) _items.get(position_p);
+        if (strTime != null) {
+            timeViewHolder_p.txtTimeTextView.setText(strTime);
+        }
     }
 
     private void bindTaskViewHolder(TaskViewHolder taskViewHolder_p, int position_p) {
-        // TODO
+        StoreTask storeTask = (StoreTask) _items.get(position_p);
+        if(storeTask != null) {
+            taskViewHolder_p.txtTaskUpperTextView.setText(storeTask.getName());
+            taskViewHolder_p.txtTaskLowerTextView.setText(storeTask.getDuration());
+        }
     }
 
     @Override
     public int getItemCount() {
-        // TODO
-        return 0;
+        return _items.size();
     }
 
     @Override
-    public int getItemViewType(int position) {
-        // TODO
-        return super.getItemViewType(position);
+    public int getItemViewType(int position_p) {
+        if (_items.get(position_p) instanceof String) {
+            return TYPE_TIME;
+        }
+        if (_items.get(position_p) instanceof StoreTask) {
+            return TYPE_TASK;
+        }
+        return TYPE_INVALID;
     }
+
 }

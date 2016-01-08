@@ -19,6 +19,9 @@ import android.view.ViewGroup;
 import android.widget.TextClock;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class DetailsActivity extends AppCompatActivity {
 
     /**
@@ -52,6 +55,7 @@ public class DetailsActivity extends AppCompatActivity {
         mViewPager.setAdapter(mSectionsPagerAdapter);
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
+        tabLayout.setTabMode(TabLayout.MODE_SCROLLABLE);
         tabLayout.setupWithViewPager(mViewPager);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -98,41 +102,37 @@ public class DetailsActivity extends AppCompatActivity {
          */
         private static final String ARG_SECTION_NUMBER = "section_number";
 
-        public PlaceholderFragment() {
-        }
-
-        /**
-         * Returns a new instance of this fragment for the given section
-         * number.
-         */
-        public static PlaceholderFragment newInstance(int sectionNumber) {
-            PlaceholderFragment fragment = new PlaceholderFragment();
-            Bundle args = new Bundle();
-            args.putInt(ARG_SECTION_NUMBER, sectionNumber);
-            fragment.setArguments(args);
-            return fragment;
-        }
-
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
+            Toast.makeText(getActivity(), "onCreateView", Toast.LENGTH_SHORT).show();
             View rootView = inflater.inflate(R.layout.fragment_details, container, false);
 
+            // Get the views in the fragment
+            TextClock textClock = (TextClock) rootView.findViewById(R.id.fragment_details_text_clock);
+            RecyclerView recyclerView = (RecyclerView) rootView.findViewById(R.id.fragment_details_recycler_view);
+
             // Set the on click listener for the clock
-            final TextClock textClock = (TextClock) rootView.findViewById(R.id.fragment_details_text_clock);
             textClock.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    // TODO
-                    Toast.makeText(getActivity(), "it is " + textClock.getText().toString(), Toast.LENGTH_SHORT).show();
+                    // TODO scroll to most relevant element in list (i.e. current task according to current time)
+                    // recyclerView.setSelectionFromTop(position, mListView.getTop());
+                    Toast.makeText(getActivity(), "it is " + ((TextClock) v).getText().toString(), Toast.LENGTH_SHORT).show();
                 }
             });
 
             // Set up the list view with custom adapter
-            RecyclerView recyclerView = (RecyclerView) rootView.findViewById(R.id.fragment_details_recycler_view);
-            recyclerView.setAdapter(new DetailsRecyclerAdapter());
+            int sectionNumber = getArguments().getInt(ARG_SECTION_NUMBER);
+            List<Object> objects = createListForAdapter(StoreWorkerModel.getInstance().getStoreWorker(sectionNumber).getTasks());
+            recyclerView.setAdapter(new DetailsRecyclerAdapter(objects));
 
             return rootView;
+        }
+
+        private List<Object> createListForAdapter(List<StoreTask> tasks_p) {
+            // TODO
+            return new ArrayList<>();
         }
     }
 
@@ -147,29 +147,22 @@ public class DetailsActivity extends AppCompatActivity {
         }
 
         @Override
-        public Fragment getItem(int position) {
-            // getItem is called to instantiate the fragment for the given page.
-            // Return a PlaceholderFragment (defined as a static inner class below).
-            return PlaceholderFragment.newInstance(position + 1);
+        public Fragment getItem(int position_p) {
+            PlaceholderFragment fragment = new PlaceholderFragment();
+            Bundle args = new Bundle();
+            args.putInt(PlaceholderFragment.ARG_SECTION_NUMBER, position_p);
+            fragment.setArguments(args);
+            return fragment;
         }
 
         @Override
         public int getCount() {
-            // Show 3 total pages.
-            return 3;
+            return StoreWorkerModel.getInstance().getStoreWorkerNumber();
         }
 
         @Override
-        public CharSequence getPageTitle(int position) {
-            switch (position) {
-                case 0:
-                    return "SECTION 1";
-                case 1:
-                    return "SECTION 2";
-                case 2:
-                    return "SECTION 3";
-            }
-            return null;
+        public CharSequence getPageTitle(int position_p) {
+            return StoreWorkerModel.getInstance().getStoreWorker(position_p).getName();
         }
     }
 }
