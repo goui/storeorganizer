@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <TextView
+        android:id="@+id/fragment_settings_generic_category_text_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="24sp" />
+
+    <View
+        android:id="@+id/fragment_settings_generic_category_separator"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_below="@id/fragment_settings_generic_category_text_view"
+        android:background="@color/black_overlay" />
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/fragment_settings_generic_category_recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/fragment_settings_generic_category_separator"
+        android:layout_marginTop="8dp" />
+
+</RelativeLayout>

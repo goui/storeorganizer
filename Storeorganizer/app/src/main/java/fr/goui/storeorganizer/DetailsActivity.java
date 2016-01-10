@@ -108,7 +108,6 @@ public class DetailsActivity extends AppCompatActivity {
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
-            Toast.makeText(getActivity(), "onCreateView", Toast.LENGTH_SHORT).show();
             View rootView = inflater.inflate(R.layout.fragment_details, container, false);
 
             // Get the views in the fragment
@@ -129,6 +128,8 @@ public class DetailsActivity extends AppCompatActivity {
             int sectionNumber = getArguments().getInt(ARG_SECTION_NUMBER);
             List<Object> objects = createListForAdapter(StoreWorkerModel.getInstance().getStoreWorker(sectionNumber).getTasks());
             recyclerView.setAdapter(new DetailsRecyclerAdapter(objects));
+
+            // TODO on click
 
             return rootView;
         }
