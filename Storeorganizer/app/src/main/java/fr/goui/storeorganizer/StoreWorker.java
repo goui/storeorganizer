@@ -21,6 +21,10 @@ public class StoreWorker {
         return _name;
     }
 
+    public void setName(String name_p) {
+        _name = name_p;
+    }
+
     public static int getId() {
         return _id;
     }

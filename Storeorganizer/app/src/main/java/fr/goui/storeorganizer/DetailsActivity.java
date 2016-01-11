@@ -22,8 +22,10 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
 
-public class DetailsActivity extends AppCompatActivity {
+public class DetailsActivity extends AppCompatActivity implements Observer {
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -40,10 +42,17 @@ public class DetailsActivity extends AppCompatActivity {
      */
     private ViewPager mViewPager;
 
+    /**
+     * The tab layout.
+     */
+    private TabLayout mTabLayout;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_details);
+
+        StoreWorkerModel.getInstance().addObserver(this);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -55,9 +64,9 @@ public class DetailsActivity extends AppCompatActivity {
         mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
 
-        TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
-        tabLayout.setTabMode(TabLayout.MODE_SCROLLABLE);
-        tabLayout.setupWithViewPager(mViewPager);
+        mTabLayout = (TabLayout) findViewById(R.id.tabs);
+        mTabLayout.setTabMode(TabLayout.MODE_SCROLLABLE);
+        mTabLayout.setupWithViewPager(mViewPager);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -93,6 +102,22 @@ public class DetailsActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void update(Observable observable, Object data) {
+        if (observable instanceof StoreWorkerModel && data instanceof StoreWorkerModel.ObsData) {
+            StoreWorkerModel.ObsData obsData = (StoreWorkerModel.ObsData) data;
+            switch (obsData.updateReason) {
+                case StoreWorkerModel.ObsData.CREATION:
+                    mTabLayout.addTab(mTabLayout.newTab().setText(obsData.worker.getName()));
+                    mSectionsPagerAdapter.notifyDataSetChanged();
+                    break;
+                case StoreWorkerModel.ObsData.UPDATE:
+                    mTabLayout.getTabAt(obsData.workersPosition).setText(obsData.worker.getName());
+                    break;
+            }
+        }
     }
 
     /**
@@ -168,5 +193,6 @@ public class DetailsActivity extends AppCompatActivity {
         public CharSequence getPageTitle(int position_p) {
             return StoreWorkerModel.getInstance().getStoreWorker(position_p).getName();
         }
+
     }
 }

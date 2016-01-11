@@ -7,9 +7,8 @@
     <string name="action_add">Add</string>
     <string name="workers">Workers</string>
     <string name="tasks">Tasks</string>
+    <string name="edit_workers_name">Edit worker\'s name</string>
+    <string name="add_a_worker">Add a worker</string>
     <string name="section_format">Hello World from section: %1$d</string>
-
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
 
 </resources>
