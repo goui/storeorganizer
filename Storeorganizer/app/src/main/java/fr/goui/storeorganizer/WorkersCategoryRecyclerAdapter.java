@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.List;
 
@@ -79,9 +80,14 @@ public class WorkersCategoryRecyclerAdapter extends RecyclerView.Adapter<Recycle
             builder.setPositiveButton(_context.getString(R.string.ok), new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    StoreWorkerModel.getInstance().removeStoreWorker(position);
-                    notifyItemRemoved(position);
-                    // TODO change in shared prefs
+                    if(StoreWorkerModel.getInstance().getStoreWorkerNumber() == 1) {
+                        Toast.makeText(_context, _context.getString(R.string.cant_remove_last_worker), Toast.LENGTH_LONG).show();
+                        dialog.cancel();
+                    } else {
+                        StoreWorkerModel.getInstance().removeStoreWorker(position);
+                        notifyItemRemoved(position);
+                        // TODO change in shared prefs
+                    }
                 }
             });
             builder.setNegativeButton(_context.getString(R.string.cancel), new DialogInterface.OnClickListener() {

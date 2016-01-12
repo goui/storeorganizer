@@ -47,6 +47,11 @@ public class DetailsActivity extends AppCompatActivity implements Observer {
      */
     private TabLayout mTabLayout;
 
+    /**
+     * The index of the tab to remove.
+     */
+    private int mTabToBeRemoved = -1;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -117,11 +122,26 @@ public class DetailsActivity extends AppCompatActivity implements Observer {
                     mTabLayout.getTabAt(obsData.workersPosition).setText(obsData.worker.getName());
                     break;
                 case StoreWorkerModel.ObsData.REMOVAL:
-                    // TODO change selection
-                    mTabLayout.removeTabAt(obsData.workersPosition);
-                    mSectionsPagerAdapter.notifyDataSetChanged();
+                    if(obsData.workersPosition == mTabLayout.getSelectedTabPosition()) {
+                        mTabToBeRemoved = obsData.workersPosition;
+                    } else {
+                        mTabLayout.removeTabAt(obsData.workersPosition);
+                        mSectionsPagerAdapter.notifyDataSetChanged();
+                    }
                     break;
             }
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        
+        if(mTabToBeRemoved != -1) {
+            mSectionsPagerAdapter.notifyDataSetChanged();
+            mTabLayout.removeTabAt(mTabToBeRemoved);
+            mSectionsPagerAdapter.notifyDataSetChanged();
+            mTabToBeRemoved = -1;
         }
     }
 
