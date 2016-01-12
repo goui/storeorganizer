@@ -136,7 +136,7 @@ public class DetailsActivity extends AppCompatActivity implements Observer {
     @Override
     protected void onResume() {
         super.onResume();
-        
+
         if(mTabToBeRemoved != -1) {
             mSectionsPagerAdapter.notifyDataSetChanged();
             mTabLayout.removeTabAt(mTabToBeRemoved);

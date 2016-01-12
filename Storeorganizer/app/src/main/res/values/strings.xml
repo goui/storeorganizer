@@ -4,11 +4,11 @@
     <string name="click_to_continue">Click\nto continue</string>
     <string name="details">Details</string>
     <string name="settings">Settings</string>
-    <string name="action_add">Add</string>
     <string name="workers">Workers</string>
     <string name="tasks">Tasks</string>
     <string name="edit_workers_name">Edit worker\'s name</string>
-    <string name="add_a_worker">Add a worker</string>
+    <string name="add_worker">Add worker</string>
+    <string name="add_task">Add task</string>
     <string name="ok">Ok</string>
     <string name="cancel">Cancel</string>
     <string name="worker_removed">Worker removed</string>

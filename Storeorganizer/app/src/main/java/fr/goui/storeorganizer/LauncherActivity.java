@@ -1,26 +1,28 @@
 package fr.goui.storeorganizer;
 
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.ProgressBar;
 
-/**
- * An example full-screen activity that shows and hides the system UI (i.e.
- * status bar and navigation/system bar) with user interaction.
- */
 public class LauncherActivity extends AppCompatActivity {
 
     private View mContentView;
 
+    private ProgressBar mProgressBar;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_launcher);
-        mContentView = findViewById(R.id.fullscreen_content);
+        mProgressBar = (ProgressBar)findViewById(R.id.activity_launcher_progress_bar);
+        mContentView = findViewById(R.id.activity_launcher_continue_text_view);
+
+        mProgressBar.setIndeterminate(true);
 
         hide();
 
@@ -34,10 +36,7 @@ public class LauncherActivity extends AppCompatActivity {
             }
         });
 
-        StoreWorkerModel.getInstance().addStoreWorker(new StoreWorker("Worker1"));
-        StoreWorkerModel.getInstance().addStoreWorker(new StoreWorker("Worker2"));
-        StoreWorkerModel.getInstance().addStoreWorker(new StoreWorker("Worker3"));
-        StoreWorkerModel.getInstance().addStoreWorker(new StoreWorker("Worker4"));
+        new ProgressTask().execute();
     }
 
     private void hide() {
@@ -46,6 +45,12 @@ public class LauncherActivity extends AppCompatActivity {
         if (actionBar != null) {
             actionBar.hide();
         }
+        mProgressBar.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE
+                | View.SYSTEM_UI_FLAG_FULLSCREEN
+                | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
         mContentView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LOW_PROFILE
                 | View.SYSTEM_UI_FLAG_FULLSCREEN
                 | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
@@ -53,4 +58,24 @@ public class LauncherActivity extends AppCompatActivity {
                 | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
                 | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
     }
+
+    private class ProgressTask extends AsyncTask<Void,Void,Void> {
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            // TODO load shared prefs or fill them with default file
+            // TODO load models with shared prefs
+            StoreWorkerModel.getInstance().addStoreWorker(new StoreWorker("Worker1"));
+            StoreWorkerModel.getInstance().addStoreWorker(new StoreWorker("Worker2"));
+            StoreWorkerModel.getInstance().addStoreWorker(new StoreWorker("Worker3"));
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void result) {
+            mProgressBar.setVisibility(View.GONE);
+            mContentView.setVisibility(View.VISIBLE);
+        }
+    }
+
 }

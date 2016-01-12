@@ -42,7 +42,7 @@ public class WorkersCategoryFragment extends Fragment {
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
-        inflater.inflate(R.menu.menu_settings, menu);
+        inflater.inflate(R.menu.menu_settings_workers, menu);
     }
 
     @Override
@@ -52,9 +52,9 @@ public class WorkersCategoryFragment extends Fragment {
             getActivity().onBackPressed();
             return true;
         }
-        if(id == R.id.action_add) {
+        if(id == R.id.action_add_worker) {
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-            builder.setTitle(getActivity().getString(R.string.add_a_worker));
+            builder.setTitle(getActivity().getString(R.string.add_worker));
             final EditText input = new EditText(getActivity());
             input.setInputType(InputType.TYPE_TEXT_VARIATION_PERSON_NAME | InputType.TYPE_TEXT_FLAG_CAP_WORDS);
             builder.setView(input);

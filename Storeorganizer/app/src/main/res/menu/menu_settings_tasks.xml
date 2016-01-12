@@ -3,9 +3,9 @@
       xmlns:tools="http://schemas.android.com/tools"
       tools:context="fr.goui.storeorganizer.SettingsActivity">
     <item
-        android:id="@+id/action_add"
+        android:id="@+id/action_add_task"
         android:orderInCategory="100"
-        android:icon="@drawable/ic_action_add"
-        android:title="@string/action_add"
+        android:icon="@drawable/ic_action_add_task"
+        android:title="@string/add_task"
         app:showAsAction="ifRoom" />
 </menu>

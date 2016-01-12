@@ -33,7 +33,7 @@ public class TasksCategoryFragment extends Fragment {
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
-        inflater.inflate(R.menu.menu_settings, menu);
+        inflater.inflate(R.menu.menu_settings_tasks, menu);
     }
 
     @Override
@@ -43,7 +43,7 @@ public class TasksCategoryFragment extends Fragment {
             getActivity().onBackPressed();
             return true;
         }
-        if(id == R.id.action_add) {
+        if(id == R.id.action_add_task) {
             // TODO add a task in the recycler view
         }
         return super.onOptionsItemSelected(item);
