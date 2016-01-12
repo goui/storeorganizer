@@ -21,7 +21,7 @@ public class DetailsRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vi
 
         public TimeViewHolder(View itemView_p) {
             super(itemView_p);
-            txtTimeTextView = (TextView) itemView_p.findViewById(R.id.layout_one_text_view);
+            txtTimeTextView = (TextView) itemView_p.findViewById(R.id.layout_simple_item_text_view);
         }
     }
 
@@ -47,7 +47,7 @@ public class DetailsRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vi
 
         switch (viewType_p) {
             case TYPE_TIME:
-                View timeView = inflater.inflate(R.layout.layout_one_text_view, parent_p, false);
+                View timeView = inflater.inflate(R.layout.layout_simple_item, parent_p, false);
                 viewHolder = new TimeViewHolder(timeView);
                 break;
             case TYPE_TASK:

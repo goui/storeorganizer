@@ -9,6 +9,11 @@
     <string name="tasks">Tasks</string>
     <string name="edit_workers_name">Edit worker\'s name</string>
     <string name="add_a_worker">Add a worker</string>
+    <string name="ok">Ok</string>
+    <string name="cancel">Cancel</string>
+    <string name="worker_removed">Worker removed</string>
+    <string name="question_remove_worker">Remove worker?</string>
+    <string name="undo">Undo</string>
     <string name="section_format">Hello World from section: %1$d</string>
 
 </resources>

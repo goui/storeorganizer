@@ -116,6 +116,11 @@ public class DetailsActivity extends AppCompatActivity implements Observer {
                 case StoreWorkerModel.ObsData.UPDATE:
                     mTabLayout.getTabAt(obsData.workersPosition).setText(obsData.worker.getName());
                     break;
+                case StoreWorkerModel.ObsData.REMOVAL:
+                    // TODO change selection
+                    mTabLayout.removeTabAt(obsData.workersPosition);
+                    mSectionsPagerAdapter.notifyDataSetChanged();
+                    break;
             }
         }
     }

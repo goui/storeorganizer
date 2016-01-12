@@ -48,12 +48,29 @@ public class StoreWorkerModel extends Observable {
         _workers.get(position_p).setName(name_p);
         _workersNames.set(position_p, name_p);
         setChanged();
-        notifyObservers(new ObsData( _workers.get(position_p), position_p, ObsData.UPDATE));
+        notifyObservers(new ObsData(_workers.get(position_p), position_p, ObsData.UPDATE));
+    }
+
+    public void removeStoreWorker(StoreWorker storeWorker_p) {
+        int index = _workers.indexOf(storeWorker_p);
+        _workers.remove(index);
+        _workersNames.remove(index);
+        setChanged();
+        notifyObservers(new ObsData(storeWorker_p, index, ObsData.REMOVAL));
+    }
+
+    public void removeStoreWorker(int position_p) {
+        StoreWorker worker = _workers.get(position_p);
+        _workers.remove(position_p);
+        _workersNames.remove(position_p);
+        setChanged();
+        notifyObservers(new ObsData(worker, position_p, ObsData.REMOVAL));
     }
 
     public class ObsData {
         public static final int CREATION = 0;
         public static final int UPDATE = 1;
+        public static final int REMOVAL = 2;
         public StoreWorker worker;
         public int updateReason;
         public int workersPosition;

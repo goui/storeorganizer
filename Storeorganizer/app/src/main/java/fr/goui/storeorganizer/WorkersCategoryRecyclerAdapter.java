@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import java.util.List;
@@ -20,28 +21,41 @@ public class WorkersCategoryRecyclerAdapter extends RecyclerView.Adapter<Recycle
 
     class WorkersViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         TextView textView;
+        ImageButton btnEdit;
+        ImageButton btnDelete;
         int position;
-        String workersName;
+        boolean toggle;
 
         public WorkersViewHolder(View itemView_p) {
             super(itemView_p);
-            textView = (TextView) itemView_p.findViewById(R.id.layout_one_text_view);
+            textView = (TextView) itemView_p.findViewById(R.id.layout_simple_item_text_view);
+            btnEdit = (ImageButton) itemView_p.findViewById(R.id.layout_simple_item_edit_button);
+            btnDelete = (ImageButton) itemView_p.findViewById(R.id.layout_simple_item_delete_button);
             itemView_p.setOnClickListener(this);
+
+            btnEdit.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    editCurrentItem();
+                }
+            });
+
+            btnDelete.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    deleteCurrentItem();
+                }
+            });
         }
 
-        public void setPosition(int position_p) {
-            position = position_p;
-        }
-
-        @Override
-        public void onClick(View v) {
+        private void editCurrentItem() {
             AlertDialog.Builder builder = new AlertDialog.Builder(_context);
             builder.setTitle(_context.getString(R.string.edit_workers_name));
             final EditText input = new EditText(_context);
             input.setText(textView.getText());
             input.setInputType(InputType.TYPE_TEXT_VARIATION_PERSON_NAME | InputType.TYPE_TEXT_FLAG_CAP_WORDS);
             builder.setView(input);
-            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            builder.setPositiveButton(_context.getString(R.string.ok), new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     String name = input.getText().toString();
@@ -50,7 +64,7 @@ public class WorkersCategoryRecyclerAdapter extends RecyclerView.Adapter<Recycle
                     // TODO change in shared prefs
                 }
             });
-            builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            builder.setNegativeButton(_context.getString(R.string.cancel), new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     dialog.cancel();
@@ -58,6 +72,43 @@ public class WorkersCategoryRecyclerAdapter extends RecyclerView.Adapter<Recycle
             });
             builder.show();
         }
+
+        private void deleteCurrentItem() {
+            AlertDialog.Builder builder = new AlertDialog.Builder(_context);
+            builder.setTitle(_context.getString(R.string.question_remove_worker));
+            builder.setPositiveButton(_context.getString(R.string.ok), new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    StoreWorkerModel.getInstance().removeStoreWorker(position);
+                    notifyItemRemoved(position);
+                    // TODO change in shared prefs
+                }
+            });
+            builder.setNegativeButton(_context.getString(R.string.cancel), new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.cancel();
+                }
+            });
+            builder.show();
+        }
+
+        private void setPosition(int position_p) {
+            position = position_p;
+        }
+
+        @Override
+        public void onClick(View v) {
+            if(toggle) {
+                btnEdit.setVisibility(View.GONE);
+                btnDelete.setVisibility(View.GONE);
+            } else {
+                btnEdit.setVisibility(View.VISIBLE);
+                btnDelete.setVisibility(View.VISIBLE);
+            }
+            toggle = !toggle;
+        }
+
     }
 
     public WorkersCategoryRecyclerAdapter(Context context_p, List<StoreWorker> workers_p) {
@@ -68,7 +119,7 @@ public class WorkersCategoryRecyclerAdapter extends RecyclerView.Adapter<Recycle
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent_p, int viewType_p) {
         LayoutInflater inflater = LayoutInflater.from(parent_p.getContext());
-        View timeView = inflater.inflate(R.layout.layout_one_text_view, parent_p, false);
+        View timeView = inflater.inflate(R.layout.layout_simple_item, parent_p, false);
         return new WorkersViewHolder(timeView);
     }
 
@@ -85,4 +136,5 @@ public class WorkersCategoryRecyclerAdapter extends RecyclerView.Adapter<Recycle
     public int getItemCount() {
         return _workers.size();
     }
+
 }
