@@ -7,30 +7,32 @@
                 android:paddingTop="16dp">
 
     <TextView
-        android:id="@+id/layout_simple_item_text_view"
+        android:id="@+id/layout_simple_item_1tv_text_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
-        android:paddingLeft="16dp"
-        android:paddingRight="16dp"
-        android:textSize="20dp"/>
+        android:paddingLeft="8dp"
+        android:paddingRight="8dp"
+        android:textSize="20sp"/>
 
     <ImageButton
-        android:id="@+id/layout_simple_item_delete_button"
+        android:id="@+id/layout_simple_item_1tv_delete_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
         android:layout_centerVertical="true"
         android:src="@drawable/ic_action_delete_black"
-        android:visibility="gone"/>
+        android:visibility="gone"
+        android:contentDescription="@string/delete"/>
 
     <ImageButton
-        android:id="@+id/layout_simple_item_edit_button"
+        android:id="@+id/layout_simple_item_1tv_edit_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
-        android:layout_toLeftOf="@id/layout_simple_item_delete_button"
+        android:layout_toStartOf="@id/layout_simple_item_1tv_delete_button"
         android:src="@drawable/ic_action_edit_black"
-        android:visibility="gone"/>
+        android:visibility="gone"
+        android:contentDescription="@string/edit"/>
 
 </RelativeLayout>

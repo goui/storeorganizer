@@ -29,9 +29,9 @@ public class WorkersCategoryRecyclerAdapter extends RecyclerView.Adapter<Recycle
 
         public WorkersViewHolder(View itemView_p) {
             super(itemView_p);
-            textView = (TextView) itemView_p.findViewById(R.id.layout_simple_item_text_view);
-            btnEdit = (ImageButton) itemView_p.findViewById(R.id.layout_simple_item_edit_button);
-            btnDelete = (ImageButton) itemView_p.findViewById(R.id.layout_simple_item_delete_button);
+            textView = (TextView) itemView_p.findViewById(R.id.layout_simple_item_1tv_text_view);
+            btnEdit = (ImageButton) itemView_p.findViewById(R.id.layout_simple_item_1tv_edit_button);
+            btnDelete = (ImageButton) itemView_p.findViewById(R.id.layout_simple_item_1tv_delete_button);
             itemView_p.setOnClickListener(this);
 
             btnEdit.setOnClickListener(new View.OnClickListener() {
@@ -50,11 +50,13 @@ public class WorkersCategoryRecyclerAdapter extends RecyclerView.Adapter<Recycle
         }
 
         private void editCurrentItem() {
-            AlertDialog.Builder builder = new AlertDialog.Builder(_context);
-            builder.setTitle(_context.getString(R.string.edit_workers_name));
+            StoreWorker storeWorker = _workers.get(position);
             final EditText input = new EditText(_context);
-            input.setText(textView.getText());
+            input.setText(storeWorker.getName());
             input.setInputType(InputType.TYPE_TEXT_VARIATION_PERSON_NAME | InputType.TYPE_TEXT_FLAG_CAP_WORDS);
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(_context);
+            builder.setTitle(_context.getString(R.string.edit));
             builder.setView(input);
             builder.setPositiveButton(_context.getString(R.string.ok), new DialogInterface.OnClickListener() {
                 @Override
@@ -76,12 +78,12 @@ public class WorkersCategoryRecyclerAdapter extends RecyclerView.Adapter<Recycle
 
         private void deleteCurrentItem() {
             AlertDialog.Builder builder = new AlertDialog.Builder(_context);
-            builder.setTitle(_context.getString(R.string.question_remove_worker));
+            builder.setTitle(_context.getString(R.string.question_remove));
             builder.setPositiveButton(_context.getString(R.string.ok), new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     if(StoreWorkerModel.getInstance().getStoreWorkerNumber() == 1) {
-                        Toast.makeText(_context, _context.getString(R.string.cant_remove_last_worker), Toast.LENGTH_LONG).show();
+                        Toast.makeText(_context, _context.getString(R.string.cant_remove_last), Toast.LENGTH_LONG).show();
                         dialog.cancel();
                     } else {
                         StoreWorkerModel.getInstance().removeStoreWorker(position);
@@ -125,7 +127,7 @@ public class WorkersCategoryRecyclerAdapter extends RecyclerView.Adapter<Recycle
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent_p, int viewType_p) {
         LayoutInflater inflater = LayoutInflater.from(parent_p.getContext());
-        View timeView = inflater.inflate(R.layout.layout_simple_item, parent_p, false);
+        View timeView = inflater.inflate(R.layout.layout_simple_item_1tv, parent_p, false);
         return new WorkersViewHolder(timeView);
     }
 

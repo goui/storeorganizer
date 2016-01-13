@@ -18,4 +18,12 @@ public class StoreTask {
     public int getDuration() {
         return _duration;
     }
+
+    public void setName(String name_p) {
+        _name = name_p;
+    }
+
+    public void setDuration(int duration_p) {
+        _duration = duration_p;
+    }
 }

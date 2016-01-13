@@ -21,7 +21,7 @@ public class DetailsRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vi
 
         public TimeViewHolder(View itemView_p) {
             super(itemView_p);
-            txtTimeTextView = (TextView) itemView_p.findViewById(R.id.layout_simple_item_text_view);
+            txtTimeTextView = (TextView) itemView_p.findViewById(R.id.layout_simple_item_1tv_text_view);
         }
     }
 
@@ -31,8 +31,8 @@ public class DetailsRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vi
 
         public TaskViewHolder(View itemView_p) {
             super(itemView_p);
-            txtTaskUpperTextView = (TextView) itemView_p.findViewById(R.id.layout_upper_text_view);
-            txtTaskLowerTextView = (TextView) itemView_p.findViewById(R.id.layout_lower_text_view);
+            txtTaskUpperTextView = (TextView) itemView_p.findViewById(R.id.layout_simple_item_2tv_upper_text_view);
+            txtTaskLowerTextView = (TextView) itemView_p.findViewById(R.id.layout_simple_item_2tv_lower_text_view);
         }
     }
 
@@ -47,11 +47,11 @@ public class DetailsRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vi
 
         switch (viewType_p) {
             case TYPE_TIME:
-                View timeView = inflater.inflate(R.layout.layout_simple_item, parent_p, false);
+                View timeView = inflater.inflate(R.layout.layout_simple_item_1tv, parent_p, false);
                 viewHolder = new TimeViewHolder(timeView);
                 break;
             case TYPE_TASK:
-                View taskView = inflater.inflate(R.layout.layout_two_text_views, parent_p, false);
+                View taskView = inflater.inflate(R.layout.layout_simple_item_2tv, parent_p, false);
                 viewHolder = new TaskViewHolder(taskView);
                 break;
         }

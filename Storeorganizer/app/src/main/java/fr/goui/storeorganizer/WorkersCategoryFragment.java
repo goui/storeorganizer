@@ -15,6 +15,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class WorkersCategoryFragment extends Fragment {
 
@@ -52,21 +53,26 @@ public class WorkersCategoryFragment extends Fragment {
             getActivity().onBackPressed();
             return true;
         }
-        if(id == R.id.action_add_worker) {
-            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-            builder.setTitle(getActivity().getString(R.string.add_worker));
+        if (id == R.id.action_add_worker) {
             final EditText input = new EditText(getActivity());
             input.setInputType(InputType.TYPE_TEXT_VARIATION_PERSON_NAME | InputType.TYPE_TEXT_FLAG_CAP_WORDS);
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            builder.setTitle(getActivity().getString(R.string.add_worker));
             builder.setView(input);
-            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            builder.setPositiveButton(getString(R.string.ok), new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    StoreWorkerModel.getInstance().addStoreWorker(new StoreWorker(input.getText().toString()));
-                    mAdapter.notifyDataSetChanged();
-                    // TODO change in shared prefs
+                    if (!input.getText().toString().isEmpty()) {
+                        StoreWorkerModel.getInstance().addStoreWorker(new StoreWorker(input.getText().toString()));
+                        mAdapter.notifyDataSetChanged();
+                        // TODO change in shared prefs
+                    } else {
+                        Toast.makeText(getActivity(), getString(R.string.please_specify_a_name), Toast.LENGTH_SHORT).show();
+                    }
                 }
             });
-            builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            builder.setNegativeButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     dialog.cancel();

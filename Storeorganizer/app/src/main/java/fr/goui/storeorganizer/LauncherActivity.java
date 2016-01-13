@@ -68,6 +68,9 @@ public class LauncherActivity extends AppCompatActivity {
             StoreWorkerModel.getInstance().addStoreWorker(new StoreWorker("Worker1"));
             StoreWorkerModel.getInstance().addStoreWorker(new StoreWorker("Worker2"));
             StoreWorkerModel.getInstance().addStoreWorker(new StoreWorker("Worker3"));
+            StoreTaskModel.getInstance().addStoreTask(new StoreTask("Task1", 30));
+            StoreTaskModel.getInstance().addStoreTask(new StoreTask("Task2", 45));
+            StoreTaskModel.getInstance().addStoreTask(new StoreTask("Task3", 60));
             return null;
         }
 
