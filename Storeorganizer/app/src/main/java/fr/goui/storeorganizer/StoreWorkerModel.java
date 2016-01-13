@@ -10,7 +10,7 @@ public class StoreWorkerModel extends Observable {
 
     private List<StoreWorker> _workers;
 
-    private List<String> _workersNames;
+    private int _maxId;
 
     public static StoreWorkerModel getInstance() {
         return ourInstance;
@@ -18,15 +18,14 @@ public class StoreWorkerModel extends Observable {
 
     private StoreWorkerModel() {
         _workers = new ArrayList<>();
-        _workersNames = new ArrayList<>();
+    }
+
+    public void setMaxId(int maxId_p) {
+        _maxId = maxId_p;
     }
 
     public List<StoreWorker> getStoreWorkers() {
         return _workers;
-    }
-
-    public List<String> getStoreWorkersNames() {
-        return _workersNames;
     }
 
     public int getStoreWorkerNumber() {
@@ -37,26 +36,33 @@ public class StoreWorkerModel extends Observable {
         return _workers.get(position_p);
     }
 
-    public void addStoreWorker(StoreWorker worker_p) {
-        _workers.add(worker_p);
-        _workersNames.add(worker_p.getName());
-        setChanged();
-        notifyObservers(new ObsData(worker_p, _workers.size() - 1, ObsData.CREATION));
+    public void addStoreWorker(String name_p, int id_p) {
+        _workers.add(new StoreWorker(name_p, id_p));
     }
 
-    public void updateStoreWorker(int position_p, String name_p) {
-        _workers.get(position_p).setName(name_p);
-        _workersNames.set(position_p, name_p);
+    public int addStoreWorker(String name_p) {
+        _maxId++;
+        StoreWorker storeWorker = new StoreWorker(name_p, _maxId);
+        _workers.add(storeWorker);
         setChanged();
-        notifyObservers(new ObsData(_workers.get(position_p), position_p, ObsData.UPDATE));
+        notifyObservers(new ObsData(storeWorker, _workers.size() - 1, ObsData.CREATION));
+        return _maxId;
     }
 
-    public void removeStoreWorker(int position_p) {
+    public int updateStoreWorker(int position_p, String name_p) {
+        StoreWorker storeWorker = _workers.get(position_p);
+        storeWorker.setName(name_p);
+        setChanged();
+        notifyObservers(new ObsData(storeWorker, position_p, ObsData.UPDATE));
+        return storeWorker.getId();
+    }
+
+    public int removeStoreWorker(int position_p) {
         StoreWorker worker = _workers.get(position_p);
         _workers.remove(position_p);
-        _workersNames.remove(position_p);
         setChanged();
         notifyObservers(new ObsData(worker, position_p, ObsData.REMOVAL));
+        return worker.getId();
     }
 
     public class ObsData {

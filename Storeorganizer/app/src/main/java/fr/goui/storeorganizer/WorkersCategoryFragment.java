@@ -64,7 +64,7 @@ public class WorkersCategoryFragment extends Fragment {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     if (!input.getText().toString().isEmpty()) {
-                        StoreWorkerModel.getInstance().addStoreWorker(new StoreWorker(input.getText().toString()));
+                        int id = StoreWorkerModel.getInstance().addStoreWorker(input.getText().toString());
                         mAdapter.notifyDataSetChanged();
                         // TODO change in shared prefs
                     } else {

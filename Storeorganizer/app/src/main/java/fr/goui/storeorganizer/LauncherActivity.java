@@ -65,12 +65,15 @@ public class LauncherActivity extends AppCompatActivity {
         protected Void doInBackground(Void... params) {
             // TODO load shared prefs or fill them with default file
             // TODO load models with shared prefs
-            StoreWorkerModel.getInstance().addStoreWorker(new StoreWorker("Worker1"));
-            StoreWorkerModel.getInstance().addStoreWorker(new StoreWorker("Worker2"));
-            StoreWorkerModel.getInstance().addStoreWorker(new StoreWorker("Worker3"));
-            StoreTaskModel.getInstance().addStoreTask(new StoreTask("Task1", 30));
-            StoreTaskModel.getInstance().addStoreTask(new StoreTask("Task2", 45));
-            StoreTaskModel.getInstance().addStoreTask(new StoreTask("Task3", 60));
+            StoreWorkerModel.getInstance().setMaxId(2);
+            StoreWorkerModel.getInstance().addStoreWorker("Worker1", 0);
+            StoreWorkerModel.getInstance().addStoreWorker("Worker2", 1);
+            StoreWorkerModel.getInstance().addStoreWorker("Worker3", 2);
+
+            StoreTaskModel.getInstance().setMaxId(2);
+            StoreTaskModel.getInstance().addStoreTask("Task1", 30, 0);
+            StoreTaskModel.getInstance().addStoreTask("Task2", 45, 1);
+            StoreTaskModel.getInstance().addStoreTask("Task3", 60, 2);
             return null;
         }
 

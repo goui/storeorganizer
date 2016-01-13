@@ -2,13 +2,20 @@ package fr.goui.storeorganizer;
 
 public class StoreTask {
 
+    private int _id;
+
     private String _name;
 
     private int _duration;
 
-    public StoreTask(String name_p, int duration_p) {
+    public StoreTask(String name_p, int duration_p, int id_p) {
         _name = name_p;
         _duration = duration_p;
+        _id = id_p;
+    }
+
+    public int getId() {
+        return _id;
     }
 
     public String getName() {

@@ -81,7 +81,7 @@ public class TasksCategoryRecyclerAdapter extends RecyclerView.Adapter<RecyclerV
                     String duration = etDuration.getText().toString();
                     txtUpper.setText(name);
                     txtLower.setText(duration + "min");
-                    StoreTaskModel.getInstance().updateStoreTask(position, name, Integer.parseInt(duration));
+                    int id = StoreTaskModel.getInstance().updateStoreTask(position, name, Integer.parseInt(duration));
                     Toast.makeText(_context, _context.getString(R.string.modification_will_appear_for_later_tasks), Toast.LENGTH_LONG).show();
                     // TODO change in shared prefs
                 }
@@ -105,7 +105,7 @@ public class TasksCategoryRecyclerAdapter extends RecyclerView.Adapter<RecyclerV
                         Toast.makeText(_context, _context.getString(R.string.cant_remove_last), Toast.LENGTH_LONG).show();
                         dialog.cancel();
                     } else {
-                        StoreTaskModel.getInstance().removeStoreTask(position);
+                        int id = StoreTaskModel.getInstance().removeStoreTask(position);
                         notifyItemRemoved(position);
                         // TODO change in shared prefs
                     }

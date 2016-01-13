@@ -5,14 +5,14 @@ import java.util.List;
 
 public class StoreWorker {
 
-    private static int _id;
+    private int _id;
 
     private String _name;
 
     private List<StoreTask> _tasks;
 
-    public StoreWorker(String name_p) {
-        _id++;
+    public StoreWorker(String name_p, int id_p) {
+        _id = id_p;
         _name = name_p;
         _tasks = new ArrayList<>();
     }
@@ -25,7 +25,7 @@ public class StoreWorker {
         _name = name_p;
     }
 
-    public static int getId() {
+    public int getId() {
         return _id;
     }
 

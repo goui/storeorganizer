@@ -63,7 +63,7 @@ public class WorkersCategoryRecyclerAdapter extends RecyclerView.Adapter<Recycle
                 public void onClick(DialogInterface dialog, int which) {
                     String name = input.getText().toString();
                     textView.setText(name);
-                    StoreWorkerModel.getInstance().updateStoreWorker(position, name);
+                    int id = StoreWorkerModel.getInstance().updateStoreWorker(position, name);
                     // TODO change in shared prefs
                 }
             });
@@ -86,7 +86,7 @@ public class WorkersCategoryRecyclerAdapter extends RecyclerView.Adapter<Recycle
                         Toast.makeText(_context, _context.getString(R.string.cant_remove_last), Toast.LENGTH_LONG).show();
                         dialog.cancel();
                     } else {
-                        StoreWorkerModel.getInstance().removeStoreWorker(position);
+                        int id = StoreWorkerModel.getInstance().removeStoreWorker(position);
                         notifyItemRemoved(position);
                         // TODO change in shared prefs
                     }

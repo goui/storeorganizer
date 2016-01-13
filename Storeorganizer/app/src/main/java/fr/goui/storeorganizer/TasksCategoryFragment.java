@@ -81,8 +81,7 @@ public class TasksCategoryFragment extends Fragment {
                     } else if (etDuration.getText().toString().isEmpty()) {
                         Toast.makeText(getActivity(), getString(R.string.please_specify_a_duration), Toast.LENGTH_SHORT).show();
                     } else {
-                        StoreTaskModel.getInstance().addStoreTask(
-                                new StoreTask(etName.getText().toString(), Integer.parseInt(etDuration.getText().toString())));
+                        int id = StoreTaskModel.getInstance().addStoreTask(etName.getText().toString(), Integer.parseInt(etDuration.getText().toString()));
                         mAdapter.notifyDataSetChanged();
                         // TODO change in shared prefs
                     }
