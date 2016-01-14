@@ -1,6 +1,8 @@
 package fr.goui.storeorganizer;
 
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
@@ -22,6 +24,8 @@ public class TasksCategoryFragment extends Fragment {
 
     private TasksCategoryRecyclerAdapter mAdapter;
 
+    private SharedPreferences mSharedPreferences;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -38,6 +42,7 @@ public class TasksCategoryFragment extends Fragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         mAdapter = new TasksCategoryRecyclerAdapter(getActivity(), StoreTaskModel.getInstance().getStoreTasks());
         recyclerView.setAdapter(mAdapter);
+        mSharedPreferences = getActivity().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
         return rootView;
     }
 
@@ -73,7 +78,7 @@ public class TasksCategoryFragment extends Fragment {
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
             builder.setTitle(getActivity().getString(R.string.add_task));
             builder.setView(layout);
-            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            builder.setPositiveButton(getString(R.string.ok), new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     if (etName.getText().toString().isEmpty()) {
@@ -83,11 +88,15 @@ public class TasksCategoryFragment extends Fragment {
                     } else {
                         int id = StoreTaskModel.getInstance().addStoreTask(etName.getText().toString(), Integer.parseInt(etDuration.getText().toString()));
                         mAdapter.notifyDataSetChanged();
-                        // TODO change in shared prefs
+                        SharedPreferences.Editor editor = mSharedPreferences.edit();
+                        editor.putInt(getString(R.string.task_max_id), id);
+                        editor.putString(getString(R.string.task) + id, etName.getText().toString());
+                        editor.putInt(getString(R.string.task) + id + getString(R.string.duration), Integer.parseInt(etDuration.getText().toString()));
+                        editor.apply();
                     }
                 }
             });
-            builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            builder.setNegativeButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     dialog.cancel();

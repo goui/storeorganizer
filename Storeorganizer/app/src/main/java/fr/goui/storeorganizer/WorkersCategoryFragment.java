@@ -1,6 +1,8 @@
 package fr.goui.storeorganizer;
 
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AlertDialog;
@@ -21,6 +23,8 @@ public class WorkersCategoryFragment extends Fragment {
 
     private WorkersCategoryRecyclerAdapter mAdapter;
 
+    private SharedPreferences mSharedPreferences;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,6 +41,7 @@ public class WorkersCategoryFragment extends Fragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         mAdapter = new WorkersCategoryRecyclerAdapter(getActivity(), StoreWorkerModel.getInstance().getStoreWorkers());
         recyclerView.setAdapter(mAdapter);
+        mSharedPreferences = getActivity().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
         return rootView;
     }
 
@@ -66,7 +71,10 @@ public class WorkersCategoryFragment extends Fragment {
                     if (!input.getText().toString().isEmpty()) {
                         int id = StoreWorkerModel.getInstance().addStoreWorker(input.getText().toString());
                         mAdapter.notifyDataSetChanged();
-                        // TODO change in shared prefs
+                        SharedPreferences.Editor editor = mSharedPreferences.edit();
+                        editor.putInt(getString(R.string.worker_max_id), id);
+                        editor.putString(getString(R.string.worker) + id, input.getText().toString());
+                        editor.apply();
                     } else {
                         Toast.makeText(getActivity(), getString(R.string.please_specify_a_name), Toast.LENGTH_SHORT).show();
                     }

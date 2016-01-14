@@ -2,6 +2,7 @@ package fr.goui.storeorganizer;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.text.InputType;
@@ -20,6 +21,7 @@ public class TasksCategoryRecyclerAdapter extends RecyclerView.Adapter<RecyclerV
 
     private Context _context;
     private List<StoreTask> _tasks;
+    private SharedPreferences mSharedPreferences;
 
     class TasksViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         TextView txtUpper;
@@ -50,6 +52,8 @@ public class TasksCategoryRecyclerAdapter extends RecyclerView.Adapter<RecyclerV
                     deleteCurrentItem();
                 }
             });
+
+            mSharedPreferences = _context.getSharedPreferences(_context.getString(R.string.preference_file_key), Context.MODE_PRIVATE);
         }
 
         private void editCurrentItem() {
@@ -77,13 +81,27 @@ public class TasksCategoryRecyclerAdapter extends RecyclerView.Adapter<RecyclerV
             builder.setPositiveButton(_context.getString(R.string.ok), new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    String name = etName.getText().toString();
-                    String duration = etDuration.getText().toString();
-                    txtUpper.setText(name);
-                    txtLower.setText(duration + "min");
-                    int id = StoreTaskModel.getInstance().updateStoreTask(position, name, Integer.parseInt(duration));
-                    Toast.makeText(_context, _context.getString(R.string.modification_will_appear_for_later_tasks), Toast.LENGTH_LONG).show();
-                    // TODO change in shared prefs
+                    String oldName = txtUpper.getText().toString();
+                    String oldDuration = txtLower.getText().toString();
+                    String newName = etName.getText().toString();
+                    String newDuration = etDuration.getText().toString();
+                    boolean modification = false;
+                    if (!oldName.equals(newName)) {
+                        txtUpper.setText(newName);
+                        modification = true;
+                    }
+                    if (!oldDuration.equals(newDuration)) {
+                        txtLower.setText(newDuration + "min");
+                        modification = true;
+                    }
+                    if (modification) {
+                        int id = StoreTaskModel.getInstance().updateStoreTask(position, newName, Integer.parseInt(newDuration));
+                        Toast.makeText(_context, _context.getString(R.string.modification_will_appear_for_later_tasks), Toast.LENGTH_LONG).show();
+                        SharedPreferences.Editor editor = mSharedPreferences.edit();
+                        editor.putString(_context.getString(R.string.task) + id, newName);
+                        editor.putInt(_context.getString(R.string.task) + id + _context.getString(R.string.duration), Integer.parseInt(newDuration));
+                        editor.apply();
+                    }
                 }
             });
             builder.setNegativeButton(_context.getString(R.string.cancel), new DialogInterface.OnClickListener() {
@@ -107,7 +125,10 @@ public class TasksCategoryRecyclerAdapter extends RecyclerView.Adapter<RecyclerV
                     } else {
                         int id = StoreTaskModel.getInstance().removeStoreTask(position);
                         notifyItemRemoved(position);
-                        // TODO change in shared prefs
+                        SharedPreferences.Editor editor = mSharedPreferences.edit();
+                        editor.remove(_context.getString(R.string.task) + id);
+                        editor.remove(_context.getString(R.string.task) + id + _context.getString(R.string.duration));
+                        editor.apply();
                     }
                 }
             });
@@ -118,6 +139,8 @@ public class TasksCategoryRecyclerAdapter extends RecyclerView.Adapter<RecyclerV
                 }
             });
             builder.show();
+
+            // TODO update position of item
         }
 
         public void setPosition(int position_p) {
@@ -126,7 +149,7 @@ public class TasksCategoryRecyclerAdapter extends RecyclerView.Adapter<RecyclerV
 
         @Override
         public void onClick(View v) {
-            if(toggle) {
+            if (toggle) {
                 btnEdit.setVisibility(View.GONE);
                 btnDelete.setVisibility(View.GONE);
             } else {
@@ -152,7 +175,7 @@ public class TasksCategoryRecyclerAdapter extends RecyclerView.Adapter<RecyclerV
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder_p, int position_p) {
         StoreTask task = _tasks.get(position_p);
-        if(task != null) {
+        if (task != null) {
             ((TasksViewHolder) holder_p).setPosition(position_p);
             ((TasksViewHolder) holder_p).txtUpper.setText(task.getName());
             ((TasksViewHolder) holder_p).txtLower.setText(task.getDuration() + "min");

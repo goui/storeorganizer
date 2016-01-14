@@ -2,6 +2,7 @@ package fr.goui.storeorganizer;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.SharedPreferences;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.text.InputType;
@@ -19,6 +20,7 @@ public class WorkersCategoryRecyclerAdapter extends RecyclerView.Adapter<Recycle
 
     private Context _context;
     private List<StoreWorker> _workers;
+    private SharedPreferences mSharedPreferences;
 
     class WorkersViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         TextView textView;
@@ -47,6 +49,8 @@ public class WorkersCategoryRecyclerAdapter extends RecyclerView.Adapter<Recycle
                     deleteCurrentItem();
                 }
             });
+
+            mSharedPreferences = _context.getSharedPreferences(_context.getString(R.string.preference_file_key), Context.MODE_PRIVATE);
         }
 
         private void editCurrentItem() {
@@ -61,10 +65,19 @@ public class WorkersCategoryRecyclerAdapter extends RecyclerView.Adapter<Recycle
             builder.setPositiveButton(_context.getString(R.string.ok), new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    String name = input.getText().toString();
-                    textView.setText(name);
-                    int id = StoreWorkerModel.getInstance().updateStoreWorker(position, name);
-                    // TODO change in shared prefs
+                    String oldName = textView.getText().toString();
+                    String newName = input.getText().toString();
+                    boolean modification = false;
+                    if(!oldName.equals(newName)) {
+                        textView.setText(newName);
+                        modification = true;
+                    }
+                    if(modification) {
+                        int id = StoreWorkerModel.getInstance().updateStoreWorker(position, newName);
+                        SharedPreferences.Editor editor = mSharedPreferences.edit();
+                        editor.putString(_context.getString(R.string.worker) + id, newName);
+                        editor.apply();
+                    }
                 }
             });
             builder.setNegativeButton(_context.getString(R.string.cancel), new DialogInterface.OnClickListener() {
@@ -88,7 +101,9 @@ public class WorkersCategoryRecyclerAdapter extends RecyclerView.Adapter<Recycle
                     } else {
                         int id = StoreWorkerModel.getInstance().removeStoreWorker(position);
                         notifyItemRemoved(position);
-                        // TODO change in shared prefs
+                        SharedPreferences.Editor editor = mSharedPreferences.edit();
+                        editor.remove(_context.getString(R.string.worker) + id);
+                        editor.apply();
                     }
                 }
             });
@@ -99,6 +114,8 @@ public class WorkersCategoryRecyclerAdapter extends RecyclerView.Adapter<Recycle
                 }
             });
             builder.show();
+
+            // TODO update position of item
         }
 
         private void setPosition(int position_p) {
