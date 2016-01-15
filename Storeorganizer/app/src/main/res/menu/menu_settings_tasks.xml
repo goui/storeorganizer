@@ -3,6 +3,12 @@
       xmlns:tools="http://schemas.android.com/tools"
       tools:context="fr.goui.storeorganizer.SettingsActivity">
     <item
+        android:id="@+id/action_restore_tasks"
+        android:orderInCategory="100"
+        android:icon="@drawable/ic_action_restore_default"
+        android:title="@string/restore_tasks"
+        app:showAsAction="ifRoom" />
+    <item
         android:id="@+id/action_add_task"
         android:orderInCategory="100"
         android:icon="@drawable/ic_action_add_task"

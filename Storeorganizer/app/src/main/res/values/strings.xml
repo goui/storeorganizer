@@ -5,8 +5,8 @@
     <string name="click_to_continue">Click\nto continue</string>
     <string name="details">Details</string>
     <string name="settings">Settings</string>
-    <string name="worker">worker</string>
-    <string name="task">task</string>
+    <string name="worker">Worker</string>
+    <string name="task">Task</string>
     <string name="workers">Workers</string>
     <string name="tasks">Tasks</string>
     <string name="name">Name</string>
@@ -21,6 +21,12 @@
     <string name="edit">Edit</string>
     <string name="delete">Delete</string>
     <string name="minutes">min</string>
+    <string name="restore_default">Restore default</string>
+    <string name="restore_workers">Restore workers</string>
+    <string name="restore_tasks">Restore tasks</string>
+    <string name="question_restore_default">Restore default?</string>
+    <string name="question_restore_workers">Restore workers?</string>
+    <string name="question_restore_tasks">Restore tasks?</string>
     <string name="cant_remove_last">You cannot remove the last one</string>
     <string name="please_specify_a_name">Please specify a name</string>
     <string name="please_specify_a_duration">Please specify a duration</string>

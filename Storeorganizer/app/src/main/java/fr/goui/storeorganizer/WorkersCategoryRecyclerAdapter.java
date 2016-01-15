@@ -27,7 +27,6 @@ public class WorkersCategoryRecyclerAdapter extends RecyclerView.Adapter<Recycle
         ImageButton btnEdit;
         ImageButton btnDelete;
         int position;
-        boolean toggle;
 
         public WorkersViewHolder(View itemView_p) {
             super(itemView_p);
@@ -58,6 +57,7 @@ public class WorkersCategoryRecyclerAdapter extends RecyclerView.Adapter<Recycle
             final EditText input = new EditText(_context);
             input.setText(storeWorker.getName());
             input.setInputType(InputType.TYPE_TEXT_VARIATION_PERSON_NAME | InputType.TYPE_TEXT_FLAG_CAP_WORDS);
+            input.setHint(_context.getString(R.string.name));
 
             AlertDialog.Builder builder = new AlertDialog.Builder(_context);
             builder.setTitle(_context.getString(R.string.edit));
@@ -100,7 +100,7 @@ public class WorkersCategoryRecyclerAdapter extends RecyclerView.Adapter<Recycle
                         dialog.cancel();
                     } else {
                         int id = StoreWorkerModel.getInstance().removeStoreWorker(position);
-                        notifyItemRemoved(position);
+                        notifyDataSetChanged();
                         SharedPreferences.Editor editor = mSharedPreferences.edit();
                         editor.remove(_context.getString(R.string.worker) + id);
                         editor.apply();
@@ -114,8 +114,6 @@ public class WorkersCategoryRecyclerAdapter extends RecyclerView.Adapter<Recycle
                 }
             });
             builder.show();
-
-            // TODO update position of item
         }
 
         private void setPosition(int position_p) {
@@ -124,14 +122,7 @@ public class WorkersCategoryRecyclerAdapter extends RecyclerView.Adapter<Recycle
 
         @Override
         public void onClick(View v) {
-            if(toggle) {
-                btnEdit.setVisibility(View.GONE);
-                btnDelete.setVisibility(View.GONE);
-            } else {
-                btnEdit.setVisibility(View.VISIBLE);
-                btnDelete.setVisibility(View.VISIBLE);
-            }
-            toggle = !toggle;
+            // do nothing
         }
 
     }

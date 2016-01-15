@@ -3,15 +3,9 @@
       xmlns:tools="http://schemas.android.com/tools"
       tools:context="fr.goui.storeorganizer.SettingsActivity">
     <item
-        android:id="@+id/action_restore_workers"
+        android:id="@+id/action_restore_default"
         android:orderInCategory="100"
         android:icon="@drawable/ic_action_restore_default"
-        android:title="@string/restore_workers"
-        app:showAsAction="ifRoom" />
-    <item
-        android:id="@+id/action_add_worker"
-        android:orderInCategory="100"
-        android:icon="@drawable/ic_action_add_person"
-        android:title="@string/add_worker"
+        android:title="@string/restore_default"
         app:showAsAction="ifRoom" />
 </menu>

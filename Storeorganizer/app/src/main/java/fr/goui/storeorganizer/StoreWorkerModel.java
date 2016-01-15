@@ -24,6 +24,10 @@ public class StoreWorkerModel extends Observable {
         _maxId = maxId_p;
     }
 
+    public int getMaxId() {
+        return _maxId;
+    }
+
     public List<StoreWorker> getStoreWorkers() {
         return _workers;
     }
@@ -65,10 +69,20 @@ public class StoreWorkerModel extends Observable {
         return worker.getId();
     }
 
+    public void clear(String name_p) {
+        _maxId = 0;
+        _workers.clear();
+        StoreWorker storeWorker = new StoreWorker(name_p, 0);
+        _workers.add(storeWorker);
+        setChanged();
+        notifyObservers(new ObsData(storeWorker, 0, ObsData.REMOVE_ALL));
+    }
+
     public class ObsData {
         public static final int CREATION = 0;
         public static final int UPDATE = 1;
         public static final int REMOVAL = 2;
+        public static final int REMOVE_ALL = 3;
         public StoreWorker worker;
         public int updateReason;
         public int workersPosition;

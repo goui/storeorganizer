@@ -31,8 +31,7 @@
         android:layout_alignParentEnd="true"
         android:layout_centerVertical="true"
         android:contentDescription="@string/delete"
-        android:src="@drawable/ic_action_delete_black"
-        android:visibility="gone"/>
+        android:src="@drawable/ic_action_delete_black"/>
 
     <ImageButton
         android:id="@+id/layout_simple_item_2tv_edit_button"
@@ -41,7 +40,6 @@
         android:layout_centerVertical="true"
         android:layout_toStartOf="@id/layout_simple_item_2tv_delete_button"
         android:contentDescription="@string/edit"
-        android:src="@drawable/ic_action_edit_black"
-        android:visibility="gone"/>
+        android:src="@drawable/ic_action_edit_black"/>
 
 </RelativeLayout>

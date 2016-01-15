@@ -29,7 +29,6 @@ public class TasksCategoryRecyclerAdapter extends RecyclerView.Adapter<RecyclerV
         ImageButton btnEdit;
         ImageButton btnDelete;
         int position;
-        boolean toggle;
 
         public TasksViewHolder(View itemView_p) {
             super(itemView_p);
@@ -60,19 +59,15 @@ public class TasksCategoryRecyclerAdapter extends RecyclerView.Adapter<RecyclerV
             StoreTask storeTask = _tasks.get(position);
             LinearLayout layout = new LinearLayout(_context);
             layout.setOrientation(LinearLayout.VERTICAL);
-            TextView txtName = new TextView(_context);
-            txtName.setText(_context.getString(R.string.name));
             final EditText etName = new EditText(_context);
             etName.setInputType(InputType.TYPE_TEXT_VARIATION_PERSON_NAME | InputType.TYPE_TEXT_FLAG_CAP_SENTENCES);
             etName.setText(storeTask.getName());
-            TextView txtDuration = new TextView(_context);
-            txtDuration.setText(_context.getString(R.string.duration));
+            etName.setHint(_context.getString(R.string.name));
             final EditText etDuration = new EditText(_context);
             etDuration.setInputType(InputType.TYPE_CLASS_NUMBER);
             etDuration.setText(String.valueOf(storeTask.getDuration()));
-            layout.addView(txtName);
+            etDuration.setHint(_context.getString(R.string.duration));
             layout.addView(etName);
-            layout.addView(txtDuration);
             layout.addView(etDuration);
 
             AlertDialog.Builder builder = new AlertDialog.Builder(_context);
@@ -124,7 +119,7 @@ public class TasksCategoryRecyclerAdapter extends RecyclerView.Adapter<RecyclerV
                         dialog.cancel();
                     } else {
                         int id = StoreTaskModel.getInstance().removeStoreTask(position);
-                        notifyItemRemoved(position);
+                        notifyDataSetChanged();
                         SharedPreferences.Editor editor = mSharedPreferences.edit();
                         editor.remove(_context.getString(R.string.task) + id);
                         editor.remove(_context.getString(R.string.task) + id + _context.getString(R.string.duration));
@@ -139,8 +134,6 @@ public class TasksCategoryRecyclerAdapter extends RecyclerView.Adapter<RecyclerV
                 }
             });
             builder.show();
-
-            // TODO update position of item
         }
 
         public void setPosition(int position_p) {
@@ -149,14 +142,7 @@ public class TasksCategoryRecyclerAdapter extends RecyclerView.Adapter<RecyclerV
 
         @Override
         public void onClick(View v) {
-            if (toggle) {
-                btnEdit.setVisibility(View.GONE);
-                btnDelete.setVisibility(View.GONE);
-            } else {
-                btnEdit.setVisibility(View.VISIBLE);
-                btnDelete.setVisibility(View.VISIBLE);
-            }
-            toggle = !toggle;
+            // do nothing
         }
     }
 

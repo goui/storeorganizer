@@ -47,11 +47,6 @@ public class DetailsActivity extends AppCompatActivity implements Observer {
      */
     private TabLayout mTabLayout;
 
-    /**
-     * The index of the tab to remove.
-     */
-    private int mTabToBeRemoved = -1;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -115,33 +110,27 @@ public class DetailsActivity extends AppCompatActivity implements Observer {
             StoreWorkerModel.ObsData obsData = (StoreWorkerModel.ObsData) data;
             switch (obsData.updateReason) {
                 case StoreWorkerModel.ObsData.CREATION:
+                    mSectionsPagerAdapter.notifyDataSetChanged();
                     mTabLayout.addTab(mTabLayout.newTab().setText(obsData.worker.getName()));
                     mSectionsPagerAdapter.notifyDataSetChanged();
                     break;
                 case StoreWorkerModel.ObsData.UPDATE:
+                    mSectionsPagerAdapter.notifyDataSetChanged();
                     mTabLayout.getTabAt(obsData.workersPosition).setText(obsData.worker.getName());
+                    mSectionsPagerAdapter.notifyDataSetChanged();
                     break;
                 case StoreWorkerModel.ObsData.REMOVAL:
-                    if(obsData.workersPosition == mTabLayout.getSelectedTabPosition()) {
-                        mTabToBeRemoved = obsData.workersPosition;
-                    } else {
-                        mTabLayout.removeTabAt(obsData.workersPosition);
-                        mSectionsPagerAdapter.notifyDataSetChanged();
-                    }
+                    mSectionsPagerAdapter.notifyDataSetChanged();
+                    mTabLayout.removeTabAt(obsData.workersPosition);
+                    mSectionsPagerAdapter.notifyDataSetChanged();
+                    break;
+                case StoreWorkerModel.ObsData.REMOVE_ALL:
+                    mSectionsPagerAdapter.notifyDataSetChanged();
+                    mTabLayout.removeAllTabs();
+                    mTabLayout.addTab(mTabLayout.newTab().setText(obsData.worker.getName()));
+                    mSectionsPagerAdapter.notifyDataSetChanged();
                     break;
             }
-        }
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-        if(mTabToBeRemoved != -1) {
-            mSectionsPagerAdapter.notifyDataSetChanged();
-            mTabLayout.removeTabAt(mTabToBeRemoved);
-            mSectionsPagerAdapter.notifyDataSetChanged();
-            mTabToBeRemoved = -1;
         }
     }
 
@@ -219,5 +208,14 @@ public class DetailsActivity extends AppCompatActivity implements Observer {
             return StoreWorkerModel.getInstance().getStoreWorker(position_p).getName();
         }
 
+        @Override
+        public int getItemPosition(Object object) {
+            return POSITION_NONE;
+        }
+
+        @Override
+        public long getItemId(int position) {
+            return position;
+        }
     }
 }

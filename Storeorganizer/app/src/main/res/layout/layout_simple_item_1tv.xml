@@ -3,8 +3,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:background="?attr/selectableItemBackground"
-                android:paddingBottom="16dp"
-                android:paddingTop="16dp">
+                android:paddingBottom="8dp"
+                android:paddingTop="8dp">
 
     <TextView
         android:id="@+id/layout_simple_item_1tv_text_view"
@@ -21,9 +21,8 @@
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
         android:layout_centerVertical="true"
-        android:src="@drawable/ic_action_delete_black"
-        android:visibility="gone"
-        android:contentDescription="@string/delete"/>
+        android:contentDescription="@string/delete"
+        android:src="@drawable/ic_action_delete_black"/>
 
     <ImageButton
         android:id="@+id/layout_simple_item_1tv_edit_button"
@@ -31,8 +30,7 @@
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
         android:layout_toStartOf="@id/layout_simple_item_1tv_delete_button"
-        android:src="@drawable/ic_action_edit_black"
-        android:visibility="gone"
-        android:contentDescription="@string/edit"/>
+        android:contentDescription="@string/edit"
+        android:src="@drawable/ic_action_edit_black"/>
 
 </RelativeLayout>

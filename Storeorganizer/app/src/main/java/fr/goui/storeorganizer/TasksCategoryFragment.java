@@ -53,6 +53,12 @@ public class TasksCategoryFragment extends Fragment {
     }
 
     @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        super.onPrepareOptionsMenu(menu);
+        menu.findItem(R.id.action_restore_default).setVisible(false);
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == android.R.id.home) {
@@ -60,51 +66,87 @@ public class TasksCategoryFragment extends Fragment {
             return true;
         }
         if (id == R.id.action_add_task) {
-            LinearLayout layout = new LinearLayout(getActivity());
-            layout.setOrientation(LinearLayout.VERTICAL);
-            TextView txtName = new TextView(getActivity());
-            txtName.setText(getString(R.string.name));
-            final EditText etName = new EditText(getActivity());
-            etName.setInputType(InputType.TYPE_TEXT_VARIATION_PERSON_NAME | InputType.TYPE_TEXT_FLAG_CAP_SENTENCES);
-            TextView txtDuration = new TextView(getActivity());
-            txtDuration.setText(getString(R.string.duration));
-            final EditText etDuration = new EditText(getActivity());
-            etDuration.setInputType(InputType.TYPE_CLASS_NUMBER);
-            layout.addView(txtName);
-            layout.addView(etName);
-            layout.addView(txtDuration);
-            layout.addView(etDuration);
-
-            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-            builder.setTitle(getActivity().getString(R.string.add_task));
-            builder.setView(layout);
-            builder.setPositiveButton(getString(R.string.ok), new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    if (etName.getText().toString().isEmpty()) {
-                        Toast.makeText(getActivity(), getString(R.string.please_specify_a_name), Toast.LENGTH_SHORT).show();
-                    } else if (etDuration.getText().toString().isEmpty()) {
-                        Toast.makeText(getActivity(), getString(R.string.please_specify_a_duration), Toast.LENGTH_SHORT).show();
-                    } else {
-                        int id = StoreTaskModel.getInstance().addStoreTask(etName.getText().toString(), Integer.parseInt(etDuration.getText().toString()));
-                        mAdapter.notifyDataSetChanged();
-                        SharedPreferences.Editor editor = mSharedPreferences.edit();
-                        editor.putInt(getString(R.string.task_max_id), id);
-                        editor.putString(getString(R.string.task) + id, etName.getText().toString());
-                        editor.putInt(getString(R.string.task) + id + getString(R.string.duration), Integer.parseInt(etDuration.getText().toString()));
-                        editor.apply();
-                    }
-                }
-            });
-            builder.setNegativeButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    dialog.cancel();
-                }
-            });
-            builder.show();
+            addNewTask();
+            return true;
+        }
+        if (id == R.id.action_restore_tasks) {
+            restoreDefault();
+            return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void addNewTask() {
+        LinearLayout layout = new LinearLayout(getActivity());
+        layout.setOrientation(LinearLayout.VERTICAL);
+        final EditText etName = new EditText(getActivity());
+        etName.setInputType(InputType.TYPE_TEXT_VARIATION_PERSON_NAME | InputType.TYPE_TEXT_FLAG_CAP_SENTENCES);
+        etName.setHint(getString(R.string.name));
+        final EditText etDuration = new EditText(getActivity());
+        etDuration.setInputType(InputType.TYPE_CLASS_NUMBER);
+        etDuration.setHint(getString(R.string.duration));
+        layout.addView(etName);
+        layout.addView(etDuration);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setTitle(getActivity().getString(R.string.add_task));
+        builder.setView(layout);
+        builder.setPositiveButton(getString(R.string.ok), new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                if (etName.getText().toString().isEmpty()) {
+                    Toast.makeText(getActivity(), getString(R.string.please_specify_a_name), Toast.LENGTH_SHORT).show();
+                } else if (etDuration.getText().toString().isEmpty()) {
+                    Toast.makeText(getActivity(), getString(R.string.please_specify_a_duration), Toast.LENGTH_SHORT).show();
+                } else {
+                    int id = StoreTaskModel.getInstance().addStoreTask(etName.getText().toString(), Integer.parseInt(etDuration.getText().toString()));
+                    mAdapter.notifyDataSetChanged();
+                    SharedPreferences.Editor editor = mSharedPreferences.edit();
+                    editor.putInt(getString(R.string.task_max_id), id);
+                    editor.putString(getString(R.string.task) + id, etName.getText().toString());
+                    editor.putInt(getString(R.string.task) + id + getString(R.string.duration), Integer.parseInt(etDuration.getText().toString()));
+                    editor.apply();
+                }
+            }
+        });
+        builder.setNegativeButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+        builder.show();
+    }
+
+    private void restoreDefault() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setTitle(getString(R.string.question_restore_tasks));
+        builder.setPositiveButton(getString(R.string.ok), new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                int size = StoreTaskModel.getInstance().getMaxId();
+                StoreTaskModel.getInstance().clear(getString(R.string.task), 30);
+                mAdapter.notifyDataSetChanged();
+
+                SharedPreferences.Editor editor = mSharedPreferences.edit();
+                for (int i = 0; i < size + 1; i++) {
+                    editor.remove(getString(R.string.task) + i);
+                    editor.remove(getString(R.string.task) + i + getString(R.string.duration));
+                }
+
+                editor.putInt(getString(R.string.task_max_id), 0);
+                editor.putString(getString(R.string.task) + 0, getString(R.string.task));
+                editor.putInt(getString(R.string.task) + 0 + getString(R.string.duration), 30);
+                editor.apply();
+            }
+        });
+        builder.setNegativeButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+        builder.show();
     }
 
 }

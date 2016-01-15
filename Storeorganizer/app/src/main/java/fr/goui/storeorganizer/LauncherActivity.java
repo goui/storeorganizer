@@ -80,10 +80,10 @@ public class LauncherActivity extends AppCompatActivity {
                 }
             } else {
                 StoreWorkerModel.getInstance().setMaxId(0);
-                StoreWorkerModel.getInstance().addStoreWorker("Worker1", 0);
+                StoreWorkerModel.getInstance().addStoreWorker(getString(R.string.worker), 0);
                 SharedPreferences.Editor editor = mSharedPreferences.edit();
                 editor.putInt(getString(R.string.worker_max_id), 0);
-                editor.putString(getString(R.string.worker) + 0, "Worker1");
+                editor.putString(getString(R.string.worker) + 0, getString(R.string.worker));
                 editor.apply();
             }
 
@@ -99,10 +99,10 @@ public class LauncherActivity extends AppCompatActivity {
                 }
             } else {
                 StoreTaskModel.getInstance().setMaxId(0);
-                StoreTaskModel.getInstance().addStoreTask("Task1", 30, 0);
+                StoreTaskModel.getInstance().addStoreTask(getString(R.string.task), 30, 0);
                 SharedPreferences.Editor editor = mSharedPreferences.edit();
                 editor.putInt(getString(R.string.task_max_id), 0);
-                editor.putString(getString(R.string.task) + 0, "Task1");
+                editor.putString(getString(R.string.task) + 0, getString(R.string.task));
                 editor.putInt(getString(R.string.task) + 0 + getString(R.string.duration), 30);
                 editor.apply();
             }
