@@ -9,12 +9,12 @@ public class StoreWorker {
 
     private String _name;
 
-    private List<StoreTask> _tasks;
+    private List<StoreAppointment> _appointments;
 
     public StoreWorker(String name_p, int id_p) {
         _id = id_p;
         _name = name_p;
-        _tasks = new ArrayList<>();
+        _appointments = new ArrayList<>();
     }
 
     public String getName() {
@@ -29,7 +29,7 @@ public class StoreWorker {
         return _id;
     }
 
-    public List<StoreTask> getTasks() {
-        return _tasks;
+    public List<StoreAppointment> getAppointments() {
+        return _appointments;
     }
 }

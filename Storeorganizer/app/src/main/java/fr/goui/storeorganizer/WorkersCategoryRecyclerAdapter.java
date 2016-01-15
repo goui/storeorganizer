@@ -19,6 +19,7 @@ import java.util.List;
 public class WorkersCategoryRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private Context _context;
+    private LayoutInflater _layoutInflater;
     private List<StoreWorker> _workers;
     private SharedPreferences mSharedPreferences;
 
@@ -129,14 +130,13 @@ public class WorkersCategoryRecyclerAdapter extends RecyclerView.Adapter<Recycle
 
     public WorkersCategoryRecyclerAdapter(Context context_p, List<StoreWorker> workers_p) {
         _context = context_p;
+        _layoutInflater = LayoutInflater.from(_context);
         _workers = workers_p;
     }
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent_p, int viewType_p) {
-        LayoutInflater inflater = LayoutInflater.from(parent_p.getContext());
-        View timeView = inflater.inflate(R.layout.layout_simple_item_1tv, parent_p, false);
-        return new WorkersViewHolder(timeView);
+        return new WorkersViewHolder(_layoutInflater.inflate(R.layout.layout_simple_item_1tv, parent_p, false));
     }
 
     @Override

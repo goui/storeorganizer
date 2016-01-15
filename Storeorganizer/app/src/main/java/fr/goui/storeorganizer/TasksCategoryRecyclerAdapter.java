@@ -20,6 +20,7 @@ import java.util.List;
 public class TasksCategoryRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private Context _context;
+    private LayoutInflater _layoutInflater;
     private List<StoreTask> _tasks;
     private SharedPreferences mSharedPreferences;
 
@@ -148,14 +149,13 @@ public class TasksCategoryRecyclerAdapter extends RecyclerView.Adapter<RecyclerV
 
     public TasksCategoryRecyclerAdapter(Context context_p, List<StoreTask> tasks_p) {
         _context = context_p;
+        _layoutInflater = LayoutInflater.from(_context);
         _tasks = tasks_p;
     }
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent_p, int viewType_p) {
-        LayoutInflater inflater = LayoutInflater.from(parent_p.getContext());
-        View timeView = inflater.inflate(R.layout.layout_simple_item_2tv, parent_p, false);
-        return new TasksViewHolder(timeView);
+        return new TasksViewHolder(_layoutInflater.inflate(R.layout.layout_simple_item_2tv, parent_p, false));
     }
 
     @Override

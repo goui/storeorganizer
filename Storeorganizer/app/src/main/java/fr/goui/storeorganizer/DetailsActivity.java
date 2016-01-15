@@ -10,18 +10,11 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.TextClock;
-import android.widget.Toast;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -109,7 +102,7 @@ public class DetailsActivity extends AppCompatActivity implements Observer {
         if (observable instanceof StoreWorkerModel && data instanceof StoreWorkerModel.ObsData) {
             StoreWorkerModel.ObsData obsData = (StoreWorkerModel.ObsData) data;
             switch (obsData.updateReason) {
-                case StoreWorkerModel.ObsData.CREATION:
+                case StoreWorkerModel.ObsData.CREATE:
                     mSectionsPagerAdapter.notifyDataSetChanged();
                     mTabLayout.addTab(mTabLayout.newTab().setText(obsData.worker.getName()));
                     mSectionsPagerAdapter.notifyDataSetChanged();
@@ -119,7 +112,7 @@ public class DetailsActivity extends AppCompatActivity implements Observer {
                     mTabLayout.getTabAt(obsData.workersPosition).setText(obsData.worker.getName());
                     mSectionsPagerAdapter.notifyDataSetChanged();
                     break;
-                case StoreWorkerModel.ObsData.REMOVAL:
+                case StoreWorkerModel.ObsData.REMOVE:
                     mSectionsPagerAdapter.notifyDataSetChanged();
                     mTabLayout.removeTabAt(obsData.workersPosition);
                     mSectionsPagerAdapter.notifyDataSetChanged();
@@ -135,51 +128,6 @@ public class DetailsActivity extends AppCompatActivity implements Observer {
     }
 
     /**
-     * A placeholder fragment containing a simple view.
-     */
-    public static class PlaceholderFragment extends Fragment {
-        /**
-         * The fragment argument representing the section number for this
-         * fragment.
-         */
-        private static final String ARG_SECTION_NUMBER = "section_number";
-
-        @Override
-        public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                                 Bundle savedInstanceState) {
-            View rootView = inflater.inflate(R.layout.fragment_details, container, false);
-
-            // Get the views in the fragment
-            TextClock textClock = (TextClock) rootView.findViewById(R.id.fragment_details_text_clock);
-            RecyclerView recyclerView = (RecyclerView) rootView.findViewById(R.id.fragment_details_recycler_view);
-
-            // Set the on click listener for the clock
-            textClock.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    // TODO scroll to most relevant element in list (i.e. current task according to current time)
-                    // recyclerView.setSelectionFromTop(position, mListView.getTop());
-                    Toast.makeText(getActivity(), "it is " + ((TextClock) v).getText().toString(), Toast.LENGTH_SHORT).show();
-                }
-            });
-
-            // Set up the list view with custom adapter
-            int sectionNumber = getArguments().getInt(ARG_SECTION_NUMBER);
-            List<Object> objects = createListForAdapter(StoreWorkerModel.getInstance().getStoreWorker(sectionNumber).getTasks());
-            recyclerView.setAdapter(new DetailsRecyclerAdapter(objects));
-
-            // TODO on click
-
-            return rootView;
-        }
-
-        private List<Object> createListForAdapter(List<StoreTask> tasks_p) {
-            // TODO
-            return new ArrayList<>();
-        }
-    }
-
-    /**
      * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
      * one of the sections/tabs/pages.
      */
@@ -191,9 +139,9 @@ public class DetailsActivity extends AppCompatActivity implements Observer {
 
         @Override
         public Fragment getItem(int position_p) {
-            PlaceholderFragment fragment = new PlaceholderFragment();
+            DetailsFragment fragment = new DetailsFragment();
             Bundle args = new Bundle();
-            args.putInt(PlaceholderFragment.ARG_SECTION_NUMBER, position_p);
+            args.putInt(DetailsFragment.ARG_SECTION_NUMBER, position_p);
             fragment.setArguments(args);
             return fragment;
         }

@@ -49,7 +49,7 @@ public class StoreWorkerModel extends Observable {
         StoreWorker storeWorker = new StoreWorker(name_p, _maxId);
         _workers.add(storeWorker);
         setChanged();
-        notifyObservers(new ObsData(storeWorker, _workers.size() - 1, ObsData.CREATION));
+        notifyObservers(new ObsData(storeWorker, _workers.size() - 1, ObsData.CREATE));
         return _maxId;
     }
 
@@ -65,7 +65,7 @@ public class StoreWorkerModel extends Observable {
         StoreWorker worker = _workers.get(position_p);
         _workers.remove(position_p);
         setChanged();
-        notifyObservers(new ObsData(worker, position_p, ObsData.REMOVAL));
+        notifyObservers(new ObsData(worker, position_p, ObsData.REMOVE));
         return worker.getId();
     }
 
@@ -79,9 +79,9 @@ public class StoreWorkerModel extends Observable {
     }
 
     public class ObsData {
-        public static final int CREATION = 0;
+        public static final int CREATE = 0;
         public static final int UPDATE = 1;
-        public static final int REMOVAL = 2;
+        public static final int REMOVE = 2;
         public static final int REMOVE_ALL = 3;
         public StoreWorker worker;
         public int updateReason;

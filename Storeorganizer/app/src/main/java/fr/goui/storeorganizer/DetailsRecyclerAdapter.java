@@ -1,5 +1,6 @@
 package fr.goui.storeorganizer;
 
+import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,8 +13,9 @@ public class DetailsRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vi
 
     private static final int TYPE_INVALID = -1;
     private static final int TYPE_TIME = 0;
-    private static final int TYPE_TASK = 1;
+    private static final int TYPE_APPOINTMENT = 1;
 
+    private LayoutInflater _inflater;
     private List<Object> _items;
 
     class TimeViewHolder extends RecyclerView.ViewHolder {
@@ -25,34 +27,34 @@ public class DetailsRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vi
         }
     }
 
-    class TaskViewHolder extends RecyclerView.ViewHolder {
-        TextView txtTaskUpperTextView;
-        TextView txtTaskLowerTextView;
+    class AppointmentViewHolder extends RecyclerView.ViewHolder {
+        TextView txtAppointmentUpperTextView;
+        TextView txtAppointmentLowerTextView;
 
-        public TaskViewHolder(View itemView_p) {
+        public AppointmentViewHolder(View itemView_p) {
             super(itemView_p);
-            txtTaskUpperTextView = (TextView) itemView_p.findViewById(R.id.layout_simple_item_2tv_upper_text_view);
-            txtTaskLowerTextView = (TextView) itemView_p.findViewById(R.id.layout_simple_item_2tv_lower_text_view);
+            txtAppointmentUpperTextView = (TextView) itemView_p.findViewById(R.id.layout_simple_item_2tv_upper_text_view);
+            txtAppointmentLowerTextView = (TextView) itemView_p.findViewById(R.id.layout_simple_item_2tv_lower_text_view);
         }
     }
 
-    public DetailsRecyclerAdapter(List<Object> items_p) {
+    public DetailsRecyclerAdapter(Context context_p, List<Object> items_p) {
+        _inflater = LayoutInflater.from(context_p);
         _items = items_p;
     }
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent_p, int viewType_p) {
         RecyclerView.ViewHolder viewHolder = null;
-        LayoutInflater inflater = LayoutInflater.from(parent_p.getContext());
 
         switch (viewType_p) {
             case TYPE_TIME:
-                View timeView = inflater.inflate(R.layout.layout_simple_item_1tv, parent_p, false);
+                View timeView = _inflater.inflate(R.layout.layout_simple_item_1tv, parent_p, false);
                 viewHolder = new TimeViewHolder(timeView);
                 break;
-            case TYPE_TASK:
-                View taskView = inflater.inflate(R.layout.layout_simple_item_2tv, parent_p, false);
-                viewHolder = new TaskViewHolder(taskView);
+            case TYPE_APPOINTMENT:
+                View appointmentView = _inflater.inflate(R.layout.layout_simple_item_2tv, parent_p, false);
+                viewHolder = new AppointmentViewHolder(appointmentView);
                 break;
         }
 
@@ -66,9 +68,9 @@ public class DetailsRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vi
                 TimeViewHolder timeViewHolder = (TimeViewHolder) holder_p;
                 bindTimeViewHolder(timeViewHolder, position_p);
                 break;
-            case TYPE_TASK:
-                TaskViewHolder taskViewHolder = (TaskViewHolder) holder_p;
-                bindTaskViewHolder(taskViewHolder, position_p);
+            case TYPE_APPOINTMENT:
+                AppointmentViewHolder appointmentViewHolder = (AppointmentViewHolder) holder_p;
+                bindAppointmentViewHolder(appointmentViewHolder, position_p);
                 break;
         }
     }
@@ -80,11 +82,11 @@ public class DetailsRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vi
         }
     }
 
-    private void bindTaskViewHolder(TaskViewHolder taskViewHolder_p, int position_p) {
-        StoreTask storeTask = (StoreTask) _items.get(position_p);
-        if(storeTask != null) {
-            taskViewHolder_p.txtTaskUpperTextView.setText(storeTask.getName());
-            taskViewHolder_p.txtTaskLowerTextView.setText(storeTask.getDuration());
+    private void bindAppointmentViewHolder(AppointmentViewHolder appointmentViewHolder_p, int position_p) {
+        StoreAppointment storeAppointment = (StoreAppointment) _items.get(position_p);
+        if(storeAppointment != null) {
+            appointmentViewHolder_p.txtAppointmentUpperTextView.setText(storeAppointment.getClientName());
+            appointmentViewHolder_p.txtAppointmentLowerTextView.setText(storeAppointment.getStoreTask().getDuration());
         }
     }
 
@@ -98,8 +100,8 @@ public class DetailsRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vi
         if (_items.get(position_p) instanceof String) {
             return TYPE_TIME;
         }
-        if (_items.get(position_p) instanceof StoreTask) {
-            return TYPE_TASK;
+        if (_items.get(position_p) instanceof StoreAppointment) {
+            return TYPE_APPOINTMENT;
         }
         return TYPE_INVALID;
     }
