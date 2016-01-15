@@ -20,6 +20,8 @@ import java.util.Observer;
 
 public class DetailsActivity extends AppCompatActivity implements Observer {
 
+    private static final int REQUEST_CODE_APPOINTMENT_CREATION = 1;
+
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
      * fragments for each of the sections. We use a
@@ -72,6 +74,15 @@ public class DetailsActivity extends AppCompatActivity implements Observer {
 
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_CODE_APPOINTMENT_CREATION) {
+            if (resultCode == RESULT_OK) {
+                // TODO update model and corresponding fragment
+            }
+        }
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

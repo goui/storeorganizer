@@ -10,6 +10,8 @@ import android.view.ViewGroup;
 import android.widget.TextClock;
 import android.widget.Toast;
 
+import java.util.List;
+
 public class DetailsFragment extends Fragment {
 
     public static final String ARG_SECTION_NUMBER = "section_number";
@@ -29,19 +31,23 @@ public class DetailsFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 // TODO scroll to most relevant element in list (i.e. current task according to current time)
-                // recyclerView.setSelectionFromTop(position, mListView.getTop());
+                // recyclerView.setSelectionFromTop(position, recyclerView.getTop());
                 Toast.makeText(getActivity(), "it is " + ((TextClock) v).getText().toString(), Toast.LENGTH_SHORT).show();
             }
         });
 
-        // Set up the list view with custom adapter
-        // int sectionNumber = getArguments().getInt(ARG_SECTION_NUMBER);
-        // List<Object> objects = createListForAdapter(StoreWorkerModel.getInstance().getStoreWorker(sectionNumber).getAppointments());
+        int sectionNumber = getArguments().getInt(ARG_SECTION_NUMBER);
+        List<StoreAppointment> appointments = StoreWorkerModel.getInstance().getStoreWorker(sectionNumber).getAppointments();
+        List<Object> objects = generateItemsList(appointments);
         // recyclerView.setAdapter(new DetailsRecyclerAdapter(getActivity(), objects));
 
-        // TODO adapter layout manager and onClick
+        // TODO adapter onClick
 
         return rootView;
+    }
+
+    private List<Object> generateItemsList(List<StoreAppointment> appointments_p) {
+        return null;
     }
 
 }
