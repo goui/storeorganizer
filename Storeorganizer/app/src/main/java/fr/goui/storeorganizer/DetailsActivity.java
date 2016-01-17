@@ -3,7 +3,6 @@ package fr.goui.storeorganizer;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -20,8 +19,6 @@ import java.util.Observer;
 
 public class DetailsActivity extends AppCompatActivity implements Observer {
 
-    private static final int REQUEST_CODE_APPOINTMENT_CREATION = 1;
-
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
      * fragments for each of the sections. We use a
@@ -31,6 +28,8 @@ public class DetailsActivity extends AppCompatActivity implements Observer {
      * {@link android.support.v4.app.FragmentStatePagerAdapter}.
      */
     private SectionsPagerAdapter mSectionsPagerAdapter;
+
+    private static final int REQUEST_CODE_CREATE_APPOINTMENT = 1;
 
     /**
      * The {@link ViewPager} that will host the section contents.
@@ -67,8 +66,8 @@ public class DetailsActivity extends AppCompatActivity implements Observer {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                Intent intent = new Intent(DetailsActivity.this, AppointmentCreationActivity.class);
+                startActivityForResult(intent, REQUEST_CODE_CREATE_APPOINTMENT);
             }
         });
 
@@ -77,9 +76,10 @@ public class DetailsActivity extends AppCompatActivity implements Observer {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REQUEST_CODE_APPOINTMENT_CREATION) {
-            if (resultCode == RESULT_OK) {
-                // TODO update model and corresponding fragment
+        if(requestCode == REQUEST_CODE_CREATE_APPOINTMENT) {
+            if(resultCode == RESULT_OK) {
+                int position = data.getIntExtra(AppointmentCreationActivity.RESULT_INTENT_STRING_KEY, 0);
+                ((DetailsFragment)mSectionsPagerAdapter.getItem(position)).notifyDataSetChanged();
             }
         }
     }

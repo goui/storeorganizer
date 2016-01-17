@@ -1,6 +1,7 @@
 package fr.goui.storeorganizer;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class StoreWorker {
@@ -32,4 +33,16 @@ public class StoreWorker {
     public List<StoreAppointment> getAppointments() {
         return _appointments;
     }
+
+    public void addStoreAppointment(StoreAppointment storeAppointment_p) {
+        _appointments.add(storeAppointment_p);
+    }
+
+    public Date getNextAvailability() {
+        if (_appointments.size() > 0) {
+            return _appointments.get(_appointments.size() - 1).getEndDate();
+        }
+        return new Date();
+    }
+
 }

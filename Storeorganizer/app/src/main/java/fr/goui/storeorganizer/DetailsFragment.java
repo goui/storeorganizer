@@ -10,11 +10,16 @@ import android.view.ViewGroup;
 import android.widget.TextClock;
 import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class DetailsFragment extends Fragment {
 
     public static final String ARG_SECTION_NUMBER = "section_number";
+
+    private StoreWorker _currentWorker;
+
+    private List<Object> _items;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -37,17 +42,18 @@ public class DetailsFragment extends Fragment {
         });
 
         int sectionNumber = getArguments().getInt(ARG_SECTION_NUMBER);
-        List<StoreAppointment> appointments = StoreWorkerModel.getInstance().getStoreWorker(sectionNumber).getAppointments();
-        List<Object> objects = generateItemsList(appointments);
-        // recyclerView.setAdapter(new DetailsRecyclerAdapter(getActivity(), objects));
-
-        // TODO adapter onClick
+        _currentWorker = StoreWorkerModel.getInstance().getStoreWorker(sectionNumber);
+        _items = new ArrayList<>();
+        recyclerView.setAdapter(new DetailsRecyclerAdapter(getActivity(), _items));
+        // TODO onClick
 
         return rootView;
     }
 
-    private List<Object> generateItemsList(List<StoreAppointment> appointments_p) {
-        return null;
+    public void notifyDataSetChanged() {
+        List<StoreAppointment> appointments = _currentWorker.getAppointments();
+
+        // TODO generate items list
     }
 
 }

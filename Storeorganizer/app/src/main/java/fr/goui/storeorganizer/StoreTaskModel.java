@@ -35,6 +35,10 @@ public class StoreTaskModel {
         return _tasks;
     }
 
+    public StoreTask getStoreTask(int position_p) {
+        return _tasks.get(position_p);
+    }
+
     public void addStoreTask(String name_p, int duration_p, int id_p) {
         _tasks.add(new StoreTask(name_p, duration_p, id_p));
     }

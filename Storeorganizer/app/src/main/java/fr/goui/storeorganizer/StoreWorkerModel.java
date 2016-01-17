@@ -40,6 +40,16 @@ public class StoreWorkerModel extends Observable {
         return _workers.get(position_p);
     }
 
+    public int getStoreWorkerPosition(StoreWorker storeWorker_p) {
+        int position = -1;
+        for(int i = 0; i < _workers.size(); i++) {
+            if(_workers.get(i).getId() == storeWorker_p.getId()) {
+                position = i;
+            }
+        }
+        return position;
+    }
+
     public void addStoreWorker(String name_p, int id_p) {
         _workers.add(new StoreWorker(name_p, id_p));
     }

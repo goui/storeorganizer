@@ -21,15 +21,8 @@ public class StoreAppointment {
 
     private String _formattedEndDate;
 
-    public StoreAppointment(StoreTask storeTask_p, String clientName_p) {
-        this(storeTask_p, clientName_p, null);
-    }
-
-    public StoreAppointment(StoreTask storeTask_p, String clientName_p, String clientPhoneNumber_p) {
+    public StoreAppointment() {
         _simpleDateFormat = new SimpleDateFormat("HH:mm");
-        _storeTask = storeTask_p;
-        _clientName = clientName_p;
-        _clientPhoneNumber = clientPhoneNumber_p;
     }
 
     public StoreTask getStoreTask() {
@@ -60,16 +53,27 @@ public class StoreAppointment {
         return _formattedEndDate;
     }
 
+    public void setStoreTask(StoreTask storeTask_p) {
+        _storeTask = storeTask_p;
+    }
+
+    public void setClientName(String clientName_p) {
+        _clientName = clientName_p;
+    }
+
+    public void setClientPhoneNumber(String clientPhoneNumber_p) {
+        _clientPhoneNumber = clientPhoneNumber_p;
+    }
+
     public void setStartDate(Date startDate_p) {
         _startDate = startDate_p;
         _formattedStartDate = _simpleDateFormat.format(_startDate);
-        _endDate = new Date(_startDate.getTime() + _storeTask.getDuration() * 60000);
-        _formattedStartDate = _simpleDateFormat.format(_endDate);
+        setEndDate(new Date(_startDate.getTime() + _storeTask.getDuration() * 60000));
     }
 
     public void setEndDate(Date endDate_p) {
         _endDate = endDate_p;
-        _formattedStartDate = _simpleDateFormat.format(_endDate);
+        _formattedEndDate = _simpleDateFormat.format(_endDate);
     }
 
 }
