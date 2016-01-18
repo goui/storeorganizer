@@ -7,7 +7,7 @@
                 android:paddingTop="8dp">
 
     <TextView
-        android:id="@+id/layout_simple_item_2tv_upper_text_view"
+        android:id="@+id/fragment_settings_item_task_name_text_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:paddingLeft="8dp"
@@ -15,17 +15,17 @@
         android:textSize="20sp"/>
 
     <TextView
-        android:id="@+id/layout_simple_item_2tv_lower_text_view"
+        android:id="@+id/fragment_settings_item_task_duration_text_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/layout_simple_item_2tv_upper_text_view"
+        android:layout_below="@id/fragment_settings_item_task_name_text_view"
         android:layout_marginTop="4dp"
         android:paddingLeft="8dp"
         android:paddingRight="8dp"
         android:textSize="16sp"/>
 
     <ImageButton
-        android:id="@+id/layout_simple_item_2tv_delete_button"
+        android:id="@+id/fragment_settings_item_task_delete_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
@@ -34,11 +34,11 @@
         android:src="@drawable/ic_action_delete_black"/>
 
     <ImageButton
-        android:id="@+id/layout_simple_item_2tv_edit_button"
+        android:id="@+id/fragment_settings_item_task_edit_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerVertical="true"
-        android:layout_toStartOf="@id/layout_simple_item_2tv_delete_button"
+        android:layout_toStartOf="@id/fragment_settings_item_task_delete_button"
         android:contentDescription="@string/edit"
         android:src="@drawable/ic_action_edit_black"/>
 

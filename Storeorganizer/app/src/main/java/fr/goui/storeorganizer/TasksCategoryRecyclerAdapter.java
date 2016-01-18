@@ -25,18 +25,18 @@ public class TasksCategoryRecyclerAdapter extends RecyclerView.Adapter<RecyclerV
     private SharedPreferences mSharedPreferences;
 
     class TasksViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        TextView txtUpper;
-        TextView txtLower;
+        TextView txtName;
+        TextView txtDuration;
         ImageButton btnEdit;
         ImageButton btnDelete;
         int position;
 
         public TasksViewHolder(View itemView_p) {
             super(itemView_p);
-            txtUpper = (TextView) itemView_p.findViewById(R.id.layout_simple_item_2tv_upper_text_view);
-            txtLower = (TextView) itemView_p.findViewById(R.id.layout_simple_item_2tv_lower_text_view);
-            btnEdit = (ImageButton) itemView_p.findViewById(R.id.layout_simple_item_2tv_edit_button);
-            btnDelete = (ImageButton) itemView_p.findViewById(R.id.layout_simple_item_2tv_delete_button);
+            txtName = (TextView) itemView_p.findViewById(R.id.fragment_settings_item_task_name_text_view);
+            txtDuration = (TextView) itemView_p.findViewById(R.id.fragment_settings_item_task_duration_text_view);
+            btnEdit = (ImageButton) itemView_p.findViewById(R.id.fragment_settings_item_task_edit_button);
+            btnDelete = (ImageButton) itemView_p.findViewById(R.id.fragment_settings_item_task_delete_button);
             itemView_p.setOnClickListener(this);
 
             btnEdit.setOnClickListener(new View.OnClickListener() {
@@ -77,17 +77,17 @@ public class TasksCategoryRecyclerAdapter extends RecyclerView.Adapter<RecyclerV
             builder.setPositiveButton(_context.getString(R.string.ok), new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    String oldName = txtUpper.getText().toString();
-                    String oldDuration = txtLower.getText().toString();
+                    String oldName = txtName.getText().toString();
+                    String oldDuration = txtDuration.getText().toString();
                     String newName = etName.getText().toString();
                     String newDuration = etDuration.getText().toString();
                     boolean modification = false;
                     if (!oldName.equals(newName)) {
-                        txtUpper.setText(newName);
+                        txtName.setText(newName);
                         modification = true;
                     }
                     if (!oldDuration.equals(newDuration)) {
-                        txtLower.setText(newDuration + "min");
+                        txtDuration.setText(newDuration + "min");
                         modification = true;
                     }
                     if (modification) {
@@ -155,7 +155,7 @@ public class TasksCategoryRecyclerAdapter extends RecyclerView.Adapter<RecyclerV
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent_p, int viewType_p) {
-        return new TasksViewHolder(_layoutInflater.inflate(R.layout.layout_simple_item_2tv, parent_p, false));
+        return new TasksViewHolder(_layoutInflater.inflate(R.layout.fragment_settings_item_task, parent_p, false));
     }
 
     @Override
@@ -163,8 +163,8 @@ public class TasksCategoryRecyclerAdapter extends RecyclerView.Adapter<RecyclerV
         StoreTask task = _tasks.get(position_p);
         if (task != null) {
             ((TasksViewHolder) holder_p).setPosition(position_p);
-            ((TasksViewHolder) holder_p).txtUpper.setText(task.getName());
-            ((TasksViewHolder) holder_p).txtLower.setText(task.getDuration() + "min");
+            ((TasksViewHolder) holder_p).txtName.setText(task.getName());
+            ((TasksViewHolder) holder_p).txtDuration.setText(task.getDuration() + "min");
         }
     }
 

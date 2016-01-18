@@ -24,16 +24,16 @@ public class WorkersCategoryRecyclerAdapter extends RecyclerView.Adapter<Recycle
     private SharedPreferences mSharedPreferences;
 
     class WorkersViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        TextView textView;
+        TextView txtName;
         ImageButton btnEdit;
         ImageButton btnDelete;
         int position;
 
         public WorkersViewHolder(View itemView_p) {
             super(itemView_p);
-            textView = (TextView) itemView_p.findViewById(R.id.layout_simple_item_1tv_text_view);
-            btnEdit = (ImageButton) itemView_p.findViewById(R.id.layout_simple_item_1tv_edit_button);
-            btnDelete = (ImageButton) itemView_p.findViewById(R.id.layout_simple_item_1tv_delete_button);
+            txtName = (TextView) itemView_p.findViewById(R.id.fragment_settings_item_worker_name_text_view);
+            btnEdit = (ImageButton) itemView_p.findViewById(R.id.fragment_settings_item_worker_edit_button);
+            btnDelete = (ImageButton) itemView_p.findViewById(R.id.fragment_settings_item_worker_delete_button);
             itemView_p.setOnClickListener(this);
 
             btnEdit.setOnClickListener(new View.OnClickListener() {
@@ -66,11 +66,11 @@ public class WorkersCategoryRecyclerAdapter extends RecyclerView.Adapter<Recycle
             builder.setPositiveButton(_context.getString(R.string.ok), new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    String oldName = textView.getText().toString();
+                    String oldName = txtName.getText().toString();
                     String newName = input.getText().toString();
                     boolean modification = false;
                     if(!oldName.equals(newName)) {
-                        textView.setText(newName);
+                        txtName.setText(newName);
                         modification = true;
                     }
                     if(modification) {
@@ -136,7 +136,7 @@ public class WorkersCategoryRecyclerAdapter extends RecyclerView.Adapter<Recycle
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent_p, int viewType_p) {
-        return new WorkersViewHolder(_layoutInflater.inflate(R.layout.layout_simple_item_1tv, parent_p, false));
+        return new WorkersViewHolder(_layoutInflater.inflate(R.layout.fragment_settings_item_worker, parent_p, false));
     }
 
     @Override
@@ -144,7 +144,7 @@ public class WorkersCategoryRecyclerAdapter extends RecyclerView.Adapter<Recycle
         StoreWorker worker = _workers.get(position_p);
         if (worker != null) {
             ((WorkersViewHolder) holder_p).setPosition(position_p);
-            ((WorkersViewHolder) holder_p).textView.setText(worker.getName());
+            ((WorkersViewHolder) holder_p).txtName.setText(worker.getName());
         }
     }
 

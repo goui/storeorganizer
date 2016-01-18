@@ -38,9 +38,9 @@ public class WorkerBaseAdapter extends BaseAdapter {
     public View getView(int position_p, View convertView_p, ViewGroup parent_p) {
         ViewHolder viewHolder;
         if(convertView_p == null) {
-            convertView_p = _layoutInflater.inflate(R.layout.layout_1tv, null);
+            convertView_p = _layoutInflater.inflate(R.layout.spinner_item_worker, null);
             viewHolder = new ViewHolder();
-            viewHolder.txtName = (TextView) convertView_p.findViewById(R.id.layout_1tv_text_view);
+            viewHolder.txtName = (TextView) convertView_p.findViewById(R.id.spinner_item_worker_name_text_view);
             convertView_p.setTag(viewHolder);
         } else {
             viewHolder = (ViewHolder) convertView_p.getTag();

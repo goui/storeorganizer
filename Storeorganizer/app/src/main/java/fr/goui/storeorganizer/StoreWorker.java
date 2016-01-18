@@ -30,7 +30,11 @@ public class StoreWorker {
         return _id;
     }
 
-    public List<StoreAppointment> getAppointments() {
+    public int getStoreAppointmentsNumber() {
+        return _appointments.size();
+    }
+
+    public List<StoreAppointment> getStoreAppointments() {
         return _appointments;
     }
 

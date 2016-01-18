@@ -154,7 +154,7 @@ public class AppointmentCreationActivity extends AppCompatActivity {
             if (confirmAppointment()) {
                 Intent intent = new Intent();
                 intent.putExtra(RESULT_INTENT_STRING_KEY, StoreWorkerModel.getInstance().getStoreWorkerPosition(_selectedWorker));
-                setResult(RESULT_OK);
+                setResult(RESULT_OK, intent);
                 finish();
             }
             return true;

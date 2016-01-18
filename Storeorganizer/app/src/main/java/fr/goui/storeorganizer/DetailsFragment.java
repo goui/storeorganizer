@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextClock;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -17,9 +18,28 @@ public class DetailsFragment extends Fragment {
 
     public static final String ARG_SECTION_NUMBER = "section_number";
 
+    private int _sectionNumber;
+
     private StoreWorker _currentWorker;
 
     private List<Object> _items;
+
+    private TextView _noAppointmentsTextView;
+
+    private RecyclerView _recyclerView;
+
+    private DetailsRecyclerAdapter _detailsRecyclerAdapter;
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        _sectionNumber = getArguments().getInt(ARG_SECTION_NUMBER);
+        _currentWorker = StoreWorkerModel.getInstance().getStoreWorker(_sectionNumber);
+        _items = new ArrayList<>();
+        _detailsRecyclerAdapter = new DetailsRecyclerAdapter(getActivity(), _items);
+        _recyclerView.setAdapter(_detailsRecyclerAdapter);
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -28,8 +48,9 @@ public class DetailsFragment extends Fragment {
 
         // Get the views in the fragment
         TextClock textClock = (TextClock) rootView.findViewById(R.id.fragment_details_text_clock);
-        RecyclerView recyclerView = (RecyclerView) rootView.findViewById(R.id.fragment_details_recycler_view);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        _noAppointmentsTextView = (TextView) rootView.findViewById(R.id.fragment_details_no_appointments_text_view);
+        _recyclerView = (RecyclerView) rootView.findViewById(R.id.fragment_details_recycler_view);
+        _recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
         // Set the on click listener for the clock
         textClock.setOnClickListener(new View.OnClickListener() {
@@ -41,19 +62,26 @@ public class DetailsFragment extends Fragment {
             }
         });
 
-        int sectionNumber = getArguments().getInt(ARG_SECTION_NUMBER);
-        _currentWorker = StoreWorkerModel.getInstance().getStoreWorker(sectionNumber);
-        _items = new ArrayList<>();
-        recyclerView.setAdapter(new DetailsRecyclerAdapter(getActivity(), _items));
-        // TODO onClick
+        // TODO _recyclerView onClick
 
         return rootView;
     }
 
-    public void notifyDataSetChanged() {
-        List<StoreAppointment> appointments = _currentWorker.getAppointments();
-
-        // TODO generate items list
+    public void notifyItemAdded() {
+        StoreAppointment storeAppointment = _currentWorker.getStoreAppointments().get(_currentWorker.getStoreAppointmentsNumber() - 1);
+        if (_currentWorker.getStoreAppointmentsNumber() == 1) {
+            _items.add(storeAppointment.getFormattedStartDate());
+            _noAppointmentsTextView.setVisibility(View.GONE);
+        } else {
+            StoreAppointment previousAppointment = _currentWorker.getStoreAppointments().get(_currentWorker.getStoreAppointmentsNumber() - 2);
+            if (!previousAppointment.getFormattedEndDate().equals(storeAppointment.getFormattedStartDate())) {
+                _items.add(new StoreAppointment().newNullInstance());
+                _items.add(storeAppointment.getFormattedStartDate());
+            }
+        }
+        _items.add(storeAppointment);
+        _items.add(storeAppointment.getFormattedEndDate());
+        _detailsRecyclerAdapter.notifyDataSetChanged();
     }
 
 }

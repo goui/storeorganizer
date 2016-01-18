@@ -6,7 +6,7 @@
                 android:paddingTop="8dp">
 
     <TextView
-        android:id="@+id/layout_2tv_horizontal_duration_text_view"
+        android:id="@+id/spinner_item_task_duration_text_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
@@ -15,12 +15,12 @@
         android:textSize="16sp"/>
 
     <TextView
-        android:id="@+id/layout_2tv_horizontal_name_text_view"
+        android:id="@+id/spinner_item_task_name_text_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentStart="true"
         android:layout_centerVertical="true"
-        android:layout_toLeftOf="@id/layout_2tv_horizontal_duration_text_view"
+        android:layout_toLeftOf="@id/spinner_item_task_duration_text_view"
         android:padding="8dp"
         android:textSize="16sp"/>
 

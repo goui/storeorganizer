@@ -15,30 +15,34 @@ public class DetailsRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vi
     private static final int TYPE_TIME = 0;
     private static final int TYPE_APPOINTMENT = 1;
 
+    private Context _context;
     private LayoutInflater _inflater;
     private List<Object> _items;
 
     class TimeViewHolder extends RecyclerView.ViewHolder {
-        TextView txtTimeTextView;
+        TextView txtTime;
 
         public TimeViewHolder(View itemView_p) {
             super(itemView_p);
-            txtTimeTextView = (TextView) itemView_p.findViewById(R.id.layout_simple_item_1tv_text_view);
+            txtTime = (TextView) itemView_p.findViewById(R.id.fragment_details_item_time_text_view);
         }
     }
 
     class AppointmentViewHolder extends RecyclerView.ViewHolder {
-        TextView txtAppointmentUpperTextView;
-        TextView txtAppointmentLowerTextView;
+        TextView txtName;
+        TextView txtPhone;
+        TextView txtDuration;
 
         public AppointmentViewHolder(View itemView_p) {
             super(itemView_p);
-            txtAppointmentUpperTextView = (TextView) itemView_p.findViewById(R.id.layout_simple_item_2tv_upper_text_view);
-            txtAppointmentLowerTextView = (TextView) itemView_p.findViewById(R.id.layout_simple_item_2tv_lower_text_view);
+            txtName = (TextView) itemView_p.findViewById(R.id.fragment_details_item_appointment_name_text_view);
+            txtPhone = (TextView) itemView_p.findViewById(R.id.fragment_details_item_appointment_phone_text_view);
+            txtDuration = (TextView) itemView_p.findViewById(R.id.fragment_details_item_appointment_duration_text_view);
         }
     }
 
     public DetailsRecyclerAdapter(Context context_p, List<Object> items_p) {
+        _context = context_p;
         _inflater = LayoutInflater.from(context_p);
         _items = items_p;
     }
@@ -49,11 +53,11 @@ public class DetailsRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vi
 
         switch (viewType_p) {
             case TYPE_TIME:
-                View timeView = _inflater.inflate(R.layout.layout_simple_item_1tv, parent_p, false);
+                View timeView = _inflater.inflate(R.layout.fragment_details_item_time, parent_p, false);
                 viewHolder = new TimeViewHolder(timeView);
                 break;
             case TYPE_APPOINTMENT:
-                View appointmentView = _inflater.inflate(R.layout.layout_simple_item_2tv, parent_p, false);
+                View appointmentView = _inflater.inflate(R.layout.fragment_details_item_appointment, parent_p, false);
                 viewHolder = new AppointmentViewHolder(appointmentView);
                 break;
         }
@@ -78,15 +82,17 @@ public class DetailsRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vi
     private void bindTimeViewHolder(TimeViewHolder timeViewHolder_p, int position_p) {
         String strTime = (String) _items.get(position_p);
         if (strTime != null) {
-            timeViewHolder_p.txtTimeTextView.setText(strTime);
+            timeViewHolder_p.txtTime.setText(strTime);
         }
     }
 
     private void bindAppointmentViewHolder(AppointmentViewHolder appointmentViewHolder_p, int position_p) {
         StoreAppointment storeAppointment = (StoreAppointment) _items.get(position_p);
-        if(storeAppointment != null) {
-            appointmentViewHolder_p.txtAppointmentUpperTextView.setText(storeAppointment.getClientName());
-            appointmentViewHolder_p.txtAppointmentLowerTextView.setText(storeAppointment.getStoreTask().getDuration());
+        if (storeAppointment != null && !(storeAppointment instanceof StoreAppointment.NullStoreAppointment)) {
+            appointmentViewHolder_p.txtName.setText(storeAppointment.getClientName());
+            appointmentViewHolder_p.txtDuration.setText(storeAppointment.getStoreTask().getDuration() + "min");
+            appointmentViewHolder_p.txtPhone.setText(storeAppointment.getClientPhoneNumber().equals("") ?
+                    _context.getString(R.string.no_phone_entered) : storeAppointment.getClientPhoneNumber());
         }
     }
 

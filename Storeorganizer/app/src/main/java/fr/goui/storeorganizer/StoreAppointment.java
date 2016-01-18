@@ -76,4 +76,12 @@ public class StoreAppointment {
         _formattedEndDate = _simpleDateFormat.format(_endDate);
     }
 
+    public NullStoreAppointment newNullInstance() {
+        return new NullStoreAppointment();
+    }
+
+    public class NullStoreAppointment extends StoreAppointment {
+
+    }
+
 }

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest package="fr.goui.storeorganizer"
-          xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest
+    package="fr.goui.storeorganizer"
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
     <application
         android:allowBackup="true"
@@ -22,16 +23,19 @@
         </activity>
         <activity
             android:name=".DetailsActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/details"
             android:launchMode="singleInstance"
             android:theme="@style/AppTheme.NoActionBar"/>
         <activity
             android:name=".SettingsActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/settings"
             android:launchMode="singleInstance"/>
-        <activity android:name=".AppointmentCreationActivity"
-                  android:label="@string/appointment_creation"
-                  android:launchMode="singleInstance">
+        <activity
+            android:name=".AppointmentCreationActivity"
+            android:label="@string/appointment_creation"
+            android:launchMode="singleInstance">
         </activity>
     </application>
 

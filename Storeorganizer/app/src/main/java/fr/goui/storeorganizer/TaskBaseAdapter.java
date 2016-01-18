@@ -38,10 +38,10 @@ public class TaskBaseAdapter extends BaseAdapter {
     public View getView(int position_p, View convertView_p, ViewGroup parent_p) {
         ViewHolder viewHolder;
         if(convertView_p == null) {
-            convertView_p = _layoutInflater.inflate(R.layout.layout_2tv_horizontal, null);
+            convertView_p = _layoutInflater.inflate(R.layout.spinner_item_task, null);
             viewHolder = new ViewHolder();
-            viewHolder.txtName = (TextView) convertView_p.findViewById(R.id.layout_2tv_horizontal_name_text_view);
-            viewHolder.txtDuration = (TextView) convertView_p.findViewById(R.id.layout_2tv_horizontal_duration_text_view);
+            viewHolder.txtName = (TextView) convertView_p.findViewById(R.id.spinner_item_task_name_text_view);
+            viewHolder.txtDuration = (TextView) convertView_p.findViewById(R.id.spinner_item_task_duration_text_view);
             convertView_p.setTag(viewHolder);
         } else {
             viewHolder = (ViewHolder) convertView_p.getTag();
