@@ -9,7 +9,7 @@ An app to help crew organize one day schedule
 
 2. An overall activity displaying present day schedule.
   - create a task or schedule the lunch break for a worker
-  - see everything for every worker thoughout the day
+  - see everything for every worker throughout the day
   - use different colors to spot tasks
 
 3. A task creation activity
