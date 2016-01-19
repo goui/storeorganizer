@@ -1,36 +1,47 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:background="?attr/selectableItemBackground"
-                android:paddingBottom="8dp"
-                android:paddingTop="8dp">
+                android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/fragment_settings_item_worker_name_text_view"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerVertical="true"
-        android:paddingLeft="8dp"
-        android:paddingRight="8dp"
-        android:textSize="20sp"/>
+    <android.support.v7.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="8dp">
 
-    <ImageButton
-        android:id="@+id/fragment_settings_item_worker_delete_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_centerVertical="true"
-        android:contentDescription="@string/delete"
-        android:src="@drawable/ic_action_delete_black"/>
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="?attr/selectableItemBackground">
 
-    <ImageButton
-        android:id="@+id/fragment_settings_item_worker_edit_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerVertical="true"
-        android:layout_toStartOf="@id/fragment_settings_item_worker_delete_button"
-        android:contentDescription="@string/edit"
-        android:src="@drawable/ic_action_edit_black"/>
+            <TextView
+                android:id="@+id/fragment_settings_item_worker_name_text_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginStart="8dp"
+                android:textSize="20sp"/>
+
+            <ImageButton
+                android:id="@+id/fragment_settings_item_worker_delete_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:layout_marginEnd="8dp"
+                android:contentDescription="@string/delete"
+                android:src="@drawable/ic_action_delete_black"/>
+
+            <ImageButton
+                android:id="@+id/fragment_settings_item_worker_edit_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_toStartOf="@id/fragment_settings_item_worker_delete_button"
+                android:contentDescription="@string/edit"
+                android:src="@drawable/ic_action_edit_black"/>
+
+        </RelativeLayout>
+
+    </android.support.v7.widget.CardView>
 
 </RelativeLayout>
