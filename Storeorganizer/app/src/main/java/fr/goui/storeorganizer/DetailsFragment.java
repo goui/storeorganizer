@@ -11,6 +11,9 @@ import android.widget.TextClock;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.Calendar;
+import java.util.Date;
+
 public class DetailsFragment extends Fragment {
 
     public static final String ARG_SECTION_NUMBER = "section_number";
@@ -25,6 +28,8 @@ public class DetailsFragment extends Fragment {
 
     private DetailsRecyclerAdapter _detailsRecyclerAdapter;
 
+    private Calendar _calendar;
+
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
@@ -33,15 +38,16 @@ public class DetailsFragment extends Fragment {
         _currentWorker = StoreWorkerModel.getInstance().getStoreWorker(_sectionNumber);
         _detailsRecyclerAdapter = new DetailsRecyclerAdapter(getActivity(), _currentWorker.getStoreAppointments());
         _recyclerView.setAdapter(_detailsRecyclerAdapter);
+        _calendar = Calendar.getInstance();
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(LayoutInflater inflater, final ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_details, container, false);
 
         // Get the views in the fragment
-        TextClock textClock = (TextClock) rootView.findViewById(R.id.fragment_details_text_clock);
+        final TextClock textClock = (TextClock) rootView.findViewById(R.id.fragment_details_text_clock);
         _noAppointmentsTextView = (TextView) rootView.findViewById(R.id.fragment_details_no_appointments_text_view);
         _recyclerView = (RecyclerView) rootView.findViewById(R.id.fragment_details_recycler_view);
         _recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
@@ -50,20 +56,37 @@ public class DetailsFragment extends Fragment {
         textClock.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // TODO scroll to most relevant element in list (i.e. current task according to current time)
-                // recyclerView.setSelectionFromTop(position, recyclerView.getTop());
-                Toast.makeText(getActivity(), "it is " + ((TextClock) v).getText().toString(), Toast.LENGTH_SHORT).show();
+                scrollToCurrentAppointment();
             }
         });
 
         return rootView;
     }
 
+    private void scrollToCurrentAppointment() {
+        if (_currentWorker.getStoreAppointmentsNumber() > 0) {
+            Date currentDate = _calendar.getTime();
+            int position = -1;
+            for (int i = 0; i < _currentWorker.getStoreAppointmentsNumber(); i++) {
+                if (currentDate.after(_currentWorker.getStoreAppointments().get(i).getEndDate())) {
+                    position = i + 1;
+                }
+            }
+            ((LinearLayoutManager) _recyclerView.getLayoutManager()).scrollToPositionWithOffset(position + 1, 10);
+            Toast.makeText(getActivity(), getString(R.string.scrolling_to_the_current_appointment), Toast.LENGTH_SHORT).show();
+        }
+    }
+
     public void notifyItemAdded() {
-        if(_currentWorker.getStoreAppointmentsNumber() == 1) {
+        if (_currentWorker.getStoreAppointmentsNumber() == 1) {
             _noAppointmentsTextView.setVisibility(View.GONE);
         }
         _detailsRecyclerAdapter.notifyItemInserted(_currentWorker.getStoreAppointmentsNumber() - 1);
+    }
+
+    public void notifyDataSetChanged() {
+        _detailsRecyclerAdapter.notifyDataSetChanged();
+        scrollToCurrentAppointment();
     }
 
 }

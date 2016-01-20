@@ -8,6 +8,8 @@
     <string name="appointment_creation">Appointment creation</string>
     <string name="worker">Worker</string>
     <string name="task">Task</string>
+    <string name="task_name">Task name</string>
+    <string name="task_duration">Task duration</string>
     <string name="workers">Workers</string>
     <string name="tasks">Tasks</string>
     <string name="name">Name</string>
@@ -38,7 +40,10 @@
     <string name="cant_remove_last">You cannot remove the last one</string>
     <string name="please_specify_a_name">Please specify a name</string>
     <string name="please_specify_a_duration">Please specify a duration</string>
+    <string name="starting_time_cannot_be_in_the_past">Starting time cannot be in the past</string>
+    <string name="ending_time_cannot_be_prior_to_starting_time">Ending time cannot be prior to starting time</string>
     <string name="modification_will_appear_for_later_tasks">Modification will appear for later tasks</string>
+    <string name="scrolling_to_the_current_appointment">Scrolling to the current appointment</string>
 
     <!-- For the shared preferences  -->
     <string name="preference_file_key">fr.goui.storeorganizer.PREFERENCE_FILE_KEY</string>

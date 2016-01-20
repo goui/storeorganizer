@@ -16,6 +16,7 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 
 import java.util.Calendar;
+import java.util.Date;
 
 public class AppointmentCreationActivity extends AppCompatActivity {
 
@@ -110,7 +111,7 @@ public class AppointmentCreationActivity extends AppCompatActivity {
     };
 
     private void updateAppointment() {
-        if(_selectedTask != null) {
+        if (_selectedTask != null) {
             _storeAppointment.setStoreTask(_selectedTask);
             _storeAppointment.setStartDate(_selectedWorker.getNextAvailability());
             _txtStartTime.setText(_storeAppointment.getFormattedStartDate());
@@ -164,15 +165,30 @@ public class AppointmentCreationActivity extends AppCompatActivity {
 
     private boolean confirmAppointment() {
         boolean result = true;
-        if (!_etClientsName.getText().toString().equals("")) {
+        String errorMessage = checkValidity();
+        if (errorMessage == null) {
             _storeAppointment.setClientName(_etClientsName.getText().toString());
             _storeAppointment.setClientPhoneNumber(_etClientsPhoneNumber.getText().toString());
             _selectedWorker.addStoreAppointment(_storeAppointment);
+            // TODO specify if the list of appointments should be sorting or not (filling holes in schedule)
         } else {
-            Toast.makeText(this, getString(R.string.please_specify_a_name), Toast.LENGTH_LONG).show();
+            Toast.makeText(this, errorMessage, Toast.LENGTH_LONG).show();
             result = false;
         }
         return result;
+    }
+
+    private String checkValidity() {
+        // TODO check overlapping
+        String errorMessage = null;
+        if (_etClientsName.getText().toString().equals("")) {
+            errorMessage = getString(R.string.please_specify_a_name);
+        } else if (_storeAppointment.getStartDate().before(new Date())) {
+            errorMessage = getString(R.string.starting_time_cannot_be_in_the_past);
+        } else if (_storeAppointment.getEndDate().before(_storeAppointment.getStartDate())) {
+            errorMessage = getString(R.string.ending_time_cannot_be_prior_to_starting_time);
+        }
+        return errorMessage;
     }
 
 }

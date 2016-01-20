@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import java.util.Calendar;
 import java.util.List;
 
 public class DetailsRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
@@ -60,7 +61,7 @@ public class DetailsRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vi
     public void onBindViewHolder(RecyclerView.ViewHolder holder_p, int position_p) {
         AppointmentViewHolder appointmentViewHolder = (AppointmentViewHolder) holder_p;
         StoreAppointment appointment = _appointments.get(position_p);
-        if(appointment != null) {
+        if (appointment != null) {
             appointmentViewHolder.txtStartTime.setText(appointment.getFormattedStartDate());
             appointmentViewHolder.txtClientsName.setText(appointment.getClientName());
             appointmentViewHolder.txtClientsPhone.setText(appointment.getClientPhoneNumber());
@@ -68,6 +69,16 @@ public class DetailsRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vi
             appointmentViewHolder.txtTaskDuration.setText(appointment.getStoreTask().getDuration() + "min");
             appointmentViewHolder.txtEndTime.setText(appointment.getFormattedEndDate());
             appointmentViewHolder.position = position_p;
+
+            Calendar calendar = Calendar.getInstance();
+            int color;
+            if (calendar.getTime().after(appointment.getEndDate())) {
+                color = R.color.grey_overlay;
+            } else {
+                color = R.color.colorAccentPale;
+            }
+            appointmentViewHolder.txtStartTime.setBackgroundResource(color);
+            appointmentViewHolder.txtEndTime.setBackgroundResource(color);
         }
     }
 

@@ -43,10 +43,17 @@ public class StoreWorker {
     }
 
     public Date getNextAvailability() {
+        Date date = new Date();
         if (_appointments.size() > 0) {
-            return _appointments.get(_appointments.size() - 1).getEndDate();
+            StoreAppointment lastAppointment = _appointments.get(_appointments.size() - 1);
+            if (lastAppointment.getEndDate().after(date)) {
+                date = _appointments.get(_appointments.size() - 1).getEndDate();
+            }
         }
-        return new Date();
+        return date;
     }
+
+    // TODO sort list of appointments when filling holes in schedule
+    // TODO be observable and notify when sorting has been done
 
 }
