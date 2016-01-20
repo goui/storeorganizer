@@ -14,18 +14,11 @@
         android:gravity="center"
         android:textSize="30sp"/>
 
-    <View
-        android:id="@+id/fragment_details_separator"
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:layout_below="@id/fragment_details_text_clock"
-        android:background="@color/colorAccent"/>
-
     <TextView
         android:id="@+id/fragment_details_no_appointments_text_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/fragment_details_separator"
+        android:layout_below="@id/fragment_details_text_clock"
         android:layout_marginTop="16dp"
         android:text="@string/no_appointments_scheduled"
         android:textSize="16sp"/>
@@ -34,7 +27,7 @@
         android:id="@+id/fragment_details_recycler_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/fragment_details_separator"
-        android:layout_marginBottom="8dp"/>
+        android:layout_below="@id/fragment_details_text_clock"
+        android:layout_marginBottom="16dp"/>
 
 </RelativeLayout>

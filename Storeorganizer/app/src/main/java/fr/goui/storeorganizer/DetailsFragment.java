@@ -11,9 +11,6 @@ import android.widget.TextClock;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class DetailsFragment extends Fragment {
 
     public static final String ARG_SECTION_NUMBER = "section_number";
@@ -21,8 +18,6 @@ public class DetailsFragment extends Fragment {
     private int _sectionNumber;
 
     private StoreWorker _currentWorker;
-
-    private List<Object> _items;
 
     private TextView _noAppointmentsTextView;
 
@@ -36,8 +31,7 @@ public class DetailsFragment extends Fragment {
 
         _sectionNumber = getArguments().getInt(ARG_SECTION_NUMBER);
         _currentWorker = StoreWorkerModel.getInstance().getStoreWorker(_sectionNumber);
-        _items = new ArrayList<>();
-        _detailsRecyclerAdapter = new DetailsRecyclerAdapter(getActivity(), _items);
+        _detailsRecyclerAdapter = new DetailsRecyclerAdapter(getActivity(), _currentWorker.getStoreAppointments());
         _recyclerView.setAdapter(_detailsRecyclerAdapter);
     }
 
@@ -62,26 +56,14 @@ public class DetailsFragment extends Fragment {
             }
         });
 
-        // TODO _recyclerView onClick
-
         return rootView;
     }
 
     public void notifyItemAdded() {
-        StoreAppointment storeAppointment = _currentWorker.getStoreAppointments().get(_currentWorker.getStoreAppointmentsNumber() - 1);
-        if (_currentWorker.getStoreAppointmentsNumber() == 1) {
-            _items.add(storeAppointment.getFormattedStartDate());
+        if(_currentWorker.getStoreAppointmentsNumber() == 1) {
             _noAppointmentsTextView.setVisibility(View.GONE);
-        } else {
-            StoreAppointment previousAppointment = _currentWorker.getStoreAppointments().get(_currentWorker.getStoreAppointmentsNumber() - 2);
-            if (!previousAppointment.getFormattedEndDate().equals(storeAppointment.getFormattedStartDate())) {
-                _items.add(new StoreAppointment().newNullInstance());
-                _items.add(storeAppointment.getFormattedStartDate());
-            }
         }
-        _items.add(storeAppointment);
-        _items.add(storeAppointment.getFormattedEndDate());
-        _detailsRecyclerAdapter.notifyDataSetChanged();
+        _detailsRecyclerAdapter.notifyItemInserted(_currentWorker.getStoreAppointmentsNumber() - 1);
     }
 
 }
