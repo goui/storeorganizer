@@ -33,4 +33,20 @@ public class StoreTask {
     public void setDuration(int duration_p) {
         _duration = duration_p;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        boolean equals = false;
+        if (o instanceof StoreTask) {
+            StoreTask task = (StoreTask) o;
+            equals = task.getId() == getId();
+        }
+        return equals;
+    }
+
+    @Override
+    public String toString() {
+        return _name;
+    }
+
 }

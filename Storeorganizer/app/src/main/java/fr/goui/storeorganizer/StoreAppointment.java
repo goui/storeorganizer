@@ -1,9 +1,10 @@
 package fr.goui.storeorganizer;
 
 import java.text.SimpleDateFormat;
+import java.util.Comparator;
 import java.util.Date;
 
-public class StoreAppointment {
+public class StoreAppointment implements Comparable<StoreAppointment> {
 
     private StoreTask _storeTask;
 
@@ -76,12 +77,50 @@ public class StoreAppointment {
         _formattedEndDate = _simpleDateFormat.format(_endDate);
     }
 
+    @Override
+    public boolean equals(Object o) {
+        boolean equals = false;
+        if (o instanceof StoreAppointment) {
+            StoreAppointment appointment = (StoreAppointment) o;
+            equals = appointment.getClientName().equals(getClientName())
+                    && appointment.getClientPhoneNumber().equals(getClientPhoneNumber())
+                    && appointment.getStoreTask().equals(getStoreTask())
+                    && appointment.getStartDate().equals(getStartDate())
+                    && appointment.getEndDate().equals(getEndDate());
+        }
+        return equals;
+    }
+
+    @Override
+    public String toString() {
+        return _clientName + " - " + _storeTask.getName() + " - " + getFormattedStartDate();
+    }
+
+    @Override
+    public int compareTo(StoreAppointment another) {
+        return Comparators.TIME.compare(this, another);
+    }
+
+    public static class Comparators {
+
+        public static Comparator<StoreAppointment> TIME = new Comparator<StoreAppointment>() {
+            @Override
+            public int compare(StoreAppointment appointment1, StoreAppointment appointment2) {
+                return appointment1.getStartDate().compareTo(appointment2.getStartDate());
+            }
+        };
+    }
+
     public NullStoreAppointment newNullInstance() {
         return new NullStoreAppointment();
     }
 
     public class NullStoreAppointment extends StoreAppointment {
 
+        @Override
+        public int compareTo(StoreAppointment another) {
+            return 0;
+        }
     }
 
 }

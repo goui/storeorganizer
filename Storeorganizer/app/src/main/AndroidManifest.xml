@@ -37,6 +37,11 @@
             android:label="@string/appointment_creation"
             android:launchMode="singleInstance">
         </activity>
+        <activity
+            android:name=".AppointmentEditionActivity"
+            android:label="@string/appointment_edition"
+            android:launchMode="singleInstance">
+        </activity>
     </application>
 
 </manifest>

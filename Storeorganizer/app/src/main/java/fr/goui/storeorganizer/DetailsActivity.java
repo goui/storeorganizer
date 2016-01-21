@@ -17,7 +17,7 @@ import android.view.View;
 import java.util.Observable;
 import java.util.Observer;
 
-public class DetailsActivity extends AppCompatActivity implements Observer {
+public class DetailsActivity extends AppCompatActivity implements Observer, OnAllFragmentsChangedListener {
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -76,13 +76,27 @@ public class DetailsActivity extends AppCompatActivity implements Observer {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode == REQUEST_CODE_CREATE_APPOINTMENT) {
-            if(resultCode == RESULT_OK) {
-                int position = data.getIntExtra(AppointmentCreationActivity.RESULT_INTENT_STRING_KEY, 0);
+        if (requestCode == REQUEST_CODE_CREATE_APPOINTMENT) {
+            if (resultCode == RESULT_OK) {
+                int position = data.getIntExtra(AppointmentCreationActivity.RESULT_INTENT_POSITION_STRING_KEY, 0);
+                boolean sorted = data.getBooleanExtra(AppointmentCreationActivity.RESULT_INTENT_SORTED_STRING_KEY, false);
                 DetailsFragment fragment = (DetailsFragment) getSupportFragmentManager()
                         .findFragmentByTag("android:switcher:" + R.id.container + ":" + position);
-                fragment.notifyItemAdded();
+                if (sorted) {
+                    fragment.notifyDataSetChanged();
+                } else {
+                    fragment.notifyItemAdded();
+                }
             }
+        }
+    }
+
+    @Override
+    public void onAllFragmentsChanged() {
+        for (int i = 0; i < mSectionsPagerAdapter.getCount(); i++) {
+            DetailsFragment fragment = (DetailsFragment) getSupportFragmentManager()
+                    .findFragmentByTag("android:switcher:" + R.id.container + ":" + i);
+            fragment.notifyDataSetChanged();
         }
     }
 

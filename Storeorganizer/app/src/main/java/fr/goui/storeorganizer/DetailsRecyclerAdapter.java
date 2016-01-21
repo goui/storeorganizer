@@ -5,6 +5,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import java.util.Calendar;
@@ -18,6 +19,7 @@ public class DetailsRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vi
     private Context _context;
     private LayoutInflater _inflater;
     private List<StoreAppointment> _appointments;
+    private OnAppointmentClickListener _onAppointmentClickListener;
 
     class AppointmentViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         TextView txtStartTime;
@@ -36,20 +38,23 @@ public class DetailsRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vi
             txtTaskName = (TextView) itemView_p.findViewById(R.id.fragment_details_item_appointment_task_name_text_view);
             txtTaskDuration = (TextView) itemView_p.findViewById(R.id.fragment_details_item_appointment_task_duration_text_view);
             txtEndTime = (TextView) itemView_p.findViewById(R.id.fragment_details_item_appointment_end_time_text_view);
+            RelativeLayout layout = (RelativeLayout) itemView_p.findViewById(R.id.fragment_details_item_appointment_layout);
+            layout.setOnClickListener(this);
             itemView_p.setOnClickListener(this);
         }
 
         @Override
         public void onClick(View v) {
-            // TODO item onCLick
+            _onAppointmentClickListener.onAppointmentClick(position);
         }
 
     }
 
-    public DetailsRecyclerAdapter(Context context_p, List<StoreAppointment> appointments_p) {
+    public DetailsRecyclerAdapter(Context context_p, List<StoreAppointment> appointments_p, OnAppointmentClickListener onAppointmentClickListener_p) {
         _context = context_p;
         _inflater = LayoutInflater.from(context_p);
         _appointments = appointments_p;
+        _onAppointmentClickListener = onAppointmentClickListener_p;
     }
 
     @Override

@@ -1,6 +1,7 @@
 package fr.goui.storeorganizer;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -34,26 +35,57 @@ public class StoreWorker {
         return _appointments.size();
     }
 
+    public StoreAppointment getStoreAppointment(int position_p) {
+        return _appointments.get(position_p);
+    }
+
     public List<StoreAppointment> getStoreAppointments() {
         return _appointments;
     }
 
-    public void addStoreAppointment(StoreAppointment storeAppointment_p) {
+    public void addStoreAppointment(StoreAppointment storeAppointment_p, boolean needToBeSorted_p) {
         _appointments.add(storeAppointment_p);
+        if (needToBeSorted_p) {
+            sortAppointments();
+        }
     }
 
-    public Date getNextAvailability() {
+    public void sortAppointments() {
+        Collections.sort(_appointments, StoreAppointment.Comparators.TIME);
+    }
+
+    public void removeStoreAppointment(StoreAppointment storeAppointment_p) {
+        _appointments.remove(storeAppointment_p);
+    }
+
+    public Date getNextAvailability(boolean ignoreLast_p) {
         Date date = new Date();
         if (_appointments.size() > 0) {
             StoreAppointment lastAppointment = _appointments.get(_appointments.size() - 1);
             if (lastAppointment.getEndDate().after(date)) {
-                date = _appointments.get(_appointments.size() - 1).getEndDate();
+                if (ignoreLast_p) {
+                    date = _appointments.get(_appointments.size() - 1).getStartDate();
+                } else {
+                    date = _appointments.get(_appointments.size() - 1).getEndDate();
+                }
             }
         }
         return date;
     }
 
-    // TODO sort list of appointments when filling holes in schedule
-    // TODO be observable and notify when sorting has been done
+    @Override
+    public boolean equals(Object o) {
+        boolean equals = false;
+        if (o instanceof StoreWorker) {
+            StoreWorker worker = (StoreWorker) o;
+            equals = worker.getId() == getId();
+        }
+        return equals;
+    }
+
+    @Override
+    public String toString() {
+        return _name;
+    }
 
 }
