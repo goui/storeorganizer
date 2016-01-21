@@ -58,16 +58,12 @@ public class StoreWorker {
         _appointments.remove(storeAppointment_p);
     }
 
-    public Date getNextAvailability(boolean ignoreLast_p) {
+    public Date getNextAvailability() {
         Date date = new Date();
         if (_appointments.size() > 0) {
             StoreAppointment lastAppointment = _appointments.get(_appointments.size() - 1);
             if (lastAppointment.getEndDate().after(date)) {
-                if (ignoreLast_p) {
-                    date = _appointments.get(_appointments.size() - 1).getStartDate();
-                } else {
-                    date = _appointments.get(_appointments.size() - 1).getEndDate();
-                }
+                date = _appointments.get(_appointments.size() - 1).getEndDate();
             }
         }
         return date;

@@ -130,7 +130,12 @@ public class AppointmentEditionActivity extends AppCompatActivity {
     private void updateAppointmentInformation() {
         if (_newTask != null) {
             _newAppointment.setStoreTask(_newTask);
-            _newAppointment.setStartDate(_newWorker.getNextAvailability(_newWorker.equals(_oldWorker)));
+            if (_oldWorker.equals(_newWorker)) {
+                _newAppointment.setStartDate(_oldAppointment.getStartDate());
+                _newAppointment.setEndDate(_oldAppointment.getEndDate());
+            } else {
+                _newAppointment.setStartDate(_newWorker.getNextAvailability());
+            }
             _txtStartTime.setText(_newAppointment.getFormattedStartDate());
             _txtEndTime.setText(_newAppointment.getFormattedEndDate());
         }
@@ -178,7 +183,7 @@ public class AppointmentEditionActivity extends AppCompatActivity {
             onBackPressed();
             return true;
         }
-        if (id == R.id.action_add_prestation) {
+        if (id == R.id.action_validate_prestation) {
             if (confirmAppointment()) {
                 Intent intent = new Intent();
                 intent.putExtra(INTENT_EXTRA_WORKER_CHANGED, _hasWorkerChanged);
@@ -200,7 +205,7 @@ public class AppointmentEditionActivity extends AppCompatActivity {
             _oldAppointment.setStoreTask(_newTask);
             _oldAppointment.setStartDate(_newAppointment.getStartDate());
             _oldAppointment.setEndDate(_newAppointment.getEndDate());
-            if(!_oldWorker.equals(_newWorker)) {
+            if (!_oldWorker.equals(_newWorker)) {
                 _oldWorker.removeStoreAppointment(_oldAppointment);
                 _newWorker.addStoreAppointment(_oldAppointment, isSortingNeeded);
                 _hasWorkerChanged = true;

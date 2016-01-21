@@ -8,9 +8,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextClock;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -39,6 +41,12 @@ public class DetailsFragment extends Fragment implements OnAppointmentClickListe
     private OnAllFragmentsChangedListener _onAllFragmentsChangedListener;
 
     @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setHasOptionsMenu(true);
+    }
+
+    @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
@@ -53,21 +61,9 @@ public class DetailsFragment extends Fragment implements OnAppointmentClickListe
     public View onCreateView(LayoutInflater inflater, final ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_details, container, false);
-
-        // Get the views in the fragment
-        final TextClock textClock = (TextClock) rootView.findViewById(R.id.fragment_details_text_clock);
         _noAppointmentsTextView = (TextView) rootView.findViewById(R.id.fragment_details_no_appointments_text_view);
         _recyclerView = (RecyclerView) rootView.findViewById(R.id.fragment_details_recycler_view);
         _recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-
-        // Set the on click listener for the clock
-        textClock.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                scrollToCurrentAppointment();
-            }
-        });
-
         return rootView;
     }
 
@@ -106,6 +102,22 @@ public class DetailsFragment extends Fragment implements OnAppointmentClickListe
                 Toast.makeText(getActivity(), "appointment not edited", Toast.LENGTH_SHORT).show();
             }
         }
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.menu_details_fragment, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.action_scroll_to_current) {
+            scrollToCurrentAppointment();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     private void scrollToCurrentAppointment() {

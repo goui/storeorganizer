@@ -3,9 +3,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="fr.goui.storeorganizer.DetailsActivity">
     <item
-        android:id="@+id/action_add_prestation"
+        android:id="@+id/action_validate_prestation"
         android:orderInCategory="100"
         android:title="@string/settings"
-        android:icon="@drawable/ic_action_add_prestation"
+        android:icon="@drawable/ic_action_validate_prestation"
         app:showAsAction="ifRoom" />
 </menu>

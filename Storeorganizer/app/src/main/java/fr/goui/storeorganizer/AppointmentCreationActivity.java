@@ -116,7 +116,7 @@ public class AppointmentCreationActivity extends AppCompatActivity {
     private void updateAppointment() {
         if (_selectedTask != null) {
             _currentStoreAppointment.setStoreTask(_selectedTask);
-            _currentStoreAppointment.setStartDate(_selectedWorker.getNextAvailability(false));
+            _currentStoreAppointment.setStartDate(_selectedWorker.getNextAvailability());
             _txtStartTime.setText(_currentStoreAppointment.getFormattedStartDate());
             _txtEndTime.setText(_currentStoreAppointment.getFormattedEndDate());
         }
@@ -154,7 +154,7 @@ public class AppointmentCreationActivity extends AppCompatActivity {
             onBackPressed();
             return true;
         }
-        if (id == R.id.action_add_prestation) {
+        if (id == R.id.action_validate_prestation) {
             if (confirmAppointment()) {
                 Intent intent = new Intent();
                 intent.putExtra(RESULT_INTENT_POSITION_STRING_KEY, StoreWorkerModel.getInstance().getStoreWorkerPosition(_selectedWorker));
