@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:layout_width="match_parent"
               android:layout_height="match_parent"
-              android:padding="16dp"
+              android:layout_margin="16dp"
               android:orientation="vertical">
 
     <EditText
@@ -10,86 +10,78 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="@string/clients_name"
-        android:inputType="textPersonName|textCapSentences"/>
+        android:inputType="textPersonName|textCapSentences"
+        android:textColor="@color/black"/>
 
     <EditText
         android:id="@+id/activity_appointment_creation_clients_phone_number_edit_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="16dp"
         android:hint="@string/clients_phone_number"
-        android:inputType="phone"/>
+        android:inputType="phone"
+        android:textColor="@color/black"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="24dp"
+        android:text="@string/worker"/>
 
     <Spinner
         android:id="@+id/activity_appointment_creation_worker_spinner"
         android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+    <TextView
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"/>
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="16dp"
+        android:text="@string/task"/>
 
     <Spinner
         android:id="@+id/activity_appointment_creation_task_spinner"
         android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
+
+    <TextView
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"/>
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="24dp"
+        android:text="@string/from"/>
 
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="2dp"
-        android:layout_marginTop="8dp"
-        android:background="@color/colorAccent"/>
-
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:layout_centerVertical="true"
-            android:text="@string/starts_at"
-            android:textSize="18sp"/>
-
-        <TextView
-            android:id="@+id/activity_appointment_creation_start_text_view"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_centerVertical="true"
-            android:background="?attr/selectableItemBackground"
-            android:clickable="true"
-            android:inputType="datetime"
-            android:padding="8dp"
-            android:textSize="18sp"/>
-
-    </RelativeLayout>
-
-    <RelativeLayout
+    <TextView
+        android:id="@+id/activity_appointment_creation_start_text_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp">
+        android:layout_marginStart="4dp"
+        android:background="?attr/selectableItemBackground"
+        android:clickable="true"
+        android:paddingBottom="8dp"
+        android:paddingTop="8dp"
+        android:textColor="@color/black"
+        android:textSize="18sp"/>
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:layout_centerVertical="true"
-            android:text="@string/ends_at"
-            android:textSize="18sp"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="16dp"
+        android:text="@string/to"/>
 
-        <TextView
-            android:id="@+id/activity_appointment_creation_end_text_view"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_centerVertical="true"
-            android:background="?attr/selectableItemBackground"
-            android:clickable="true"
-            android:inputType="datetime"
-            android:padding="8dp"
-            android:textSize="18sp"/>
-
-    </RelativeLayout>
+    <TextView
+        android:id="@+id/activity_appointment_creation_end_text_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="4dp"
+        android:background="?attr/selectableItemBackground"
+        android:clickable="true"
+        android:paddingBottom="8dp"
+        android:paddingTop="8dp"
+        android:textColor="@color/black"
+        android:textSize="18sp"/>
 
 </LinearLayout>

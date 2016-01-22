@@ -5,6 +5,8 @@
     <string name="click_to_continue">Click\nto continue</string>
     <string name="details">Details</string>
     <string name="settings">Settings</string>
+    <string name="color">Color</string>
+    <string name="save">Save</string>
     <string name="appointment_creation">Appointment creation</string>
     <string name="appointment_edition">Appointment edition</string>
     <string name="worker">Worker</string>
@@ -28,8 +30,8 @@
     <string name="clients_name">Client\'s name</string>
     <string name="clients_phone_number">Client\'s phone number</string>
     <string name="no_appointments_scheduled">No appointments scheduled.</string>
-    <string name="starts_at">Starts at</string>
-    <string name="ends_at">Ends at</string>
+    <string name="from">From</string>
+    <string name="to">To</string>
     <string name="minutes">min</string>
     <string name="no_phone_entered">No phone entered</string>
     <string name="restore_default">Restore default</string>

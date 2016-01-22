@@ -6,4 +6,11 @@
     <color name="colorAccentPale">#FCE4EC</color>
     <color name="black_overlay">#66000000</color>
     <color name="grey_overlay">#33000000</color>
+
+    <color name="red">#FFFF0000</color>
+    <color name="green">#FF00FF00</color>
+    <color name="blue">#FF0000FF</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="black">#FF000000</color>
+    <color name="light_grey">#22888888</color>
 </resources>

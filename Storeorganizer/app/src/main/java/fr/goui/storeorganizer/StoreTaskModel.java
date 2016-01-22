@@ -64,7 +64,7 @@ public class StoreTaskModel {
 
     public void clear(String name_p, int duration_p) {
         int size = _tasks.size() - 1;
-        for(int i = 0; i < size; i++) {
+        for (int i = 0; i < size; i++) {
             removeStoreTask(0);
         }
         updateStoreTask(0, name_p, duration_p);

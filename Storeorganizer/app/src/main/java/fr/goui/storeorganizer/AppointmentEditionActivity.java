@@ -132,7 +132,6 @@ public class AppointmentEditionActivity extends AppCompatActivity {
             _newAppointment.setStoreTask(_newTask);
             if (_oldWorker.equals(_newWorker)) {
                 _newAppointment.setStartDate(_oldAppointment.getStartDate());
-                _newAppointment.setEndDate(_oldAppointment.getEndDate());
             } else {
                 _newAppointment.setStartDate(_newWorker.getNextAvailability());
             }
@@ -242,6 +241,7 @@ public class AppointmentEditionActivity extends AppCompatActivity {
         if (actionBar != null) {
             // Show the Up button in the action bar.
             actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setHomeAsUpIndicator(android.R.drawable.ic_menu_close_clear_cancel);
         }
     }
 

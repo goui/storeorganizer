@@ -121,7 +121,7 @@ public class DetailsFragment extends Fragment implements OnAppointmentClickListe
     }
 
     private void scrollToCurrentAppointment() {
-        if (_currentWorker.getStoreAppointmentsNumber() > 0) {
+        if (_currentWorker.getStoreAppointmentsNumber() > 2) {
             Date currentDate = _calendar.getTime();
             int position = -1;
             for (int i = 0; i < _currentWorker.getStoreAppointmentsNumber(); i++) {
@@ -135,18 +135,22 @@ public class DetailsFragment extends Fragment implements OnAppointmentClickListe
     }
 
     public void notifyItemAdded() {
-        if (_currentWorker.getStoreAppointmentsNumber() == 1) {
-            _noAppointmentsTextView.setVisibility(View.GONE);
-        }
         _detailsRecyclerAdapter.notifyItemInserted(_currentWorker.getStoreAppointmentsNumber() - 1);
+        computeNoAppointmentTextViewVisibility();
     }
 
     public void notifyDataSetChanged() {
-        if (_currentWorker.getStoreAppointmentsNumber() == 0) {
-            _noAppointmentsTextView.setVisibility(View.VISIBLE);
-        }
         _detailsRecyclerAdapter.notifyDataSetChanged();
         scrollToCurrentAppointment();
+        computeNoAppointmentTextViewVisibility();
+    }
+
+    private void computeNoAppointmentTextViewVisibility() {
+        if (_currentWorker.getStoreAppointmentsNumber() >= 1) {
+            _noAppointmentsTextView.setVisibility(View.GONE);
+        } else {
+            _noAppointmentsTextView.setVisibility(View.VISIBLE);
+        }
     }
 
 }
