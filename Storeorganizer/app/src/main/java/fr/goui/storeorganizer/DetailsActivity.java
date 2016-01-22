@@ -78,8 +78,8 @@ public class DetailsActivity extends AppCompatActivity implements Observer, OnAl
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_CODE_CREATE_APPOINTMENT) {
             if (resultCode == RESULT_OK) {
-                int position = data.getIntExtra(AppointmentCreationActivity.RESULT_INTENT_POSITION_STRING_KEY, 0);
-                boolean sorted = data.getBooleanExtra(AppointmentCreationActivity.RESULT_INTENT_SORTED_STRING_KEY, false);
+                int position = data.getIntExtra(AppointmentCreationActivity.INTENT_EXTRA_WORKER_POSITION_STRING_KEY, 0);
+                boolean sorted = data.getBooleanExtra(AppointmentCreationActivity.INTENT_EXTRA_SORT_NEEDED_STRING_KEY, false);
                 DetailsFragment fragment = (DetailsFragment) getSupportFragmentManager()
                         .findFragmentByTag("android:switcher:" + R.id.container + ":" + position);
                 if (sorted) {
@@ -96,7 +96,9 @@ public class DetailsActivity extends AppCompatActivity implements Observer, OnAl
         for (int i = 0; i < mSectionsPagerAdapter.getCount(); i++) {
             DetailsFragment fragment = (DetailsFragment) getSupportFragmentManager()
                     .findFragmentByTag("android:switcher:" + R.id.container + ":" + i);
-            fragment.notifyDataSetChanged();
+            if (fragment != null) {
+                fragment.notifyDataSetChanged();
+            }
         }
     }
 

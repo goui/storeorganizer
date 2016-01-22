@@ -20,20 +20,31 @@ import java.util.Date;
 
 public class AppointmentCreationActivity extends AppCompatActivity {
 
-    public static final String RESULT_INTENT_POSITION_STRING_KEY = "result_intent_position_string_key";
-    public static final String RESULT_INTENT_SORTED_STRING_KEY = "result_intent_sorted_string_key";
+    public static final String INTENT_EXTRA_WORKER_POSITION_STRING_KEY = "result_intent_position_string_key";
+    public static final String INTENT_EXTRA_SORT_NEEDED_STRING_KEY = "result_intent_sorted_string_key";
 
     private StoreAppointment _currentStoreAppointment;
     private StoreWorker _selectedWorker;
     private StoreTask _selectedTask;
-    private EditText _etClientsName;
-    private EditText _etClientsPhoneNumber;
-    private TextView _txtStartTime;
-    private TextView _txtEndTime;
-    private boolean _isStartTimeModified;
-    private Calendar _calendarTime = Calendar.getInstance();
     private boolean _isSortingNeeded;
     private Date _now = new Date();
+
+    protected EditText _etClientsName;
+    protected EditText _etClientsPhoneNumber;
+    protected Spinner _spinnerWorker;
+    protected Spinner _spinnerTask;
+    protected TextView _txtStartTime;
+    protected TextView _txtEndTime;
+    protected boolean _isStartTimeModified;
+    protected Calendar _calendarTime = Calendar.getInstance();
+    protected TimePickerDialog.OnTimeSetListener _timePickerDialogListener = new TimePickerDialog.OnTimeSetListener() {
+        public void onTimeSet(TimePicker view, int hourOfDay,
+                              int minute) {
+            _calendarTime.set(Calendar.HOUR_OF_DAY, hourOfDay);
+            _calendarTime.set(Calendar.MINUTE, minute);
+            updateTimes();
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,20 +55,19 @@ public class AppointmentCreationActivity extends AppCompatActivity {
 
         _etClientsName = (EditText) findViewById(R.id.activity_appointment_creation_clients_name_edit_text);
         _etClientsPhoneNumber = (EditText) findViewById(R.id.activity_appointment_creation_clients_phone_number_edit_text);
-        Spinner workerSpinner = (Spinner) findViewById(R.id.activity_appointment_creation_worker_spinner);
-        workerSpinner.setAdapter(new WorkerBaseAdapter(this, StoreWorkerModel.getInstance().getStoreWorkers()));
-        Spinner taskSpinner = (Spinner) findViewById(R.id.activity_appointment_creation_task_spinner);
-        taskSpinner.setAdapter(new TaskBaseAdapter(this, StoreTaskModel.getInstance().getStoreTasks()));
+        _spinnerWorker = (Spinner) findViewById(R.id.activity_appointment_creation_worker_spinner);
+        _spinnerWorker.setAdapter(new WorkerBaseAdapter(this, StoreWorkerModel.getInstance().getStoreWorkers()));
+        _spinnerTask = (Spinner) findViewById(R.id.activity_appointment_creation_task_spinner);
+        _spinnerTask.setAdapter(new TaskBaseAdapter(this, StoreTaskModel.getInstance().getStoreTasks()));
         _txtStartTime = (TextView) findViewById(R.id.activity_appointment_creation_start_text_view);
         _txtEndTime = (TextView) findViewById(R.id.activity_appointment_creation_end_text_view);
 
-        _currentStoreAppointment = new StoreAppointment();
+        init();
 
-        workerSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        _spinnerWorker.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                _selectedWorker = StoreWorkerModel.getInstance().getStoreWorker(position);
-                updateAppointment();
+                onWorkerSelected(position);
             }
 
             @Override
@@ -66,11 +76,10 @@ public class AppointmentCreationActivity extends AppCompatActivity {
             }
         });
 
-        taskSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        _spinnerTask.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                _selectedTask = StoreTaskModel.getInstance().getStoreTask(position);
-                updateAppointment();
+                onTaskSelected(position);
             }
 
             @Override
@@ -84,7 +93,7 @@ public class AppointmentCreationActivity extends AppCompatActivity {
             public void onClick(View v) {
                 _isStartTimeModified = true;
                 new TimePickerDialog(AppointmentCreationActivity.this,
-                        timePickerDialogListener,
+                        _timePickerDialogListener,
                         _calendarTime.get(Calendar.HOUR_OF_DAY),
                         _calendarTime.get(Calendar.MINUTE),
                         true).show();
@@ -96,7 +105,7 @@ public class AppointmentCreationActivity extends AppCompatActivity {
             public void onClick(View v) {
                 _isStartTimeModified = false;
                 new TimePickerDialog(AppointmentCreationActivity.this,
-                        timePickerDialogListener,
+                        _timePickerDialogListener,
                         _calendarTime.get(Calendar.HOUR_OF_DAY),
                         _calendarTime.get(Calendar.MINUTE),
                         true).show();
@@ -104,16 +113,21 @@ public class AppointmentCreationActivity extends AppCompatActivity {
         });
     }
 
-    TimePickerDialog.OnTimeSetListener timePickerDialogListener = new TimePickerDialog.OnTimeSetListener() {
-        public void onTimeSet(TimePicker view, int hourOfDay,
-                              int minute) {
-            _calendarTime.set(Calendar.HOUR_OF_DAY, hourOfDay);
-            _calendarTime.set(Calendar.MINUTE, minute);
-            updateTimes();
-        }
-    };
+    protected void init() {
+        _currentStoreAppointment = new StoreAppointment();
+    }
 
-    private void updateAppointment() {
+    protected void onWorkerSelected(int position_p) {
+        _selectedWorker = StoreWorkerModel.getInstance().getStoreWorker(position_p);
+        updateAppointmentInformation();
+    }
+
+    protected void onTaskSelected(int position_p) {
+        _selectedTask = StoreTaskModel.getInstance().getStoreTask(position_p);
+        updateAppointmentInformation();
+    }
+
+    protected void updateAppointmentInformation() {
         if (_selectedTask != null) {
             _currentStoreAppointment.setStoreTask(_selectedTask);
             _currentStoreAppointment.setStartDate(_selectedWorker.getNextAvailability());
@@ -122,7 +136,7 @@ public class AppointmentCreationActivity extends AppCompatActivity {
         }
     }
 
-    private void updateTimes() {
+    protected void updateTimes() {
         if (_isStartTimeModified) {
             _currentStoreAppointment.setStartDate(_calendarTime.getTime());
             _txtStartTime.setText(_currentStoreAppointment.getFormattedStartDate());
@@ -158,8 +172,8 @@ public class AppointmentCreationActivity extends AppCompatActivity {
         if (id == R.id.action_validate_prestation) {
             if (confirmAppointment()) {
                 Intent intent = new Intent();
-                intent.putExtra(RESULT_INTENT_POSITION_STRING_KEY, StoreWorkerModel.getInstance().getStoreWorkerPosition(_selectedWorker));
-                intent.putExtra(RESULT_INTENT_SORTED_STRING_KEY, _isSortingNeeded);
+                intent.putExtra(INTENT_EXTRA_WORKER_POSITION_STRING_KEY, StoreWorkerModel.getInstance().getStoreWorkerPosition(_selectedWorker));
+                intent.putExtra(INTENT_EXTRA_SORT_NEEDED_STRING_KEY, _isSortingNeeded);
                 setResult(RESULT_OK, intent);
                 finish();
             }
@@ -168,7 +182,7 @@ public class AppointmentCreationActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private boolean confirmAppointment() {
+    protected boolean confirmAppointment() {
         boolean result = true;
         String errorMessage = checkValidity();
         if (errorMessage == null) {
@@ -183,12 +197,12 @@ public class AppointmentCreationActivity extends AppCompatActivity {
         return result;
     }
 
-    private boolean doesAppointmentOverlap() {
+    protected boolean doesAppointmentOverlap() {
         // TODO overlapping algorithm
         return false;
     }
 
-    private String checkValidity() {
+    protected String checkValidity() {
         String errorMessage = null;
         if (_etClientsName.getText().toString().equals("")) {
             errorMessage = getString(R.string.please_specify_a_name);
