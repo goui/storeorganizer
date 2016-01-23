@@ -36,11 +36,32 @@
                 android:layout_below="@id/fragment_details_item_appointment_start_time_text_view"
                 android:background="@color/colorAccent"/>
 
+            <ImageView
+                android:id="@+id/fragment_details_item_appointment_task_name_image_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/fragment_details_item_appointment_start_separator"
+                android:layout_marginStart="4dp"
+                android:layout_marginTop="10dp"
+                android:contentDescription="@string/task_name"
+                android:src="@drawable/ic_task_black"/>
+
+            <TextView
+                android:id="@+id/fragment_details_item_appointment_task_name_text_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignTop="@id/fragment_details_item_appointment_task_name_image_view"
+                android:layout_marginTop="8dp"
+                android:layout_toEndOf="@id/fragment_details_item_appointment_task_name_image_view"
+                android:paddingEnd="8dp"
+                android:paddingStart="8dp"
+                android:textSize="16sp"/>
+
             <LinearLayout
                 android:id="@+id/fragment_details_item_appointment_content_layout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/fragment_details_item_appointment_start_separator"
+                android:layout_below="@id/fragment_details_item_appointment_task_name_image_view"
                 android:orientation="horizontal">
 
                 <RelativeLayout
@@ -54,7 +75,6 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="4dp"
-                        android:layout_marginTop="8dp"
                         android:contentDescription="@string/clients_name"
                         android:src="@drawable/ic_person_black"/>
 
@@ -69,26 +89,6 @@
                         android:paddingStart="8dp"
                         android:textSize="16sp"/>
 
-                    <ImageView
-                        android:id="@+id/fragment_details_item_appointment_clients_phone_image_view"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_below="@id/fragment_details_item_appointment_clients_name_image_view"
-                        android:layout_marginStart="4dp"
-                        android:layout_marginTop="8dp"
-                        android:contentDescription="@string/clients_phone_number"
-                        android:src="@drawable/ic_phone_black"/>
-
-                    <TextView
-                        android:id="@+id/fragment_details_item_appointment_clients_phone_text_view"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignTop="@id/fragment_details_item_appointment_clients_phone_image_view"
-                        android:layout_marginTop="7dp"
-                        android:layout_toEndOf="@id/fragment_details_item_appointment_clients_phone_image_view"
-                        android:paddingEnd="8dp"
-                        android:paddingStart="8dp"
-                        android:textSize="16sp"/>
 
                 </RelativeLayout>
 
@@ -99,42 +99,21 @@
                     android:layout_weight="1">
 
                     <ImageView
-                        android:id="@+id/fragment_details_item_appointment_task_name_image_view"
+                        android:id="@+id/fragment_details_item_appointment_clients_phone_image_view"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="4dp"
-                        android:layout_marginTop="10dp"
-                        android:contentDescription="@string/task_name"
-                        android:src="@drawable/ic_task_black"/>
+                        android:layout_marginTop="1dp"
+                        android:contentDescription="@string/clients_phone_number"
+                        android:src="@drawable/ic_phone_black"/>
 
                     <TextView
-                        android:id="@+id/fragment_details_item_appointment_task_name_text_view"
+                        android:id="@+id/fragment_details_item_appointment_clients_phone_text_view"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_alignTop="@id/fragment_details_item_appointment_task_name_image_view"
-                        android:layout_marginTop="8dp"
-                        android:layout_toEndOf="@id/fragment_details_item_appointment_task_name_image_view"
-                        android:paddingEnd="8dp"
-                        android:paddingStart="8dp"
-                        android:textSize="16sp"/>
-
-                    <ImageView
-                        android:id="@+id/fragment_details_item_appointment_task_duration_image_view"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_below="@id/fragment_details_item_appointment_task_name_image_view"
-                        android:layout_marginStart="4dp"
-                        android:layout_marginTop="7dp"
-                        android:contentDescription="@string/task_duration"
-                        android:src="@drawable/ic_duration_black"/>
-
-                    <TextView
-                        android:id="@+id/fragment_details_item_appointment_task_duration_text_view"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignTop="@id/fragment_details_item_appointment_task_duration_image_view"
+                        android:layout_alignTop="@id/fragment_details_item_appointment_clients_phone_image_view"
                         android:layout_marginTop="6dp"
-                        android:layout_toEndOf="@id/fragment_details_item_appointment_task_duration_image_view"
+                        android:layout_toEndOf="@id/fragment_details_item_appointment_clients_phone_image_view"
                         android:paddingEnd="8dp"
                         android:paddingStart="8dp"
                         android:textSize="16sp"/>

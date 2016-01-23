@@ -115,6 +115,9 @@ public class AppointmentCreationActivity extends AppCompatActivity {
 
     protected void init() {
         _currentStoreAppointment = new StoreAppointment();
+        int workerPosition = getIntent().getIntExtra(INTENT_EXTRA_WORKER_POSITION_STRING_KEY, 0);
+        _spinnerWorker.setSelection(workerPosition);
+        _selectedWorker = StoreWorkerModel.getInstance().getStoreWorker(workerPosition);
     }
 
     protected void onWorkerSelected(int position_p) {

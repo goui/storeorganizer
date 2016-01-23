@@ -67,6 +67,7 @@ public class DetailsActivity extends AppCompatActivity implements Observer, OnAl
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(DetailsActivity.this, AppointmentCreationActivity.class);
+                intent.putExtra(AppointmentCreationActivity.INTENT_EXTRA_WORKER_POSITION_STRING_KEY, mTabLayout.getSelectedTabPosition());
                 startActivityForResult(intent, REQUEST_CODE_CREATE_APPOINTMENT);
             }
         });

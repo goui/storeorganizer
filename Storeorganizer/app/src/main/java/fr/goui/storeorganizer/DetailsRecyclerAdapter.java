@@ -26,7 +26,6 @@ public class DetailsRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vi
         TextView txtClientsName;
         TextView txtClientsPhone;
         TextView txtTaskName;
-        TextView txtTaskDuration;
         TextView txtEndTime;
         int position;
 
@@ -36,7 +35,6 @@ public class DetailsRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vi
             txtClientsName = (TextView) itemView_p.findViewById(R.id.fragment_details_item_appointment_clients_name_text_view);
             txtClientsPhone = (TextView) itemView_p.findViewById(R.id.fragment_details_item_appointment_clients_phone_text_view);
             txtTaskName = (TextView) itemView_p.findViewById(R.id.fragment_details_item_appointment_task_name_text_view);
-            txtTaskDuration = (TextView) itemView_p.findViewById(R.id.fragment_details_item_appointment_task_duration_text_view);
             txtEndTime = (TextView) itemView_p.findViewById(R.id.fragment_details_item_appointment_end_time_text_view);
             RelativeLayout layout = (RelativeLayout) itemView_p.findViewById(R.id.fragment_details_item_appointment_layout);
             layout.setOnClickListener(this);
@@ -71,7 +69,6 @@ public class DetailsRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vi
             appointmentViewHolder.txtClientsName.setText(appointment.getClientName());
             appointmentViewHolder.txtClientsPhone.setText(appointment.getClientPhoneNumber());
             appointmentViewHolder.txtTaskName.setText(appointment.getStoreTask().getName());
-            appointmentViewHolder.txtTaskDuration.setText(appointment.getStoreTask().getDuration() + "min");
             appointmentViewHolder.txtEndTime.setText(appointment.getFormattedEndDate());
             appointmentViewHolder.position = position_p;
 
