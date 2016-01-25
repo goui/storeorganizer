@@ -103,7 +103,6 @@ public class AppointmentEditionActivity extends AppointmentCreationActivity {
     @Override
     protected boolean confirmAppointment() {
         boolean result = true;
-        boolean isSortingNeeded = false;
         String errorMessage = checkValidity();
         if (errorMessage == null) {
             _oldAppointment.setClientName(_etClientsName.getText().toString());
@@ -113,7 +112,7 @@ public class AppointmentEditionActivity extends AppointmentCreationActivity {
             _oldAppointment.setEndDate(_newAppointment.getEndDate());
             if (!_oldWorker.equals(_newWorker)) {
                 _oldWorker.removeStoreAppointment(_oldAppointment);
-                _newWorker.addStoreAppointment(_oldAppointment, isSortingNeeded);
+                _newWorker.addStoreAppointment(_oldAppointment);
                 _hasWorkerChanged = true;
             } else {
                 _hasWorkerChanged = false;

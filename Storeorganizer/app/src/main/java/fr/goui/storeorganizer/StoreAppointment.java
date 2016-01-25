@@ -12,13 +12,13 @@ public class StoreAppointment implements Comparable<StoreAppointment> {
 
     private String _clientPhoneNumber;
 
-    private Date _startDate;
+    protected Date _startDate;
 
-    private Date _endDate;
+    protected Date _endDate;
 
-    private SimpleDateFormat _simpleDateFormat;
+    protected SimpleDateFormat _simpleDateFormat;
 
-    private String _formattedStartDate;
+    protected String _formattedStartDate;
 
     private String _formattedEndDate;
 
@@ -118,9 +118,11 @@ public class StoreAppointment implements Comparable<StoreAppointment> {
     public class NullStoreAppointment extends StoreAppointment {
 
         @Override
-        public int compareTo(StoreAppointment another) {
-            return 0;
+        public void setStartDate(Date startDate_p) {
+            _startDate = startDate_p;
+            _formattedStartDate = _simpleDateFormat.format(_startDate);
         }
+
     }
 
 }

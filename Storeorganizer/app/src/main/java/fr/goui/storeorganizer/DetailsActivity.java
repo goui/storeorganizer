@@ -80,14 +80,9 @@ public class DetailsActivity extends AppCompatActivity implements Observer, OnAl
         if (requestCode == REQUEST_CODE_CREATE_APPOINTMENT) {
             if (resultCode == RESULT_OK) {
                 int position = data.getIntExtra(AppointmentCreationActivity.INTENT_EXTRA_WORKER_POSITION_STRING_KEY, 0);
-                boolean sorted = data.getBooleanExtra(AppointmentCreationActivity.INTENT_EXTRA_SORT_NEEDED_STRING_KEY, false);
                 DetailsFragment fragment = (DetailsFragment) getSupportFragmentManager()
                         .findFragmentByTag("android:switcher:" + R.id.container + ":" + position);
-                if (sorted) {
-                    fragment.notifyDataSetChanged();
-                } else {
-                    fragment.notifyItemAdded();
-                }
+                fragment.notifyDataSetChanged();
             }
         }
     }

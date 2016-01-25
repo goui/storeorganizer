@@ -43,11 +43,8 @@ public class StoreWorker {
         return _appointments;
     }
 
-    public void addStoreAppointment(StoreAppointment storeAppointment_p, boolean needToBeSorted_p) {
+    public void addStoreAppointment(StoreAppointment storeAppointment_p) {
         _appointments.add(storeAppointment_p);
-        if (needToBeSorted_p) {
-            sortAppointments();
-        }
     }
 
     public void sortAppointments() {
@@ -58,12 +55,16 @@ public class StoreWorker {
         _appointments.remove(storeAppointment_p);
     }
 
+    public StoreAppointment getLastAppointment() {
+        return _appointments != null && _appointments.size() > 0 ? _appointments.get(_appointments.size() - 1) : null;
+    }
+
     public Date getNextAvailability() {
         Date date = new Date();
-        if (_appointments.size() > 0) {
-            StoreAppointment lastAppointment = _appointments.get(_appointments.size() - 1);
+        StoreAppointment lastAppointment = getLastAppointment();
+        if (lastAppointment != null) {
             if (lastAppointment.getEndDate().after(date)) {
-                date = _appointments.get(_appointments.size() - 1).getEndDate();
+                date = lastAppointment.getEndDate();
             }
         }
         return date;

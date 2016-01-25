@@ -21,12 +21,10 @@ import java.util.Date;
 public class AppointmentCreationActivity extends AppCompatActivity {
 
     public static final String INTENT_EXTRA_WORKER_POSITION_STRING_KEY = "result_intent_position_string_key";
-    public static final String INTENT_EXTRA_SORT_NEEDED_STRING_KEY = "result_intent_sorted_string_key";
 
     private StoreAppointment _currentStoreAppointment;
     private StoreWorker _selectedWorker;
     private StoreTask _selectedTask;
-    private boolean _isSortingNeeded;
     private Date _now = new Date();
 
     protected EditText _etClientsName;
@@ -176,7 +174,6 @@ public class AppointmentCreationActivity extends AppCompatActivity {
             if (confirmAppointment()) {
                 Intent intent = new Intent();
                 intent.putExtra(INTENT_EXTRA_WORKER_POSITION_STRING_KEY, StoreWorkerModel.getInstance().getStoreWorkerPosition(_selectedWorker));
-                intent.putExtra(INTENT_EXTRA_SORT_NEEDED_STRING_KEY, _isSortingNeeded);
                 setResult(RESULT_OK, intent);
                 finish();
             }
@@ -191,8 +188,24 @@ public class AppointmentCreationActivity extends AppCompatActivity {
         if (errorMessage == null) {
             _currentStoreAppointment.setClientName(_etClientsName.getText().toString());
             _currentStoreAppointment.setClientPhoneNumber(_etClientsPhoneNumber.getText().toString());
-            _selectedWorker.addStoreAppointment(_currentStoreAppointment, _isSortingNeeded);
-            // TODO specify if the list of appointments should be sorted or not (filling holes in schedule)
+            if (_selectedWorker.getStoreAppointmentsNumber() == 0) {
+                if (_currentStoreAppointment.getStartDate().after(_now)
+                        && (_currentStoreAppointment.getStartDate().getTime() - _now.getTime()) >= 600000.0) {
+                    StoreAppointment.NullStoreAppointment nullStoreAppointment = _currentStoreAppointment.newNullInstance();
+                    nullStoreAppointment.setStartDate(_now);
+                    nullStoreAppointment.setEndDate(_currentStoreAppointment.getStartDate());
+                    _selectedWorker.addStoreAppointment(nullStoreAppointment);
+                }
+            } else {
+                if (_currentStoreAppointment.getStartDate().after(_selectedWorker.getLastAppointment().getEndDate())
+                        && _currentStoreAppointment.getStartDate().getTime() - _selectedWorker.getLastAppointment().getEndDate().getTime() >= 600000.0) {
+                    StoreAppointment.NullStoreAppointment nullStoreAppointment = _currentStoreAppointment.newNullInstance();
+                    nullStoreAppointment.setStartDate(_selectedWorker.getLastAppointment().getEndDate());
+                    nullStoreAppointment.setEndDate(_currentStoreAppointment.getStartDate());
+                    _selectedWorker.addStoreAppointment(nullStoreAppointment);
+                }
+            }
+            _selectedWorker.addStoreAppointment(_currentStoreAppointment);
         } else {
             Toast.makeText(this, errorMessage, Toast.LENGTH_LONG).show();
             result = false;
@@ -201,8 +214,24 @@ public class AppointmentCreationActivity extends AppCompatActivity {
     }
 
     protected boolean doesAppointmentOverlap() {
-        // TODO overlapping algorithm
-        return false;
+        boolean overlaps = false;
+        if (_selectedWorker.getStoreAppointmentsNumber() > 0) {
+            StoreAppointment firstAppointment = _selectedWorker.getStoreAppointment(0);
+            StoreAppointment lastAppointment = _selectedWorker.getLastAppointment();
+            if (_currentStoreAppointment.getStartDate().before(firstAppointment.getStartDate())
+                    && _currentStoreAppointment.getEndDate().after(firstAppointment.getStartDate())) {
+                overlaps = true;
+            }
+            if (_currentStoreAppointment.getStartDate().before(lastAppointment.getEndDate())
+                    && _currentStoreAppointment.getEndDate().after(lastAppointment.getEndDate())) {
+                overlaps = true;
+            }
+            if (_currentStoreAppointment.getStartDate().after(firstAppointment.getStartDate())
+                    && _currentStoreAppointment.getEndDate().before(lastAppointment.getEndDate())) {
+                overlaps = true;
+            }
+        }
+        return overlaps;
     }
 
     protected String checkValidity() {
