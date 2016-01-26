@@ -35,7 +35,7 @@ public class DetailsRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vi
 
         @Override
         public void onClick(View v) {
-            _onAppointmentClickListener.onAppointmentClick(position);
+            _onAppointmentClickListener.onAppointmentEdit(position);
         }
 
     }
@@ -62,7 +62,7 @@ public class DetailsRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vi
 
         @Override
         public void onClick(View v) {
-            _onAppointmentClickListener.onAppointmentClick(position);
+            _onAppointmentClickListener.onAppointmentEdit(position);
         }
 
         @Override
@@ -72,7 +72,7 @@ public class DetailsRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vi
             builder.setPositiveButton(_context.getString(R.string.yes), new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    _onAppointmentClickListener.onAppointmentLongClick(position);
+                    _onAppointmentClickListener.onAppointmentDelete(position);
                 }
             });
             builder.setNegativeButton(_context.getString(R.string.no), new DialogInterface.OnClickListener() {

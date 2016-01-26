@@ -68,7 +68,7 @@ public class DetailsFragment extends Fragment implements OnAppointmentClickListe
     }
 
     @Override
-    public void onAppointmentClick(int position_p) {
+    public void onAppointmentEdit(int position_p) {
         Intent intent = new Intent(getContext(), AppointmentEditionActivity.class);
         intent.putExtra(INTENT_EXTRA_APPOINTMENT_POSITION, position_p);
         intent.putExtra(INTENT_EXTRA_WORKER_POSITION, _sectionNumber);
@@ -76,7 +76,7 @@ public class DetailsFragment extends Fragment implements OnAppointmentClickListe
     }
 
     @Override
-    public void onAppointmentLongClick(int position_p) {
+    public void onAppointmentDelete(int position_p) {
 
         // if only item, remove appointment
         if (position_p == 0 && _currentWorker.getStoreAppointmentsNumber() == 1) {
@@ -128,10 +128,9 @@ public class DetailsFragment extends Fragment implements OnAppointmentClickListe
             _currentWorker.getStoreAppointments().remove(position_p);
         }
 
-        // if gap before and after
+        // if gap before and after, change the before gap end time and remove after gap and appointment
         else if (_currentWorker.getStoreAppointment(position_p - 1) instanceof StoreAppointment.NullStoreAppointment
                 && _currentWorker.getStoreAppointment(position_p + 1) instanceof StoreAppointment.NullStoreAppointment) {
-            // change the before gap end time and remove after gap and appointment
             _currentWorker.getStoreAppointment(position_p - 1).setEndDate(_currentWorker.getStoreAppointment(position_p + 1).getEndDate());
             _currentWorker.getStoreAppointments().remove(position_p);
             _currentWorker.getStoreAppointments().remove(position_p);
