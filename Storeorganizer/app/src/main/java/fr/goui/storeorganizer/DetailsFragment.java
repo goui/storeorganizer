@@ -76,6 +76,79 @@ public class DetailsFragment extends Fragment implements OnAppointmentClickListe
     }
 
     @Override
+    public void onAppointmentLongClick(int position_p) {
+
+        // if only item, remove appointment
+        if (position_p == 0 && _currentWorker.getStoreAppointmentsNumber() == 1) {
+            _currentWorker.getStoreAppointments().remove(position_p);
+        }
+
+        // if first item and gap after, remove appointment and extend gap between now to its end time
+        else if (position_p == 0 && _currentWorker.getStoreAppointment(position_p + 1) instanceof StoreAppointment.NullStoreAppointment) {
+            _currentWorker.getStoreAppointment(position_p + 1).setStartDate(new Date());
+            _currentWorker.getStoreAppointments().remove(position_p);
+        }
+
+        // if first item and appointment after, replace appointment with created gap between now and next appointment's start time
+        else if (position_p == 0 && !(_currentWorker.getStoreAppointment(position_p + 1) instanceof StoreAppointment.NullStoreAppointment)) {
+            StoreAppointment gap = new StoreAppointment().newNullInstance();
+            gap.setStartDate(new Date());
+            gap.setEndDate(_currentWorker.getStoreAppointment(position_p).getEndDate());
+            if ((gap.getEndDate().getTime() - gap.getStartDate().getTime()) / 60000 >= StoreTaskModel.getInstance().getMinTimeInMinutes()) {
+                _currentWorker.getStoreAppointments().set(position_p, gap);
+            } else {
+                _currentWorker.getStoreAppointments().remove(position_p);
+            }
+        }
+
+        // if last item and gap before, remove appointment and gap before
+        else if (position_p == _currentWorker.getStoreAppointmentsNumber() - 1
+                && _currentWorker.getStoreAppointment(position_p - 1) instanceof StoreAppointment.NullStoreAppointment) {
+            _currentWorker.getStoreAppointments().remove(position_p - 1);
+            _currentWorker.getStoreAppointments().remove(position_p - 1);
+        }
+
+        // if last item and appointment before, remove appointment
+        else if (position_p == _currentWorker.getStoreAppointmentsNumber() - 1
+                && !(_currentWorker.getStoreAppointment(position_p - 1) instanceof StoreAppointment.NullStoreAppointment)) {
+            _currentWorker.getStoreAppointments().remove(position_p);
+        }
+
+        // if gap only before, extend the gap end time and remove appointment
+        else if (_currentWorker.getStoreAppointment(position_p - 1) instanceof StoreAppointment.NullStoreAppointment
+                && !(_currentWorker.getStoreAppointment(position_p + 1) instanceof StoreAppointment.NullStoreAppointment)) {
+            _currentWorker.getStoreAppointment(position_p - 1).setEndDate(_currentWorker.getStoreAppointment(position_p).getEndDate());
+            _currentWorker.getStoreAppointments().remove(position_p);
+        }
+
+        // if gap only after, extend the gap start time and remove appointment
+        else if (!(_currentWorker.getStoreAppointment(position_p - 1) instanceof StoreAppointment.NullStoreAppointment)
+                && _currentWorker.getStoreAppointment(position_p + 1) instanceof StoreAppointment.NullStoreAppointment) {
+            _currentWorker.getStoreAppointment(position_p + 1).setStartDate(_currentWorker.getStoreAppointment(position_p).getStartDate());
+            _currentWorker.getStoreAppointments().remove(position_p);
+        }
+
+        // if gap before and after
+        else if (_currentWorker.getStoreAppointment(position_p - 1) instanceof StoreAppointment.NullStoreAppointment
+                && _currentWorker.getStoreAppointment(position_p + 1) instanceof StoreAppointment.NullStoreAppointment) {
+            // change the before gap end time and remove after gap and appointment
+            _currentWorker.getStoreAppointment(position_p - 1).setEndDate(_currentWorker.getStoreAppointment(position_p + 1).getEndDate());
+            _currentWorker.getStoreAppointments().remove(position_p);
+            _currentWorker.getStoreAppointments().remove(position_p);
+        }
+
+        // if appointment before and after, remove appointment and create gap
+        else {
+            StoreAppointment gap = new StoreAppointment().newNullInstance();
+            gap.setStartDate(_currentWorker.getStoreAppointment(position_p).getStartDate());
+            gap.setEndDate(_currentWorker.getStoreAppointment(position_p).getEndDate());
+            _currentWorker.getStoreAppointments().set(position_p, gap);
+        }
+
+        notifyDataSetChanged();
+    }
+
+    @Override
     public void onAttach(Context context) {
         super.onAttach(context);
         _onAllFragmentsChangedListener = (OnAllFragmentsChangedListener) context;

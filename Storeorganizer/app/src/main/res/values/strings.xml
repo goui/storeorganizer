@@ -22,8 +22,11 @@
     <string name="add_appointment">Add appointment</string>
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
     <string name="worker_removed">Worker removed</string>
     <string name="question_remove">Remove?</string>
+    <string name="question_remove_this_appointment">Remove this appointment?</string>
     <string name="gap">gap</string>
     <string name="undo">Undo</string>
     <string name="edit">Edit</string>

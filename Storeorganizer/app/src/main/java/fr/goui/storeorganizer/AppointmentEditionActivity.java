@@ -124,7 +124,14 @@ public class AppointmentEditionActivity extends AppointmentCreationActivity {
             } else {
                 _hasWorkerChanged = false;
             }
-            // TODO specify if the list of appointments should be sorted or not (filling holes in schedule)
+            // TODO manage gap case
+            // worker does not change
+            // if new appointment replace entire gap just remove the gap and create appointment
+            // if new appointment replace part of the gap create a gap if there is enough time
+            // beware of present time and overlapping
+            // worker changes
+            // see DetailsFragment.onAppointmentLongClick method for removal
+            // see AppointmentCreationActivity for addition
         } else {
             Toast.makeText(this, errorMessage, Toast.LENGTH_LONG).show();
             result = false;
