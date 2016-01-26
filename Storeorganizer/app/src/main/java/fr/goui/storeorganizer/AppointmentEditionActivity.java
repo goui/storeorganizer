@@ -27,9 +27,11 @@ public class AppointmentEditionActivity extends AppointmentCreationActivity {
                 _newAppointment = new StoreAppointment();
                 _oldTask = _oldAppointment.getStoreTask();
                 int taskPosition = -1;
-                for (int i = 0; i < StoreTaskModel.getInstance().getStoreTaskNumber(); i++) {
-                    if (_oldTask.equals(StoreTaskModel.getInstance().getStoreTask(i))) {
-                        taskPosition = i;
+                if (_oldTask != null) {
+                    for (int i = 0; i < StoreTaskModel.getInstance().getStoreTaskNumber(); i++) {
+                        if (_oldTask.equals(StoreTaskModel.getInstance().getStoreTask(i))) {
+                            taskPosition = i;
+                        }
                     }
                 }
 
@@ -68,7 +70,12 @@ public class AppointmentEditionActivity extends AppointmentCreationActivity {
         _etClientsName.setText(_oldAppointment.getClientName());
         _etClientsPhoneNumber.setText(_oldAppointment.getClientPhoneNumber());
         _spinnerWorker.setSelection(workerPosition_p);
-        _spinnerTask.setSelection(taskPosition_p);
+        if (_oldTask != null) {
+            _spinnerTask.setSelection(taskPosition_p);
+        } else {
+            _spinnerWorker.setEnabled(false);
+            _spinnerWorker.setBackgroundResource(R.color.light_grey);
+        }
         _txtStartTime.setText(_oldAppointment.getFormattedStartDate());
         _txtEndTime.setText(_oldAppointment.getFormattedEndDate());
     }
@@ -138,4 +145,8 @@ public class AppointmentEditionActivity extends AppointmentCreationActivity {
         return errorMessage;
     }
 
+    @Override
+    protected boolean doesAppointmentOverlap() {
+        return false;
+    }
 }

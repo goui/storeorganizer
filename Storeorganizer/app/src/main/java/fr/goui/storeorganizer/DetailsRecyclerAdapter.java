@@ -28,7 +28,7 @@ public class DetailsRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vi
         public NullAppointmentViewHolder(View itemView_p) {
             super(itemView_p);
             textView = (TextView) itemView_p.findViewById(R.id.fragment_details_item_null_appointment_text_view);
-            itemView_p.setOnClickListener(this);
+            textView.setOnClickListener(this);
         }
 
         @Override
@@ -55,7 +55,6 @@ public class DetailsRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vi
             txtEndTime = (TextView) itemView_p.findViewById(R.id.fragment_details_item_appointment_end_time_text_view);
             RelativeLayout layout = (RelativeLayout) itemView_p.findViewById(R.id.fragment_details_item_appointment_layout);
             layout.setOnClickListener(this);
-            itemView_p.setOnClickListener(this);
         }
 
         @Override
@@ -105,6 +104,7 @@ public class DetailsRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vi
             long endTime = appointment.getEndDate().getTime();
             holder_p.textView.setText(
                     (endTime - startTime) / 60000 + _context.getString(R.string.minutes) + " " + _context.getString(R.string.gap));
+            holder_p.position = position_p;
         }
     }
 

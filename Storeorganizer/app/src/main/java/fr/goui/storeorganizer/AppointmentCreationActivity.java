@@ -190,7 +190,7 @@ public class AppointmentCreationActivity extends AppCompatActivity {
             _currentStoreAppointment.setClientPhoneNumber(_etClientsPhoneNumber.getText().toString());
             if (_selectedWorker.getStoreAppointmentsNumber() == 0) {
                 if (_currentStoreAppointment.getStartDate().after(_now)
-                        && (_currentStoreAppointment.getStartDate().getTime() - _now.getTime()) >= 600000.0) {
+                        && ((_currentStoreAppointment.getStartDate().getTime() - _now.getTime()) / 60000) >= StoreTaskModel.getInstance().getMinTimeInMinutes()) {
                     StoreAppointment.NullStoreAppointment nullStoreAppointment = _currentStoreAppointment.newNullInstance();
                     nullStoreAppointment.setStartDate(_now);
                     nullStoreAppointment.setEndDate(_currentStoreAppointment.getStartDate());
@@ -198,7 +198,7 @@ public class AppointmentCreationActivity extends AppCompatActivity {
                 }
             } else {
                 if (_currentStoreAppointment.getStartDate().after(_selectedWorker.getLastAppointment().getEndDate())
-                        && _currentStoreAppointment.getStartDate().getTime() - _selectedWorker.getLastAppointment().getEndDate().getTime() >= 600000.0) {
+                        && ((_currentStoreAppointment.getStartDate().getTime() - _selectedWorker.getLastAppointment().getEndDate().getTime()) / 60000) >= StoreTaskModel.getInstance().getMinTimeInMinutes()) {
                     StoreAppointment.NullStoreAppointment nullStoreAppointment = _currentStoreAppointment.newNullInstance();
                     nullStoreAppointment.setStartDate(_selectedWorker.getLastAppointment().getEndDate());
                     nullStoreAppointment.setEndDate(_currentStoreAppointment.getStartDate());
