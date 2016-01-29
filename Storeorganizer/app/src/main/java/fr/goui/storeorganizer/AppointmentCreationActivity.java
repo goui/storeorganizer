@@ -22,11 +22,12 @@ public class AppointmentCreationActivity extends AppCompatActivity {
 
     public static final String INTENT_EXTRA_WORKER_POSITION_STRING_KEY = "result_intent_position_string_key";
 
-    private StoreAppointment _currentStoreAppointment;
-    private StoreWorker _selectedWorker;
-    private StoreTask _selectedTask;
-    private Date _now = new Date();
+    private StoreTask _newTask;
 
+    protected StoreAppointment _newAppointment;
+    protected StoreWorker _newWorker;
+    protected int _newWorkerPosition;
+    protected Date _now = new Date();
     protected EditText _etClientsName;
     protected EditText _etClientsPhoneNumber;
     protected Spinner _spinnerWorker;
@@ -112,39 +113,40 @@ public class AppointmentCreationActivity extends AppCompatActivity {
     }
 
     protected void init() {
-        _currentStoreAppointment = new StoreAppointment();
+        _newAppointment = new StoreAppointment();
         int workerPosition = getIntent().getIntExtra(INTENT_EXTRA_WORKER_POSITION_STRING_KEY, 0);
         _spinnerWorker.setSelection(workerPosition);
-        _selectedWorker = StoreWorkerModel.getInstance().getStoreWorker(workerPosition);
+        _newWorker = StoreWorkerModel.getInstance().getStoreWorker(workerPosition);
     }
 
     protected void onWorkerSelected(int position_p) {
-        _selectedWorker = StoreWorkerModel.getInstance().getStoreWorker(position_p);
+        _newWorker = StoreWorkerModel.getInstance().getStoreWorker(position_p);
+        _newWorkerPosition = position_p;
         updateAppointmentInformation();
     }
 
     protected void onTaskSelected(int position_p) {
-        _selectedTask = StoreTaskModel.getInstance().getStoreTask(position_p);
+        _newTask = StoreTaskModel.getInstance().getStoreTask(position_p);
         updateAppointmentInformation();
     }
 
     protected void updateAppointmentInformation() {
-        if (_selectedTask != null) {
-            _currentStoreAppointment.setStoreTask(_selectedTask);
-            _currentStoreAppointment.setStartDate(_selectedWorker.getNextAvailability());
-            _txtStartTime.setText(_currentStoreAppointment.getFormattedStartDate());
-            _txtEndTime.setText(_currentStoreAppointment.getFormattedEndDate());
+        if (_newTask != null) {
+            _newAppointment.setStoreTask(_newTask);
+            _newAppointment.setStartDate(_newWorker.getNextAvailability());
+            _txtStartTime.setText(_newAppointment.getFormattedStartDate());
+            _txtEndTime.setText(_newAppointment.getFormattedEndDate());
         }
     }
 
     protected void updateTimes() {
         if (_isStartTimeModified) {
-            _currentStoreAppointment.setStartDate(_calendarTime.getTime());
-            _txtStartTime.setText(_currentStoreAppointment.getFormattedStartDate());
-            _txtEndTime.setText(_currentStoreAppointment.getFormattedEndDate());
+            _newAppointment.setStartDate(_calendarTime.getTime());
+            _txtStartTime.setText(_newAppointment.getFormattedStartDate());
+            _txtEndTime.setText(_newAppointment.getFormattedEndDate());
         } else {
-            _currentStoreAppointment.setEndDate(_calendarTime.getTime());
-            _txtEndTime.setText(_currentStoreAppointment.getFormattedEndDate());
+            _newAppointment.setEndDate(_calendarTime.getTime());
+            _txtEndTime.setText(_newAppointment.getFormattedEndDate());
         }
     }
 
@@ -165,47 +167,47 @@ public class AppointmentCreationActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        boolean ret = super.onOptionsItemSelected(item);
         int id = item.getItemId();
         if (id == android.R.id.home) {
             onBackPressed();
-            return true;
-        }
-        if (id == R.id.action_validate_prestation) {
+            ret = true;
+        } else if (id == R.id.action_validate_prestation) {
             if (confirmAppointment()) {
                 Intent intent = new Intent();
-                intent.putExtra(INTENT_EXTRA_WORKER_POSITION_STRING_KEY, StoreWorkerModel.getInstance().getStoreWorkerPosition(_selectedWorker));
+                intent.putExtra(INTENT_EXTRA_WORKER_POSITION_STRING_KEY, _newWorkerPosition);
                 setResult(RESULT_OK, intent);
                 finish();
             }
-            return true;
+            ret = true;
         }
-        return super.onOptionsItemSelected(item);
+        return ret;
     }
 
     protected boolean confirmAppointment() {
         boolean result = true;
         String errorMessage = checkValidity();
         if (errorMessage == null) {
-            _currentStoreAppointment.setClientName(_etClientsName.getText().toString());
-            _currentStoreAppointment.setClientPhoneNumber(_etClientsPhoneNumber.getText().toString());
-            if (_selectedWorker.getStoreAppointmentsNumber() == 0) {
-                if (_currentStoreAppointment.getStartDate().after(_now)
-                        && ((_currentStoreAppointment.getStartDate().getTime() - _now.getTime()) / 60000) >= StoreTaskModel.getInstance().getMinTimeInMinutes()) {
-                    StoreAppointment.NullStoreAppointment nullStoreAppointment = _currentStoreAppointment.newNullInstance();
+            _newAppointment.setClientName(_etClientsName.getText().toString());
+            _newAppointment.setClientPhoneNumber(_etClientsPhoneNumber.getText().toString());
+            if (_newWorker.getStoreAppointmentsNumber() == 0) {
+                if (_newAppointment.getStartDate().after(_now)
+                        && ((_newAppointment.getStartDate().getTime() - _now.getTime()) / 60000) >= StoreTaskModel.getInstance().getMinTimeInMinutes()) {
+                    StoreAppointment.NullStoreAppointment nullStoreAppointment = _newAppointment.newNullInstance();
                     nullStoreAppointment.setStartDate(_now);
-                    nullStoreAppointment.setEndDate(_currentStoreAppointment.getStartDate());
-                    _selectedWorker.addStoreAppointment(nullStoreAppointment);
+                    nullStoreAppointment.setEndDate(_newAppointment.getStartDate());
+                    _newWorker.addStoreAppointment(nullStoreAppointment);
                 }
             } else {
-                if (_currentStoreAppointment.getStartDate().after(_selectedWorker.getLastAppointment().getEndDate())
-                        && ((_currentStoreAppointment.getStartDate().getTime() - _selectedWorker.getLastAppointment().getEndDate().getTime()) / 60000) >= StoreTaskModel.getInstance().getMinTimeInMinutes()) {
-                    StoreAppointment.NullStoreAppointment nullStoreAppointment = _currentStoreAppointment.newNullInstance();
-                    nullStoreAppointment.setStartDate(_selectedWorker.getLastAppointment().getEndDate());
-                    nullStoreAppointment.setEndDate(_currentStoreAppointment.getStartDate());
-                    _selectedWorker.addStoreAppointment(nullStoreAppointment);
+                if (_newAppointment.getStartDate().after(_newWorker.getLastAppointment().getEndDate())
+                        && ((_newAppointment.getStartDate().getTime() - _newWorker.getLastAppointment().getEndDate().getTime()) / 60000) >= StoreTaskModel.getInstance().getMinTimeInMinutes()) {
+                    StoreAppointment.NullStoreAppointment nullStoreAppointment = _newAppointment.newNullInstance();
+                    nullStoreAppointment.setStartDate(_newWorker.getLastAppointment().getEndDate());
+                    nullStoreAppointment.setEndDate(_newAppointment.getStartDate());
+                    _newWorker.addStoreAppointment(nullStoreAppointment);
                 }
             }
-            _selectedWorker.addStoreAppointment(_currentStoreAppointment);
+            _newWorker.addStoreAppointment(_newAppointment);
         } else {
             Toast.makeText(this, errorMessage, Toast.LENGTH_LONG).show();
             result = false;
@@ -215,19 +217,19 @@ public class AppointmentCreationActivity extends AppCompatActivity {
 
     protected boolean doesAppointmentOverlap() {
         boolean overlaps = false;
-        if (_selectedWorker.getStoreAppointmentsNumber() > 0) {
-            StoreAppointment firstAppointment = _selectedWorker.getStoreAppointment(0);
-            StoreAppointment lastAppointment = _selectedWorker.getLastAppointment();
-            if (_currentStoreAppointment.getStartDate().before(firstAppointment.getStartDate())
-                    && _currentStoreAppointment.getEndDate().after(firstAppointment.getStartDate())) {
+        if (_newWorker.getStoreAppointmentsNumber() > 0) {
+            StoreAppointment firstAppointment = _newWorker.getStoreAppointment(0);
+            StoreAppointment lastAppointment = _newWorker.getLastAppointment();
+            if (_newAppointment.getStartDate().before(firstAppointment.getStartDate())
+                    && _newAppointment.getEndDate().after(firstAppointment.getStartDate())) {
                 overlaps = true;
             }
-            if (_currentStoreAppointment.getStartDate().before(lastAppointment.getEndDate())
-                    && _currentStoreAppointment.getEndDate().after(lastAppointment.getEndDate())) {
+            if (_newAppointment.getStartDate().before(lastAppointment.getEndDate())
+                    && _newAppointment.getEndDate().after(lastAppointment.getEndDate())) {
                 overlaps = true;
             }
-            if (_currentStoreAppointment.getStartDate().after(firstAppointment.getStartDate())
-                    && _currentStoreAppointment.getEndDate().before(lastAppointment.getEndDate())) {
+            if (_newAppointment.getStartDate().after(firstAppointment.getStartDate())
+                    && _newAppointment.getEndDate().before(lastAppointment.getEndDate())) {
                 overlaps = true;
             }
         }
@@ -238,9 +240,9 @@ public class AppointmentCreationActivity extends AppCompatActivity {
         String errorMessage = null;
         if (_etClientsName.getText().toString().equals("")) {
             errorMessage = getString(R.string.please_specify_a_name);
-        } else if (_currentStoreAppointment.getStartDate().before(_now)) {
+        } else if (_newAppointment.getStartDate().before(_now)) {
             errorMessage = getString(R.string.starting_time_cannot_be_in_the_past);
-        } else if (_currentStoreAppointment.getEndDate().before(_currentStoreAppointment.getStartDate())) {
+        } else if (_newAppointment.getEndDate().before(_newAppointment.getStartDate())) {
             errorMessage = getString(R.string.ending_time_cannot_be_prior_to_starting_time);
         } else if (doesAppointmentOverlap()) {
             errorMessage = getString(R.string.appointment_overlaps_with_at_least_another_one);

@@ -54,6 +54,10 @@ public class StoreAppointment implements Comparable<StoreAppointment> {
         return _formattedEndDate;
     }
 
+    public int getDuration() {
+        return _storeTask != null ? _storeTask.getDuration() : 0;
+    }
+
     public void setStoreTask(StoreTask storeTask_p) {
         _storeTask = storeTask_p;
     }
@@ -123,6 +127,10 @@ public class StoreAppointment implements Comparable<StoreAppointment> {
             _formattedStartDate = _simpleDateFormat.format(_startDate);
         }
 
+        @Override
+        public int getDuration() {
+            return (int) (_endDate.getTime() - _startDate.getTime()) / 60000;
+        }
     }
 
 }

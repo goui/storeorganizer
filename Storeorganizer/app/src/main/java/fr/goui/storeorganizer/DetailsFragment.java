@@ -1,10 +1,8 @@
 package fr.goui.storeorganizer;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -22,7 +20,6 @@ import java.util.Date;
 public class DetailsFragment extends Fragment implements OnAppointmentClickListener {
 
     public static final String ARG_SECTION_NUMBER = "section_number";
-    private static final int REQUEST_CODE_EDIT_APPOINTMENT = 2;
     public static final String INTENT_EXTRA_APPOINTMENT_POSITION = "intent_extra_appointment_position";
     public static final String INTENT_EXTRA_WORKER_POSITION = "intent_extra_worker_position";
 
@@ -37,8 +34,6 @@ public class DetailsFragment extends Fragment implements OnAppointmentClickListe
     private DetailsRecyclerAdapter _detailsRecyclerAdapter;
 
     private Calendar _calendar;
-
-    private OnAllFragmentsChangedListener _onAllFragmentsChangedListener;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -69,14 +64,15 @@ public class DetailsFragment extends Fragment implements OnAppointmentClickListe
 
     @Override
     public void onAppointmentEdit(int position_p) {
-        Intent intent = new Intent(getContext(), AppointmentEditionActivity.class);
+        Intent intent = new Intent(getActivity(), AppointmentEditionActivity.class);
         intent.putExtra(INTENT_EXTRA_APPOINTMENT_POSITION, position_p);
         intent.putExtra(INTENT_EXTRA_WORKER_POSITION, _sectionNumber);
-        startActivityForResult(intent, REQUEST_CODE_EDIT_APPOINTMENT);
+        getActivity().startActivityForResult(intent, DetailsActivity.REQUEST_CODE_EDIT_APPOINTMENT);
     }
 
     @Override
     public void onAppointmentDelete(int position_p) {
+        // TODO simplify appointment deletion
 
         // if only item, remove appointment
         if (position_p == 0 && _currentWorker.getStoreAppointmentsNumber() == 1) {
@@ -94,7 +90,7 @@ public class DetailsFragment extends Fragment implements OnAppointmentClickListe
             StoreAppointment gap = new StoreAppointment().newNullInstance();
             gap.setStartDate(new Date());
             gap.setEndDate(_currentWorker.getStoreAppointment(position_p).getEndDate());
-            if ((gap.getEndDate().getTime() - gap.getStartDate().getTime()) / 60000 >= StoreTaskModel.getInstance().getMinTimeInMinutes()) {
+            if (gap.getDuration() >= StoreTaskModel.getInstance().getMinTimeInMinutes()) {
                 _currentWorker.getStoreAppointments().set(position_p, gap);
             } else {
                 _currentWorker.getStoreAppointments().remove(position_p);
@@ -139,41 +135,12 @@ public class DetailsFragment extends Fragment implements OnAppointmentClickListe
         // if appointment before and after, remove appointment and create gap
         else {
             StoreAppointment gap = new StoreAppointment().newNullInstance();
-            gap.setStartDate(_currentWorker.getStoreAppointment(position_p).getStartDate());
-            gap.setEndDate(_currentWorker.getStoreAppointment(position_p).getEndDate());
+            gap.setStartDate(_currentWorker.getStoreAppointment(position_p - 1).getEndDate());
+            gap.setEndDate(_currentWorker.getStoreAppointment(position_p + 1).getStartDate());
             _currentWorker.getStoreAppointments().set(position_p, gap);
         }
 
         notifyDataSetChanged();
-    }
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        _onAllFragmentsChangedListener = (OnAllFragmentsChangedListener) context;
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        _onAllFragmentsChangedListener = null;
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REQUEST_CODE_EDIT_APPOINTMENT) {
-            if (resultCode == AppCompatActivity.RESULT_OK) {
-                if (data.getBooleanExtra(AppointmentEditionActivity.INTENT_EXTRA_WORKER_CHANGED, false)) {
-                    _onAllFragmentsChangedListener.onAllFragmentsChanged();
-                } else {
-                    notifyDataSetChanged();
-                    Toast.makeText(getActivity(), "appointment edited", Toast.LENGTH_SHORT).show();
-                }
-            } else {
-                Toast.makeText(getActivity(), "appointment not edited", Toast.LENGTH_SHORT).show();
-            }
-        }
     }
 
     @Override
@@ -213,7 +180,6 @@ public class DetailsFragment extends Fragment implements OnAppointmentClickListe
 
     public void notifyDataSetChanged() {
         _detailsRecyclerAdapter.notifyDataSetChanged();
-        scrollToCurrentAppointment();
         computeNoAppointmentTextViewVisibility();
     }
 

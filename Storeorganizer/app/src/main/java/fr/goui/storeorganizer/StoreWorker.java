@@ -59,6 +59,14 @@ public class StoreWorker {
         return _appointments != null && _appointments.size() > 0 ? _appointments.get(_appointments.size() - 1) : null;
     }
 
+    public boolean isThereAppointmentBefore(int position_p) {
+        return _appointments != null && _appointments.size() > 0 && position_p > 0;
+    }
+
+    public boolean isThereAppointmentAfter(int position_p) {
+        return _appointments != null && _appointments.size() > 0 && position_p < _appointments.size() - 1;
+    }
+
     public Date getNextAvailability() {
         Date date = new Date();
         StoreAppointment lastAppointment = getLastAppointment();

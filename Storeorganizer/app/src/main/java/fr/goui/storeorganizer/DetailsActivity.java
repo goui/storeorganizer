@@ -17,7 +17,7 @@ import android.view.View;
 import java.util.Observable;
 import java.util.Observer;
 
-public class DetailsActivity extends AppCompatActivity implements Observer, OnAllFragmentsChangedListener {
+public class DetailsActivity extends AppCompatActivity implements Observer {
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -30,6 +30,9 @@ public class DetailsActivity extends AppCompatActivity implements Observer, OnAl
     private SectionsPagerAdapter mSectionsPagerAdapter;
 
     private static final int REQUEST_CODE_CREATE_APPOINTMENT = 1;
+    public static final int REQUEST_CODE_EDIT_APPOINTMENT = 2;
+    public static final String INTENT_EXTRA_APPOINTMENT_POSITION = "intent_extra_appointment_position";
+    public static final String INTENT_EXTRA_WORKER_POSITION = "intent_extra_worker_position";
 
     /**
      * The {@link ViewPager} that will host the section contents.
@@ -79,21 +82,27 @@ public class DetailsActivity extends AppCompatActivity implements Observer, OnAl
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_CODE_CREATE_APPOINTMENT) {
             if (resultCode == RESULT_OK) {
-                int position = data.getIntExtra(AppointmentCreationActivity.INTENT_EXTRA_WORKER_POSITION_STRING_KEY, 0);
+                int position = data.getIntExtra(AppointmentCreationActivity.INTENT_EXTRA_WORKER_POSITION_STRING_KEY, -1);
                 DetailsFragment fragment = (DetailsFragment) getSupportFragmentManager()
                         .findFragmentByTag("android:switcher:" + R.id.container + ":" + position);
                 fragment.notifyDataSetChanged();
             }
         }
-    }
-
-    @Override
-    public void onAllFragmentsChanged() {
-        for (int i = 0; i < mSectionsPagerAdapter.getCount(); i++) {
-            DetailsFragment fragment = (DetailsFragment) getSupportFragmentManager()
-                    .findFragmentByTag("android:switcher:" + R.id.container + ":" + i);
-            if (fragment != null) {
-                fragment.notifyDataSetChanged();
+        if (requestCode == REQUEST_CODE_EDIT_APPOINTMENT) {
+            if (resultCode == RESULT_OK) {
+                int oldWorkerPosition = data.getIntExtra(AppointmentEditionActivity.INTENT_EXTRA_OLD_WORKER_POSITION, -1);
+                int newWorkerPosition = data.getIntExtra(AppointmentEditionActivity.INTENT_EXTRA_NEW_WORKER_POSITION, -1);
+                int oldAppointmentPosition = data.getIntExtra(AppointmentEditionActivity.INTENT_EXTRA_OLD_APPOINTMENT_POSITION, -1);
+                DetailsFragment oldFragment = (DetailsFragment) getSupportFragmentManager()
+                        .findFragmentByTag("android:switcher:" + R.id.container + ":" + oldWorkerPosition);
+                if (oldWorkerPosition != newWorkerPosition) {
+                    oldFragment.onAppointmentDelete(oldAppointmentPosition);
+                    DetailsFragment newFragment = (DetailsFragment) getSupportFragmentManager()
+                            .findFragmentByTag("android:switcher:" + R.id.container + ":" + newWorkerPosition);
+                    newFragment.notifyDataSetChanged();
+                } else {
+                    oldFragment.notifyDataSetChanged();
+                }
             }
         }
     }
