@@ -79,6 +79,16 @@ public class StoreWorkerModel extends Observable {
         return worker.getId();
     }
 
+    public StoreWorker getFirstAvailableWorker() {
+        StoreWorker firstWorker = _workers.get(0);
+        for(int i = 1; i < _workers.size(); i++) {
+            if(_workers.get(i).getNextAvailability().before(firstWorker.getNextAvailability())) {
+                firstWorker =_workers.get(i);
+            }
+        }
+        return firstWorker;
+    }
+
     public void clear(String name_p) {
         _maxId = 0;
         _workers.clear();

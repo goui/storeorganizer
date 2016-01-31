@@ -36,7 +36,9 @@
     <string name="no_appointments_scheduled">No appointments scheduled.</string>
     <string name="from">From</string>
     <string name="to">To</string>
+    <string name="at">at</string>
     <string name="minutes">min</string>
+    <string name="next_availability">Next availability</string>
     <string name="no_phone_entered">No phone entered</string>
     <string name="restore_default">Restore default</string>
     <string name="restore_workers">Restore workers</string>

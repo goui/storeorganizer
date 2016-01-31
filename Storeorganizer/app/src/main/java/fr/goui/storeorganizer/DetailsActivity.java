@@ -1,5 +1,6 @@
 package fr.goui.storeorganizer;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -8,12 +9,15 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 
+import java.text.SimpleDateFormat;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -116,19 +120,35 @@ public class DetailsActivity extends AppCompatActivity implements Observer {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             Intent intent = new Intent(DetailsActivity.this, SettingsActivity.class);
             startActivity(intent);
             return true;
+        } else if (id == R.id.action_next_availability) {
+            displayNextAvailabilityDialog();
+            return true;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void displayNextAvailabilityDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(getString(R.string.next_availability));
+        View dialogLayout = getLayoutInflater().inflate(R.layout.layout_simple_text_view, null);
+        builder.setView(dialogLayout);
+        TextView textView = (TextView) dialogLayout.findViewById(R.id.layout_simple_text_view);
+        StoreWorker worker = StoreWorkerModel.getInstance().getFirstAvailableWorker();
+        String availability = new SimpleDateFormat("HH:mm").format(worker.getNextAvailability());
+        textView.setText(worker.getName() + " " + getString(R.string.at) + " " + availability);
+        builder.setPositiveButton(getString(R.string.ok), new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+        builder.show();
     }
 
     @Override
