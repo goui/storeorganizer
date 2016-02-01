@@ -2,8 +2,8 @@
                 xmlns:tools="http://schemas.android.com/tools"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:paddingLeft="16dp"
-                android:paddingRight="16dp">
+                android:paddingLeft="4dp"
+                android:paddingRight="4dp">
 
     <TextView
         android:id="@+id/fragment_details_no_appointments_text_view"
@@ -19,6 +19,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginBottom="8dp"
-        android:layout_marginTop="8dp"/>
+        android:layout_marginTop="4dp"/>
 
 </RelativeLayout>
