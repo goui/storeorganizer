@@ -4,6 +4,8 @@ import android.content.Intent;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import java.util.Date;
+
 public class AppointmentEditionActivity extends AppointmentCreationActivity {
 
     public static final String INTENT_EXTRA_OLD_WORKER_POSITION = "intent_extra_old_worker_position";
@@ -68,7 +70,14 @@ public class AppointmentEditionActivity extends AppointmentCreationActivity {
             if (_oldWorker.equals(_newWorker)) {
                 _newAppointment.setStartDate(_oldAppointment.getStartDate());
             } else {
-                _newAppointment.setStartDate(_newWorker.getNextAvailability());
+                StoreAppointment appointment = _newWorker.getNextAvailability();
+                Date startDate = _now;
+                if (appointment instanceof StoreAppointment.NullStoreAppointment) {
+                    startDate = appointment.getStartDate();
+                } else {
+                    startDate = appointment.getEndDate();
+                }
+                _newAppointment.setStartDate(startDate);
             }
             _txtStartTime.setText(_newAppointment.getFormattedStartDate());
             _txtEndTime.setText(_newAppointment.getFormattedEndDate());

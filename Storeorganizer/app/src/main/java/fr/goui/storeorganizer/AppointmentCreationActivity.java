@@ -133,7 +133,16 @@ public class AppointmentCreationActivity extends AppCompatActivity {
     protected void updateAppointmentInformation() {
         if (_newTask != null) {
             _newAppointment.setStoreTask(_newTask);
-            _newAppointment.setStartDate(_newWorker.getNextAvailability());
+            StoreAppointment appointment = _newWorker.getNextAvailability();
+            Date startDate = _now;
+            if (appointment != null) {
+                if (appointment instanceof StoreAppointment.NullStoreAppointment) {
+                    startDate = appointment.getStartDate();
+                } else {
+                    startDate = appointment.getEndDate();
+                }
+            }
+            _newAppointment.setStartDate(startDate);
             _txtStartTime.setText(_newAppointment.getFormattedStartDate());
             _txtEndTime.setText(_newAppointment.getFormattedEndDate());
         }

@@ -67,15 +67,26 @@ public class StoreWorker {
         return _appointments != null && _appointments.size() > 0 && position_p < _appointments.size() - 1;
     }
 
-    public Date getNextAvailability() {
-        Date date = new Date();
-        StoreAppointment lastAppointment = getLastAppointment();
-        if (lastAppointment != null) {
-            if (lastAppointment.getEndDate().after(date)) {
-                date = lastAppointment.getEndDate();
+    public StoreAppointment getNextAvailability() {
+        StoreAppointment appointment = null;
+        boolean isThereAGap = false;
+        for (StoreAppointment currentAppointment : _appointments) {
+            if (currentAppointment instanceof StoreAppointment.NullStoreAppointment
+                    && !isThereAGap) {
+                appointment = currentAppointment;
+                isThereAGap = true;
             }
         }
-        return date;
+        if (!isThereAGap) {
+            Date date = new Date();
+            StoreAppointment lastAppointment = getLastAppointment();
+            if (lastAppointment != null) {
+                if (lastAppointment.getEndDate().after(date)) {
+                    appointment = lastAppointment;
+                }
+            }
+        }
+        return appointment;
     }
 
     @Override

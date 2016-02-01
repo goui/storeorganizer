@@ -18,6 +18,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -140,7 +141,16 @@ public class DetailsActivity extends AppCompatActivity implements Observer {
         builder.setView(dialogLayout);
         TextView textView = (TextView) dialogLayout.findViewById(R.id.layout_simple_text_view);
         StoreWorker worker = StoreWorkerModel.getInstance().getFirstAvailableWorker();
-        String availability = new SimpleDateFormat("HH:mm").format(worker.getNextAvailability());
+        StoreAppointment appointment = worker.getNextAvailability();
+        String availability = new SimpleDateFormat("HH:mm").format(new Date());
+        if (appointment != null) {
+            if (appointment instanceof StoreAppointment.NullStoreAppointment) {
+                availability = new SimpleDateFormat("HH:mm").format(worker.getNextAvailability().getStartDate());
+                availability += " during " + appointment.getDuration() + getString(R.string.minutes);
+            } else {
+                availability = new SimpleDateFormat("HH:mm").format(worker.getNextAvailability().getEndDate());
+            }
+        }
         textView.setText(worker.getName() + " " + getString(R.string.at) + " " + availability);
         builder.setPositiveButton(getString(R.string.ok), new DialogInterface.OnClickListener() {
             @Override

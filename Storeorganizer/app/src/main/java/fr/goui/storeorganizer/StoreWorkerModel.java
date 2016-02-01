@@ -1,6 +1,7 @@
 package fr.goui.storeorganizer;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Observable;
 
@@ -42,8 +43,8 @@ public class StoreWorkerModel extends Observable {
 
     public int getStoreWorkerPosition(StoreWorker storeWorker_p) {
         int position = -1;
-        for(int i = 0; i < _workers.size(); i++) {
-            if(_workers.get(i).getId() == storeWorker_p.getId()) {
+        for (int i = 0; i < _workers.size(); i++) {
+            if (_workers.get(i).getId() == storeWorker_p.getId()) {
                 position = i;
             }
         }
@@ -80,10 +81,30 @@ public class StoreWorkerModel extends Observable {
     }
 
     public StoreWorker getFirstAvailableWorker() {
+        Date now = new Date();
         StoreWorker firstWorker = _workers.get(0);
-        for(int i = 1; i < _workers.size(); i++) {
-            if(_workers.get(i).getNextAvailability().before(firstWorker.getNextAvailability())) {
-                firstWorker =_workers.get(i);
+        StoreAppointment firstAvailableAppointment = firstWorker.getNextAvailability();
+        Date firstAvailableTime = now;
+        if (firstAvailableAppointment != null) {
+            if (firstAvailableAppointment instanceof StoreAppointment.NullStoreAppointment) {
+                firstAvailableTime = firstAvailableAppointment.getStartDate();
+            } else {
+                firstAvailableTime = firstAvailableAppointment.getEndDate();
+            }
+        }
+        for (int i = 1; i < _workers.size(); i++) {
+            StoreWorker currentWorker = _workers.get(i);
+            StoreAppointment currentAvailableAppointment = currentWorker.getNextAvailability();
+            Date currentAvailableTime = now;
+            if (currentAvailableAppointment != null) {
+                if (currentAvailableAppointment instanceof StoreAppointment.NullStoreAppointment) {
+                    currentAvailableTime = currentAvailableAppointment.getStartDate();
+                } else {
+                    currentAvailableTime = currentAvailableAppointment.getEndDate();
+                }
+            }
+            if (currentAvailableTime.before(firstAvailableTime)) {
+                firstWorker = _workers.get(i);
             }
         }
         return firstWorker;
