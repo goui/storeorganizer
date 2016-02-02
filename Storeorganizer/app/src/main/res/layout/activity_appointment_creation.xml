@@ -5,22 +5,32 @@
               android:layout_margin="16dp"
               android:orientation="vertical">
 
-    <EditText
-        android:id="@+id/activity_appointment_creation_clients_name_edit_text"
+    <android.support.design.widget.TextInputLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="@string/clients_name"
-        android:inputType="textPersonName|textCapSentences"
-        android:textColor="@color/black"/>
+        android:layout_height="wrap_content">
 
-    <EditText
-        android:id="@+id/activity_appointment_creation_clients_phone_number_edit_text"
+        <EditText
+            android:id="@+id/activity_appointment_creation_clients_name_edit_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/clients_name"
+            android:inputType="textPersonName|textCapSentences"
+            android:textColor="@color/black"/>
+    </android.support.design.widget.TextInputLayout>
+
+    <android.support.design.widget.TextInputLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:hint="@string/clients_phone_number"
-        android:inputType="phone"
-        android:textColor="@color/black"/>
+        android:layout_height="wrap_content">
+
+        <EditText
+            android:id="@+id/activity_appointment_creation_clients_phone_number_edit_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:hint="@string/clients_phone_number"
+            android:inputType="phone"
+            android:textColor="@color/black"/>
+    </android.support.design.widget.TextInputLayout>
 
     <TextView
         android:layout_width="wrap_content"

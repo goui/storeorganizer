@@ -72,10 +72,12 @@ public class AppointmentEditionActivity extends AppointmentCreationActivity {
             } else {
                 StoreAppointment appointment = _newWorker.getNextAvailability();
                 Date startDate = _now;
-                if (appointment instanceof StoreAppointment.NullStoreAppointment) {
-                    startDate = appointment.getStartDate();
-                } else {
-                    startDate = appointment.getEndDate();
+                if (appointment != null) {
+                    if (appointment instanceof StoreAppointment.NullStoreAppointment) {
+                        startDate = appointment.getStartDate();
+                    } else {
+                        startDate = appointment.getEndDate();
+                    }
                 }
                 _newAppointment.setStartDate(startDate);
             }

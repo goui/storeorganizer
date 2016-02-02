@@ -36,8 +36,6 @@ public class DetailsActivity extends AppCompatActivity implements Observer {
 
     private static final int REQUEST_CODE_CREATE_APPOINTMENT = 1;
     public static final int REQUEST_CODE_EDIT_APPOINTMENT = 2;
-    public static final String INTENT_EXTRA_APPOINTMENT_POSITION = "intent_extra_appointment_position";
-    public static final String INTENT_EXTRA_WORKER_POSITION = "intent_extra_worker_position";
 
     /**
      * The {@link ViewPager} that will host the section contents.
