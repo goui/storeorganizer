@@ -96,7 +96,7 @@ public class WorkersCategoryRecyclerAdapter extends RecyclerView.Adapter<Recycle
             builder.setPositiveButton(_context.getString(R.string.ok), new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    if(StoreWorkerModel.getInstance().getStoreWorkerNumber() == 1) {
+                    if(StoreWorkerModel.getInstance().getStoreWorkersNumber() == 1) {
                         Toast.makeText(_context, _context.getString(R.string.cant_remove_last), Toast.LENGTH_LONG).show();
                         dialog.cancel();
                     } else {

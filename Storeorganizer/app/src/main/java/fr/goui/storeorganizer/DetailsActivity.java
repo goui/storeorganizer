@@ -127,6 +127,10 @@ public class DetailsActivity extends AppCompatActivity implements Observer {
         } else if (id == R.id.action_next_availability) {
             displayNextAvailabilityDialog();
             return true;
+        } else if (id == R.id.action_go_to_overall) {
+            Intent intent = new Intent(DetailsActivity.this, OverallActivity.class);
+            startActivity(intent);
+            return true;
         }
 
         return super.onOptionsItemSelected(item);
@@ -210,7 +214,7 @@ public class DetailsActivity extends AppCompatActivity implements Observer {
 
         @Override
         public int getCount() {
-            return StoreWorkerModel.getInstance().getStoreWorkerNumber();
+            return StoreWorkerModel.getInstance().getStoreWorkersNumber();
         }
 
         @Override

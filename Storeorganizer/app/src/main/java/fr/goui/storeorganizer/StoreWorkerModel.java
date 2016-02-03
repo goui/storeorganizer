@@ -33,7 +33,7 @@ public class StoreWorkerModel extends Observable {
         return _workers;
     }
 
-    public int getStoreWorkerNumber() {
+    public int getStoreWorkersNumber() {
         return _workers.size();
     }
 

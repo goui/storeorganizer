@@ -173,11 +173,6 @@ public class DetailsFragment extends Fragment implements OnAppointmentClickListe
         }
     }
 
-    public void notifyItemAdded() {
-        _detailsRecyclerAdapter.notifyItemInserted(_currentWorker.getStoreAppointmentsNumber() - 1);
-        computeNoAppointmentTextViewVisibility();
-    }
-
     public void notifyDataSetChanged() {
         _detailsRecyclerAdapter.notifyDataSetChanged();
         computeNoAppointmentTextViewVisibility();
