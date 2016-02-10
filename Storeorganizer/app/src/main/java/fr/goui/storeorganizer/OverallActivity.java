@@ -2,6 +2,7 @@ package fr.goui.storeorganizer;
 
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.Point;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Gravity;
@@ -27,6 +28,7 @@ public class OverallActivity extends AppCompatActivity implements Observer {
     private float mScaleFactor = SCALE_FACTOR_MIN_VALUE;
     private OverallView mOverallView;
     private LinearLayout mNamesLayout;
+    private Point mScreenSize = new Point();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,6 +36,7 @@ public class OverallActivity extends AppCompatActivity implements Observer {
         setContentView(R.layout.activity_overall);
 
         StoreWorkerModel.getInstance().addObserver(this);
+        getWindowManager().getDefaultDisplay().getSize(mScreenSize);
 
         mNamesLayout = (LinearLayout) findViewById(R.id.activity_overall_names_layout);
         fillNamesLayout();
@@ -47,12 +50,20 @@ public class OverallActivity extends AppCompatActivity implements Observer {
     }
 
     private void fillNamesLayout() {
-        for (int i = 0; i < StoreWorkerModel.getInstance().getStoreWorkersNumber(); i++) {
+        int nbOfWorkers = StoreWorkerModel.getInstance().getStoreWorkersNumber();
+        int cellWidth = mScreenSize.x / (nbOfWorkers + 2);
+        for (int i = 0; i < nbOfWorkers; i++) {
             TextView textView = new TextView(this);
-            textView.setText(StoreWorkerModel.getInstance().getStoreWorker(i).getName());
+            String name = StoreWorkerModel.getInstance().getStoreWorker(i).getName();
+            textView.setText(name);
             textView.setTextColor(Color.BLACK);
             textView.setLayoutParams(new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.MATCH_PARENT, 1));
             textView.setGravity(Gravity.CENTER);
+            textView.measure(0, 0);
+            int width = textView.getMeasuredWidth();
+            if (width >= cellWidth) {
+                textView.setText(String.valueOf(name.charAt(0)));
+            }
             mNamesLayout.addView(textView);
         }
     }

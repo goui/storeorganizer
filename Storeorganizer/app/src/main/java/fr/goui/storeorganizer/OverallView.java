@@ -5,6 +5,7 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.support.v4.content.ContextCompat;
+import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 
@@ -67,7 +68,7 @@ public class OverallView extends View {
             canvas.drawLine(x, initialY, x, y, mPaint);
             x += cellWidth;
         }
-        canvas.drawLine(x, initialY, x, y, mPaint);
+        canvas.drawLine(finalX, initialY, finalX, y, mPaint);
     }
 
     @Override
