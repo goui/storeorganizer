@@ -29,7 +29,7 @@ public class OverallView extends View {
         mHoursStrings = context.getResources().getStringArray(R.array.working_hours_string_array);
         mNumberOfRows = mHoursStrings.length - 1;
         mNumberOfColumns = StoreWorkerModel.getInstance().getStoreWorkersNumber();
-        int paintColor = ContextCompat.getColor(context, R.color.cardview_dark_background);
+        int paintColor = ContextCompat.getColor(context, R.color.black);
         mTopMargin = (int) getResources().getDimension(R.dimen.hour_top_margin);
         mLeftMargin = (int) getResources().getDimension(R.dimen.hour_left_margin);
         mTextSize = (int) getResources().getDimension(R.dimen.hour_text_size);
