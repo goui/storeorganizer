@@ -22,7 +22,10 @@ public class OverallView extends View {
     private int mTextSize;
     private int mCellHeight;
     private Point mScreenSize = new Point();
-    private final Paint mPaint = new Paint();
+    private final Paint mBlackPaint = new Paint();
+    private final Paint mGreyPaint = new Paint();
+    private int mBlackColor;
+    private int mGreyColor;
 
     public OverallView(Context context) {
         super(context);
@@ -30,15 +33,19 @@ public class OverallView extends View {
         mHoursStrings = context.getResources().getStringArray(R.array.working_hours_string_array);
         mNumberOfRows = mHoursStrings.length - 1;
         mNumberOfColumns = StoreWorkerModel.getInstance().getStoreWorkersNumber();
-        int paintColor = ContextCompat.getColor(context, R.color.black);
+        mBlackColor = ContextCompat.getColor(context, R.color.black);
+        mGreyColor = ContextCompat.getColor(context, R.color.grey_overlay);
         mTopMargin = (int) getResources().getDimension(R.dimen.hour_top_margin);
         mLeftMargin = (int) getResources().getDimension(R.dimen.hour_left_margin);
         mTextSize = (int) getResources().getDimension(R.dimen.hour_text_size);
         mDefaultCellHeight = (int) getResources().getDimension(R.dimen.hour_cell_height);
         mCellHeight = mDefaultCellHeight;
-        mPaint.setColor(paintColor);
-        mPaint.setTextSize(mTextSize);
-        mPaint.setAntiAlias(true);
+        mBlackPaint.setColor(mBlackColor);
+        mBlackPaint.setTextSize(mTextSize);
+        mBlackPaint.setAntiAlias(true);
+        mGreyPaint.setColor(mGreyColor);
+        mGreyPaint.setTextSize(mTextSize);
+        mGreyPaint.setAntiAlias(true);
     }
 
     @Override
@@ -54,21 +61,24 @@ public class OverallView extends View {
         int cellWidth = (finalX - initialX) / mNumberOfColumns;
 
         int y = initialY;
-        for (int i = 0; i < mNumberOfRows; i++) {
+        canvas.drawText(mHoursStrings[0], mLeftMargin, y + mTopMargin, mBlackPaint);
+        canvas.drawLine(initialX, y, finalX, y, mBlackPaint);
+        y += mCellHeight + HOUR_GAP;
+        for (int i = 1; i < mNumberOfRows; i++) {
             String time = mHoursStrings[i];
-            canvas.drawText(time, mLeftMargin, y + mTopMargin, mPaint);
-            canvas.drawLine(initialX, y, finalX, y, mPaint);
+            canvas.drawText(time, mLeftMargin, y + mTopMargin, mBlackPaint);
+            canvas.drawLine(initialX, y, finalX, y, mGreyPaint);
             y += mCellHeight + HOUR_GAP;
         }
-        canvas.drawText(mHoursStrings[mNumberOfRows], mLeftMargin, y + mTopMargin, mPaint);
-        canvas.drawLine(initialX, y, finalX, y, mPaint);
+        canvas.drawText(mHoursStrings[mNumberOfRows], mLeftMargin, y + mTopMargin, mBlackPaint);
+        canvas.drawLine(initialX, y, finalX, y, mBlackPaint);
 
         int x = initialX;
         for (int i = 0; i < mNumberOfColumns; i++) {
-            canvas.drawLine(x, initialY, x, y, mPaint);
+            canvas.drawLine(x, initialY, x, y, mBlackPaint);
             x += cellWidth;
         }
-        canvas.drawLine(finalX, initialY, finalX, y, mPaint);
+        canvas.drawLine(finalX, initialY, finalX, y, mBlackPaint);
     }
 
     @Override
