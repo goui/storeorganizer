@@ -27,7 +27,7 @@ public class AppointmentCreationActivity extends AppCompatActivity {
     protected StoreAppointment _newAppointment;
     protected StoreWorker _newWorker;
     protected int _newWorkerPosition;
-    protected Date _now = new Date();
+    protected Calendar _now = Calendar.getInstance();
     protected EditText _etClientsName;
     protected EditText _etClientsPhoneNumber;
     protected Spinner _spinnerWorker;
@@ -35,7 +35,8 @@ public class AppointmentCreationActivity extends AppCompatActivity {
     protected TextView _txtStartTime;
     protected TextView _txtEndTime;
     protected boolean _isStartTimeModified;
-    protected Calendar _calendarTime = Calendar.getInstance();
+    protected Calendar _calendarTime = _now;
+
     protected TimePickerDialog.OnTimeSetListener _timePickerDialogListener = new TimePickerDialog.OnTimeSetListener() {
         public void onTimeSet(TimePicker view, int hourOfDay,
                               int minute) {
@@ -134,28 +135,31 @@ public class AppointmentCreationActivity extends AppCompatActivity {
         if (_newTask != null) {
             _newAppointment.setStoreTask(_newTask);
             StoreAppointment appointment = _newWorker.getNextAvailability();
-            Date startDate = _now;
+            int startHour = _now.get(Calendar.HOUR_OF_DAY);
+            int startMinute = _now.get(Calendar.MINUTE);
             if (appointment != null) {
                 if (appointment instanceof StoreAppointment.NullStoreAppointment) {
-                    startDate = appointment.getStartDate();
+                    startHour = appointment.getStartTime().get(Calendar.HOUR_OF_DAY);
+                    startMinute = appointment.getStartTime().get(Calendar.MINUTE);
                 } else {
-                    startDate = appointment.getEndDate();
+                    startHour = appointment.getEndTime().get(Calendar.HOUR_OF_DAY);
+                    startMinute = appointment.getEndTime().get(Calendar.MINUTE);
                 }
             }
-            _newAppointment.setStartDate(startDate);
-            _txtStartTime.setText(_newAppointment.getFormattedStartDate());
-            _txtEndTime.setText(_newAppointment.getFormattedEndDate());
+            _newAppointment.setStartTime(startHour, startMinute);
+            _txtStartTime.setText(_newAppointment.getFormattedStartTime());
+            _txtEndTime.setText(_newAppointment.getFormattedEndTime());
         }
     }
 
     protected void updateTimes() {
         if (_isStartTimeModified) {
-            _newAppointment.setStartDate(_calendarTime.getTime());
-            _txtStartTime.setText(_newAppointment.getFormattedStartDate());
-            _txtEndTime.setText(_newAppointment.getFormattedEndDate());
+            _newAppointment.setStartTime(_calendarTime.get(Calendar.HOUR_OF_DAY), _calendarTime.get(Calendar.MINUTE));
+            _txtStartTime.setText(_newAppointment.getFormattedStartTime());
+            _txtEndTime.setText(_newAppointment.getFormattedEndTime());
         } else {
-            _newAppointment.setEndDate(_calendarTime.getTime());
-            _txtEndTime.setText(_newAppointment.getFormattedEndDate());
+            _newAppointment.setEndTime(_calendarTime.get(Calendar.HOUR_OF_DAY), _calendarTime.get(Calendar.MINUTE));
+            _txtEndTime.setText(_newAppointment.getFormattedEndTime());
         }
     }
 
@@ -200,19 +204,22 @@ public class AppointmentCreationActivity extends AppCompatActivity {
             _newAppointment.setClientName(_etClientsName.getText().toString());
             _newAppointment.setClientPhoneNumber(_etClientsPhoneNumber.getText().toString());
             if (_newWorker.getStoreAppointmentsNumber() == 0) {
-                if (_newAppointment.getStartDate().after(_now)
-                        && ((_newAppointment.getStartDate().getTime() - _now.getTime()) / 60000) >= StoreTaskModel.getInstance().getMinTimeInMinutes()) {
+                if (_newAppointment.isAfter(_now)
+                        && (_newAppointment.gapWith(_now) >= StoreTaskModel.getInstance().getMinTimeInMinutes())) {
                     StoreAppointment.NullStoreAppointment nullStoreAppointment = _newAppointment.newNullInstance();
-                    nullStoreAppointment.setStartDate(_now);
-                    nullStoreAppointment.setEndDate(_newAppointment.getStartDate());
+                    nullStoreAppointment.setStartTime(_now.get(Calendar.HOUR_OF_DAY), _now.get(Calendar.MINUTE));
+                    nullStoreAppointment.setEndTime(_newAppointment.getStartTime().get(Calendar.HOUR_OF_DAY),
+                            _newAppointment.getStartTime().get(Calendar.MINUTE));
                     _newWorker.addStoreAppointment(nullStoreAppointment);
                 }
             } else {
-                if (_newAppointment.getStartDate().after(_newWorker.getLastAppointment().getEndDate())
-                        && ((_newAppointment.getStartDate().getTime() - _newWorker.getLastAppointment().getEndDate().getTime()) / 60000) >= StoreTaskModel.getInstance().getMinTimeInMinutes()) {
+                if (_newAppointment.isAfter(_newWorker.getLastAppointment())
+                        && (_newAppointment.gapWith(_newWorker.getLastAppointment()) >= StoreTaskModel.getInstance().getMinTimeInMinutes())) {
                     StoreAppointment.NullStoreAppointment nullStoreAppointment = _newAppointment.newNullInstance();
-                    nullStoreAppointment.setStartDate(_newWorker.getLastAppointment().getEndDate());
-                    nullStoreAppointment.setEndDate(_newAppointment.getStartDate());
+                    nullStoreAppointment.setStartTime(_newWorker.getLastAppointment().getEndTime().get(Calendar.HOUR_OF_DAY),
+                            _newWorker.getLastAppointment().getEndTime().get(Calendar.MINUTE));
+                    nullStoreAppointment.setEndTime(_newAppointment.getStartTime().get(Calendar.HOUR_OF_DAY),
+                            _newAppointment.getStartTime().get(Calendar.MINUTE));
                     _newWorker.addStoreAppointment(nullStoreAppointment);
                 }
             }
@@ -226,22 +233,7 @@ public class AppointmentCreationActivity extends AppCompatActivity {
 
     protected boolean doesAppointmentOverlap() {
         boolean overlaps = false;
-        if (_newWorker.getStoreAppointmentsNumber() > 0) {
-            StoreAppointment firstAppointment = _newWorker.getStoreAppointment(0);
-            StoreAppointment lastAppointment = _newWorker.getLastAppointment();
-            if (_newAppointment.getStartDate().before(firstAppointment.getStartDate())
-                    && _newAppointment.getEndDate().after(firstAppointment.getStartDate())) {
-                overlaps = true;
-            }
-            if (_newAppointment.getStartDate().before(lastAppointment.getEndDate())
-                    && _newAppointment.getEndDate().after(lastAppointment.getEndDate())) {
-                overlaps = true;
-            }
-            if (_newAppointment.getStartDate().after(firstAppointment.getStartDate())
-                    && _newAppointment.getEndDate().before(lastAppointment.getEndDate())) {
-                overlaps = true;
-            }
-        }
+        // TODO overlapping algorithm
         return overlaps;
     }
 
@@ -249,9 +241,9 @@ public class AppointmentCreationActivity extends AppCompatActivity {
         String errorMessage = null;
         if (_etClientsName.getText().toString().equals("")) {
             errorMessage = getString(R.string.please_specify_a_name);
-        } else if (_newAppointment.getStartDate().before(_now)) {
+        } else if (_newAppointment.getStartTime().before(_now)) {
             errorMessage = getString(R.string.starting_time_cannot_be_in_the_past);
-        } else if (_newAppointment.getEndDate().before(_newAppointment.getStartDate())) {
+        } else if (_newAppointment.getEndTime().before(_newAppointment.getStartTime())) {
             errorMessage = getString(R.string.ending_time_cannot_be_prior_to_starting_time);
         } else if (doesAppointmentOverlap()) {
             errorMessage = getString(R.string.appointment_overlaps_with_at_least_another_one);

@@ -122,8 +122,8 @@ public class DetailsRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vi
     private void bindNullAppointment(NullAppointmentViewHolder holder_p, int position_p) {
         StoreAppointment appointment = _appointments.get(position_p);
         if (appointment != null) {
-            long startTime = appointment.getStartDate().getTime();
-            long endTime = appointment.getEndDate().getTime();
+            long startTime = appointment.getStartTime().getTimeInMillis();
+            long endTime = appointment.getEndTime().getTimeInMillis();
             holder_p.textView.setText(
                     (endTime - startTime) / 60000 + _context.getString(R.string.minutes) + " " + _context.getString(R.string.gap));
             holder_p.position = position_p;
@@ -133,16 +133,16 @@ public class DetailsRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vi
     private void bindNormalAppointment(AppointmentViewHolder holder_p, int position_p) {
         StoreAppointment appointment = _appointments.get(position_p);
         if (appointment != null) {
-            holder_p.txtStartTime.setText(appointment.getFormattedStartDate());
+            holder_p.txtStartTime.setText(appointment.getFormattedStartTime());
             holder_p.txtClientsName.setText(appointment.getClientName());
             holder_p.txtClientsPhone.setText(appointment.getClientPhoneNumber());
             holder_p.txtTaskName.setText(appointment.getStoreTask().getName());
-            holder_p.txtEndTime.setText(appointment.getFormattedEndDate());
+            holder_p.txtEndTime.setText(appointment.getFormattedEndTime());
             holder_p.position = position_p;
 
-            Calendar calendar = Calendar.getInstance();
+            Calendar now = Calendar.getInstance();
             int color;
-            if (calendar.getTime().after(appointment.getEndDate())) {
+            if (appointment.isBefore(now)) {
                 color = R.color.grey_overlay;
             } else {
                 color = R.color.colorAccentPale;

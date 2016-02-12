@@ -1,6 +1,7 @@
 package fr.goui.storeorganizer;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Point;
@@ -9,41 +10,45 @@ import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 
+import java.util.Calendar;
+
 public class OverallView extends View {
 
-    private final String[] mHoursStrings;
-    private final int mNumberOfRows;
-    private int mNumberOfColumns;
-
-    private final int mDefaultCellHeight;
     private static final int HOUR_GAP = 1;
+
+    private final int mNumberOfRows;
+    private final int mDefaultCellHeight;
+    private final String[] mHoursStrings;
+    private final Paint mBlackPaint = new Paint();
+    private final Paint mGreyPaint = new Paint();
+
+    private int mNumberOfColumns;
     private int mTopMargin;
     private int mLeftMargin;
     private int mTextSize;
     private int mCellHeight;
     private Point mScreenSize = new Point();
-    private final Paint mBlackPaint = new Paint();
-    private final Paint mGreyPaint = new Paint();
-    private int mBlackColor;
-    private int mGreyColor;
+    private StoreWorkerModel mStoreWorkerModel = StoreWorkerModel.getInstance();
+    private Calendar mNow = Calendar.getInstance();
 
     public OverallView(Context context) {
         super(context);
         ((WindowManager) context.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay().getSize(mScreenSize);
-        mHoursStrings = context.getResources().getStringArray(R.array.working_hours_string_array);
+        Resources resources = context.getResources();
+        mHoursStrings = resources.getStringArray(R.array.working_hours_string_array);
         mNumberOfRows = mHoursStrings.length - 1;
-        mNumberOfColumns = StoreWorkerModel.getInstance().getStoreWorkersNumber();
-        mBlackColor = ContextCompat.getColor(context, R.color.black);
-        mGreyColor = ContextCompat.getColor(context, R.color.grey_overlay);
-        mTopMargin = (int) getResources().getDimension(R.dimen.hour_top_margin);
-        mLeftMargin = (int) getResources().getDimension(R.dimen.hour_left_margin);
-        mTextSize = (int) getResources().getDimension(R.dimen.hour_text_size);
-        mDefaultCellHeight = (int) getResources().getDimension(R.dimen.hour_cell_height);
+        mNumberOfColumns = mStoreWorkerModel.getStoreWorkersNumber();
+        int blackColor = ContextCompat.getColor(context, R.color.black);
+        int greyColor = ContextCompat.getColor(context, R.color.grey_overlay);
+        mTopMargin = (int) resources.getDimension(R.dimen.hour_top_margin);
+        mLeftMargin = (int) resources.getDimension(R.dimen.hour_left_margin);
+        mTextSize = (int) resources.getDimension(R.dimen.hour_text_size);
+        mDefaultCellHeight = (int) resources.getDimension(R.dimen.hour_cell_height);
         mCellHeight = mDefaultCellHeight;
-        mBlackPaint.setColor(mBlackColor);
+        mBlackPaint.setColor(blackColor);
         mBlackPaint.setTextSize(mTextSize);
         mBlackPaint.setAntiAlias(true);
-        mGreyPaint.setColor(mGreyColor);
+        mGreyPaint.setColor(greyColor);
         mGreyPaint.setTextSize(mTextSize);
         mGreyPaint.setAntiAlias(true);
     }
@@ -94,7 +99,7 @@ public class OverallView extends View {
     }
 
     public void onWorkersChanged() {
-        mNumberOfColumns = StoreWorkerModel.getInstance().getStoreWorkersNumber();
+        mNumberOfColumns = mStoreWorkerModel.getStoreWorkersNumber();
         invalidate();
     }
 

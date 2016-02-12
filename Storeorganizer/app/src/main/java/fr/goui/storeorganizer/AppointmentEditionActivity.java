@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import java.util.Calendar;
 import java.util.Date;
 
 public class AppointmentEditionActivity extends AppointmentCreationActivity {
@@ -68,21 +69,25 @@ public class AppointmentEditionActivity extends AppointmentCreationActivity {
         if (_newTask != null) {
             _newAppointment.setStoreTask(_newTask);
             if (_oldWorker.equals(_newWorker)) {
-                _newAppointment.setStartDate(_oldAppointment.getStartDate());
+                _newAppointment.setStartTime(_oldAppointment.getStartTime().get(Calendar.HOUR_OF_DAY),
+                        _oldAppointment.getStartTime().get(Calendar.MINUTE));
             } else {
                 StoreAppointment appointment = _newWorker.getNextAvailability();
-                Date startDate = _now;
+                int startHour = _now.get(Calendar.HOUR_OF_DAY);
+                int startMinute = _now.get(Calendar.MINUTE);
                 if (appointment != null) {
                     if (appointment instanceof StoreAppointment.NullStoreAppointment) {
-                        startDate = appointment.getStartDate();
+                        startHour = appointment.getStartTime().get(Calendar.HOUR_OF_DAY);
+                        startMinute = appointment.getStartTime().get(Calendar.MINUTE);
                     } else {
-                        startDate = appointment.getEndDate();
+                        startHour = appointment.getEndTime().get(Calendar.HOUR_OF_DAY);
+                        startMinute = appointment.getEndTime().get(Calendar.MINUTE);
                     }
                 }
-                _newAppointment.setStartDate(startDate);
+                _newAppointment.setStartTime(startHour, startMinute);
             }
-            _txtStartTime.setText(_newAppointment.getFormattedStartDate());
-            _txtEndTime.setText(_newAppointment.getFormattedEndDate());
+            _txtStartTime.setText(_newAppointment.getFormattedStartTime());
+            _txtEndTime.setText(_newAppointment.getFormattedEndTime());
         }
     }
 
@@ -96,19 +101,19 @@ public class AppointmentEditionActivity extends AppointmentCreationActivity {
         } else {
             _spinnerTask.setSelection(taskPosition_p);
         }
-        _txtStartTime.setText(_oldAppointment.getFormattedStartDate());
-        _txtEndTime.setText(_oldAppointment.getFormattedEndDate());
+        _txtStartTime.setText(_oldAppointment.getFormattedStartTime());
+        _txtEndTime.setText(_oldAppointment.getFormattedEndTime());
     }
 
     @Override
     protected void updateTimes() {
         if (_isStartTimeModified) {
-            _newAppointment.setStartDate(_calendarTime.getTime());
-            _txtStartTime.setText(_newAppointment.getFormattedStartDate());
-            _txtEndTime.setText(_newAppointment.getFormattedEndDate());
+            _newAppointment.setStartTime(_calendarTime.get(Calendar.HOUR_OF_DAY), _calendarTime.get(Calendar.MINUTE));
+            _txtStartTime.setText(_newAppointment.getFormattedStartTime());
+            _txtEndTime.setText(_newAppointment.getFormattedEndTime());
         } else {
-            _newAppointment.setEndDate(_calendarTime.getTime());
-            _txtEndTime.setText(_newAppointment.getFormattedEndDate());
+            _newAppointment.setEndTime(_calendarTime.get(Calendar.HOUR_OF_DAY), _calendarTime.get(Calendar.MINUTE));
+            _txtEndTime.setText(_newAppointment.getFormattedEndTime());
         }
     }
 
@@ -390,12 +395,12 @@ public class AppointmentEditionActivity extends AppointmentCreationActivity {
         String errorMessage = null;
         if (_etClientsName.getText().toString().equals("")) {
             errorMessage = getString(R.string.please_specify_a_name);
-        } else if (_newAppointment.getEndDate().before(_newAppointment.getStartDate())) {
+        } else if (_newAppointment.getEndTime().before(_newAppointment.getStartTime())) {
             errorMessage = getString(R.string.ending_time_cannot_be_prior_to_starting_time);
         } else if (doesAppointmentOverlap()) {
             errorMessage = getString(R.string.appointment_overlaps_with_at_least_another_one);
         }
-        if (_isAGap && _newAppointment.getStartDate().before(_now)) {
+        if (_isAGap && _newAppointment.getStartTime().before(_now)) {
             errorMessage = getString(R.string.starting_time_cannot_be_in_the_past);
         }
         return errorMessage;
@@ -404,54 +409,7 @@ public class AppointmentEditionActivity extends AppointmentCreationActivity {
     @Override
     protected boolean doesAppointmentOverlap() {
         boolean overlaps = false;
-        if (_isAGap) {
-            if (_newAppointment.getStartDate().before(_oldAppointment.getStartDate())) {
-                overlaps = true;
-            } else if (_newAppointment.getEndDate().after(_oldAppointment.getEndDate())) {
-                overlaps = true;
-            }
-        } else {
-            if (!_oldWorker.equals(_newWorker)) {
-                _hasWorkerChanged = true;
-                overlaps = super.doesAppointmentOverlap();
-            } else {
-                _hasWorkerChanged = false;
-                // if there is an appointment before, the new start time is before the previous end time and the new end time is after the previous end time
-                if (_newWorker.isThereAppointmentBefore(_oldAppointmentPosition)
-                        && !(_newWorker.getStoreAppointment(_oldAppointmentPosition - 1) instanceof StoreAppointment.NullStoreAppointment)
-                        && _newAppointment.getStartDate().before(_newWorker.getStoreAppointment(_oldAppointmentPosition - 1).getEndDate())
-                        && _newAppointment.getEndDate().after(_newWorker.getStoreAppointment(_oldAppointmentPosition - 1).getEndDate())) {
-                    overlaps = true;
-                }
-                // if there is an appointment after, the new end time is after the next start time and the new start time is before the previous start time
-                if (_newWorker.isThereAppointmentAfter(_oldAppointmentPosition)
-                        && !(_newWorker.getStoreAppointment(_oldAppointmentPosition + 1) instanceof StoreAppointment.NullStoreAppointment)
-                        && _newAppointment.getEndDate().after(_newWorker.getStoreAppointment(_oldAppointmentPosition + 1).getStartDate())
-                        && _newAppointment.getStartDate().before(_newWorker.getStoreAppointment(_oldAppointmentPosition + 1).getStartDate())) {
-                    overlaps = true;
-                }
-                // if there is a gap before and another appointment before the gap make sure the new appointment does not overlap
-                if (_newWorker.isThereAppointmentBefore(_oldAppointmentPosition)
-                        && _newWorker.getStoreAppointment(_oldAppointmentPosition - 1) instanceof StoreAppointment.NullStoreAppointment) {
-                    if (_newWorker.isThereAppointmentBefore(_oldAppointmentPosition - 1)
-                            && _newAppointment.getStartDate().before(_newWorker.getStoreAppointment(_oldAppointmentPosition - 2).getEndDate())
-                            && _newAppointment.getEndDate().after(_newWorker.getStoreAppointment(_oldAppointmentPosition - 2).getEndDate())) {
-                        overlaps = true;
-                    }
-                }
-                // if there is a gap after and another appointment after the gap make sure the new appointment does not overlap
-                if (_newWorker.isThereAppointmentAfter(_oldAppointmentPosition)
-                        && _newWorker.getStoreAppointment(_oldAppointmentPosition + 1) instanceof StoreAppointment.NullStoreAppointment) {
-                    if (_newWorker.isThereAppointmentAfter(_oldAppointmentPosition + 1)) {
-                        if (_newWorker.isThereAppointmentAfter(_oldAppointmentPosition + 1)
-                                && _newAppointment.getEndDate().after(_newWorker.getStoreAppointment(_oldAppointmentPosition + 2).getStartDate())
-                                && _newAppointment.getStartDate().before(_newWorker.getStoreAppointment(_oldAppointmentPosition + 2).getStartDate())) {
-                            overlaps = true;
-                        }
-                    }
-                }
-            }
-        }
+        // TODO overlapping algorithm
         return overlaps;
     }
 }

@@ -1,6 +1,7 @@
 package fr.goui.storeorganizer;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Observable;
@@ -81,26 +82,26 @@ public class StoreWorkerModel extends Observable {
     }
 
     public StoreWorker getFirstAvailableWorker() {
-        Date now = new Date();
+        Calendar now = Calendar.getInstance();
         StoreWorker firstWorker = _workers.get(0);
         StoreAppointment firstAvailableAppointment = firstWorker.getNextAvailability();
-        Date firstAvailableTime = now;
+        Calendar firstAvailableTime = now;
         if (firstAvailableAppointment != null) {
             if (firstAvailableAppointment instanceof StoreAppointment.NullStoreAppointment) {
-                firstAvailableTime = firstAvailableAppointment.getStartDate();
+                firstAvailableTime = firstAvailableAppointment.getStartTime();
             } else {
-                firstAvailableTime = firstAvailableAppointment.getEndDate();
+                firstAvailableTime = firstAvailableAppointment.getEndTime();
             }
         }
         for (int i = 1; i < _workers.size(); i++) {
             StoreWorker currentWorker = _workers.get(i);
             StoreAppointment currentAvailableAppointment = currentWorker.getNextAvailability();
-            Date currentAvailableTime = now;
+            Calendar currentAvailableTime = now;
             if (currentAvailableAppointment != null) {
                 if (currentAvailableAppointment instanceof StoreAppointment.NullStoreAppointment) {
-                    currentAvailableTime = currentAvailableAppointment.getStartDate();
+                    currentAvailableTime = currentAvailableAppointment.getStartTime();
                 } else {
-                    currentAvailableTime = currentAvailableAppointment.getEndDate();
+                    currentAvailableTime = currentAvailableAppointment.getEndTime();
                 }
             }
             if (currentAvailableTime.before(firstAvailableTime)) {

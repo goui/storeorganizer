@@ -147,10 +147,10 @@ public class DetailsActivity extends AppCompatActivity implements Observer {
         String availability = new SimpleDateFormat("HH:mm").format(new Date());
         if (appointment != null) {
             if (appointment instanceof StoreAppointment.NullStoreAppointment) {
-                availability = new SimpleDateFormat("HH:mm").format(worker.getNextAvailability().getStartDate());
+                availability = appointment.getFormattedStartTime();
                 availability += " during " + appointment.getDuration() + getString(R.string.minutes);
             } else {
-                availability = new SimpleDateFormat("HH:mm").format(worker.getNextAvailability().getEndDate());
+                availability = appointment.getFormattedEndTime();
             }
         }
         textView.setText(worker.getName() + " " + getString(R.string.at) + " " + availability);

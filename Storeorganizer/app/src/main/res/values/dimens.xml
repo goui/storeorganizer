@@ -8,5 +8,5 @@
     <dimen name="hour_text_size">12sp</dimen>
     <dimen name="hour_top_margin">4dp</dimen>
     <dimen name="hour_left_margin">8dp</dimen>
-    <dimen name="hour_cell_height">48dp</dimen>
+    <dimen name="hour_cell_height">60dp</dimen>
 </resources>

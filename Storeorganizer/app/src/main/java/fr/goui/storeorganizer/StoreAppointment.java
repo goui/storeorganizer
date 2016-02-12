@@ -1,10 +1,11 @@
 package fr.goui.storeorganizer;
 
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Comparator;
 import java.util.Date;
 
-public class StoreAppointment implements Comparable<StoreAppointment> {
+public class StoreAppointment {
 
     private StoreTask _storeTask;
 
@@ -12,18 +13,13 @@ public class StoreAppointment implements Comparable<StoreAppointment> {
 
     private String _clientPhoneNumber;
 
-    protected Date _startDate;
+    private Calendar _startTime;
 
-    protected Date _endDate;
-
-    protected SimpleDateFormat _simpleDateFormat;
-
-    protected String _formattedStartDate;
-
-    private String _formattedEndDate;
+    private Calendar _endTime;
 
     public StoreAppointment() {
-        _simpleDateFormat = new SimpleDateFormat("HH:mm");
+        _startTime = Calendar.getInstance();
+        _endTime = Calendar.getInstance();
     }
 
     public StoreTask getStoreTask() {
@@ -38,20 +34,20 @@ public class StoreAppointment implements Comparable<StoreAppointment> {
         return _clientPhoneNumber;
     }
 
-    public Date getStartDate() {
-        return _startDate;
+    public Calendar getStartTime() {
+        return _startTime;
     }
 
-    public Date getEndDate() {
-        return _endDate;
+    public Calendar getEndTime() {
+        return _endTime;
     }
 
-    public String getFormattedStartDate() {
-        return _formattedStartDate;
+    public String getFormattedStartTime() {
+        return _startTime.get(Calendar.HOUR_OF_DAY) + ":" + _startTime.get(Calendar.MINUTE);
     }
 
-    public String getFormattedEndDate() {
-        return _formattedEndDate;
+    public String getFormattedEndTime() {
+        return _endTime.get(Calendar.HOUR_OF_DAY) + ":" + _endTime.get(Calendar.MINUTE);
     }
 
     public int getDuration() {
@@ -70,15 +66,51 @@ public class StoreAppointment implements Comparable<StoreAppointment> {
         _clientPhoneNumber = clientPhoneNumber_p;
     }
 
-    public void setStartDate(Date startDate_p) {
-        _startDate = startDate_p;
-        _formattedStartDate = _simpleDateFormat.format(_startDate);
-        setEndDate(new Date(_startDate.getTime() + _storeTask.getDuration() * 60000));
+    public void setStartTime(int startHour_p, int startMinute_p) {
+        _startTime.set(Calendar.HOUR_OF_DAY, startHour_p);
+        _startTime.set(Calendar.MINUTE, startMinute_p);
+        _endTime.setTimeInMillis(_startTime.getTimeInMillis() + getDuration() * 60000);
     }
 
-    public void setEndDate(Date endDate_p) {
-        _endDate = endDate_p;
-        _formattedEndDate = _simpleDateFormat.format(_endDate);
+    public void setEndTime(int endHour_p, int endMinute_p) {
+        _endTime.set(Calendar.HOUR_OF_DAY, endHour_p);
+        _endTime.set(Calendar.MINUTE, endMinute_p);
+    }
+
+    public boolean isBefore(Calendar calendar_p) {
+        return getEndTime().before(calendar_p);
+    }
+
+    public boolean isBefore(StoreAppointment appointment_p) {
+        return _endTime.before(appointment_p.getStartTime());
+    }
+
+    public boolean isAfter(Calendar calendar_p) {
+        return getStartTime().after(calendar_p);
+    }
+
+    public boolean isAfter(StoreAppointment appointment_p) {
+        return _startTime.after(appointment_p.getEndTime());
+    }
+
+    public int gapWith(Calendar calendar_p) {
+        int gap;
+        if (isAfter(calendar_p)) {
+            gap = (int) (_startTime.getTimeInMillis() - calendar_p.getTimeInMillis()) / 60000;
+        } else {
+            gap = (int) (calendar_p.getTimeInMillis() - _endTime.getTimeInMillis()) / 60000;
+        }
+        return gap;
+    }
+
+    public int gapWith(StoreAppointment storeAppointment_p) {
+        int gap;
+        if (isAfter(storeAppointment_p)) {
+            gap = (int) (_startTime.getTimeInMillis() - storeAppointment_p.getEndTime().getTimeInMillis()) / 60000;
+        } else {
+            gap = (int) (storeAppointment_p.getStartTime().getTimeInMillis() - _endTime.getTimeInMillis()) / 60000;
+        }
+        return gap;
     }
 
     @Override
@@ -86,33 +118,18 @@ public class StoreAppointment implements Comparable<StoreAppointment> {
         boolean equals = false;
         if (o instanceof StoreAppointment) {
             StoreAppointment appointment = (StoreAppointment) o;
-            equals = appointment.getClientName().equals(getClientName())
-                    && appointment.getClientPhoneNumber().equals(getClientPhoneNumber())
-                    && appointment.getStoreTask().equals(getStoreTask())
-                    && appointment.getStartDate().equals(getStartDate())
-                    && appointment.getEndDate().equals(getEndDate());
+            equals = appointment.getClientName().equals(_clientName)
+                    && appointment.getClientPhoneNumber().equals(_clientPhoneNumber)
+                    && appointment.getStoreTask().equals(_storeTask)
+                    && appointment.getStartTime().equals(_startTime)
+                    && appointment.getEndTime().equals(_endTime);
         }
         return equals;
     }
 
     @Override
     public String toString() {
-        return _clientName + " - " + _storeTask.getName() + " - " + getFormattedStartDate();
-    }
-
-    @Override
-    public int compareTo(StoreAppointment another) {
-        return Comparators.TIME.compare(this, another);
-    }
-
-    public static class Comparators {
-
-        public static Comparator<StoreAppointment> TIME = new Comparator<StoreAppointment>() {
-            @Override
-            public int compare(StoreAppointment appointment1, StoreAppointment appointment2) {
-                return appointment1.getStartDate().compareTo(appointment2.getStartDate());
-            }
-        };
+        return _clientName + " - " + _storeTask.getName() + " - " + getFormattedStartTime();
     }
 
     public NullStoreAppointment newNullInstance() {
@@ -122,14 +139,14 @@ public class StoreAppointment implements Comparable<StoreAppointment> {
     public class NullStoreAppointment extends StoreAppointment {
 
         @Override
-        public void setStartDate(Date startDate_p) {
-            _startDate = startDate_p;
-            _formattedStartDate = _simpleDateFormat.format(_startDate);
+        public void setStartTime(int startHour_p, int startMinute_p) {
+            _startTime.set(Calendar.HOUR_OF_DAY, startHour_p);
+            _startTime.set(Calendar.MINUTE, startMinute_p);
         }
 
         @Override
         public int getDuration() {
-            return (int) (_endDate.getTime() - _startDate.getTime()) / 60000;
+            return (int) (_endTime.getTimeInMillis() - _startTime.getTimeInMillis()) / 60000;
         }
     }
 

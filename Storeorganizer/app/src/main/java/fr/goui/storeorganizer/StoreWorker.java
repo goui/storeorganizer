@@ -1,6 +1,7 @@
 package fr.goui.storeorganizer;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -47,10 +48,6 @@ public class StoreWorker {
         _appointments.add(storeAppointment_p);
     }
 
-    public void sortAppointments() {
-        Collections.sort(_appointments, StoreAppointment.Comparators.TIME);
-    }
-
     public void removeStoreAppointment(StoreAppointment storeAppointment_p) {
         _appointments.remove(storeAppointment_p);
     }
@@ -78,10 +75,10 @@ public class StoreWorker {
             }
         }
         if (!isThereAGap) {
-            Date date = new Date();
+            Calendar now = Calendar.getInstance();
             StoreAppointment lastAppointment = getLastAppointment();
             if (lastAppointment != null) {
-                if (lastAppointment.getEndDate().after(date)) {
+                if (lastAppointment.getEndTime().after(now)) {
                     appointment = lastAppointment;
                 }
             }
