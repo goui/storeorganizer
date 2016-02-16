@@ -33,6 +33,7 @@ public class OverallView extends View {
     private final int mFinalX;
 
     private int mNumberOfColumns;
+    private int mCellWidth;
     private float mScaleFactor = 1.0f;
     private int mCellHeight;
     private int mNowLineY;
@@ -58,6 +59,7 @@ public class OverallView extends View {
         mInitialX = 2 * mLeftMargin + mTextSize;
         mInitialY = mTextSize + mTopMargin;
         mFinalX = mScreenSize.x - mTextSize;
+        mCellWidth = (mFinalX - mInitialX) / mNumberOfColumns;
 
         mBlackPaint.setColor(blackColor);
         mBlackPaint.setTextSize(mTextSize);
@@ -91,7 +93,7 @@ public class OverallView extends View {
     }
 
     private void drawBackground(Canvas canvas) {
-        int cellWidth = (mFinalX - mInitialX) / mNumberOfColumns;
+        mCellWidth = (mFinalX - mInitialX) / mNumberOfColumns;
         int y = mInitialY;
         canvas.drawText(mHoursStrings[0], mLeftMargin, y + mTopMargin, mBlackPaint);
         canvas.drawLine(mInitialX, y, mFinalX, y, mBlackPaint);
@@ -108,16 +110,15 @@ public class OverallView extends View {
         int x = mInitialX;
         for (int i = 0; i < mNumberOfColumns; i++) {
             canvas.drawLine(x, mInitialY, x, y, mBlackPaint);
-            x += cellWidth;
+            x += mCellWidth;
         }
         canvas.drawLine(mFinalX, mInitialY, mFinalX, y, mBlackPaint);
     }
 
     private void drawAppointments(Canvas canvas) {
-        int cellWidth = (mFinalX - mInitialX) / mNumberOfColumns;
         int x1 = mInitialX + 1;
         for (int i = 0; i < mNumberOfColumns; i++) {
-            int x2 = x1 + cellWidth - 2;
+            int x2 = x1 + mCellWidth - 2;
             if (i == mNumberOfColumns - 1) {
                 x2 = mFinalX - 1;
             }
@@ -134,9 +135,11 @@ public class OverallView extends View {
                     } else {
                         canvas.drawRect(x1, y1, x2, y2, mGreyPaint);
                     }
+                    canvas.drawLine(x1, y1, x2, y1, mBlackPaint);
+                    canvas.drawLine(x1, y2, x2, y2, mBlackPaint);
                 }
             }
-            x1 += cellWidth;
+            x1 += mCellWidth;
         }
     }
 
