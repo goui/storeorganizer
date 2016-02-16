@@ -77,6 +77,14 @@ public class StoreAppointment {
         _endTime.set(Calendar.MINUTE, endMinute_p);
     }
 
+    public void setStartTime(Calendar calendar_p) {
+        setStartTime(calendar_p.get(Calendar.HOUR_OF_DAY), calendar_p.get(Calendar.MINUTE));
+    }
+
+    public void setEndTime(Calendar calendar_p) {
+        setEndTime(calendar_p.get(Calendar.HOUR_OF_DAY), calendar_p.get(Calendar.MINUTE));
+    }
+
     public boolean isBefore(Calendar calendar_p) {
         return getEndTime().before(calendar_p);
     }

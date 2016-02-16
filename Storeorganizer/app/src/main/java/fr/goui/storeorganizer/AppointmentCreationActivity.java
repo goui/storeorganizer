@@ -135,18 +135,15 @@ public class AppointmentCreationActivity extends AppCompatActivity {
         if (_newTask != null) {
             _newAppointment.setStoreTask(_newTask);
             StoreAppointment appointment = _newWorker.getNextAvailability();
-            int startHour = _now.get(Calendar.HOUR_OF_DAY);
-            int startMinute = _now.get(Calendar.MINUTE);
+            Calendar calendar = _now;
             if (appointment != null) {
                 if (appointment instanceof StoreAppointment.NullStoreAppointment) {
-                    startHour = appointment.getStartTime().get(Calendar.HOUR_OF_DAY);
-                    startMinute = appointment.getStartTime().get(Calendar.MINUTE);
+                    calendar = appointment.getStartTime();
                 } else {
-                    startHour = appointment.getEndTime().get(Calendar.HOUR_OF_DAY);
-                    startMinute = appointment.getEndTime().get(Calendar.MINUTE);
+                    calendar = appointment.getEndTime();
                 }
             }
-            _newAppointment.setStartTime(startHour, startMinute);
+            _newAppointment.setStartTime(calendar);
             _txtStartTime.setText(_newAppointment.getFormattedStartTime());
             _txtEndTime.setText(_newAppointment.getFormattedEndTime());
         }
@@ -154,11 +151,11 @@ public class AppointmentCreationActivity extends AppCompatActivity {
 
     protected void updateTimes() {
         if (_isStartTimeModified) {
-            _newAppointment.setStartTime(_calendarTime.get(Calendar.HOUR_OF_DAY), _calendarTime.get(Calendar.MINUTE));
+            _newAppointment.setStartTime(_calendarTime);
             _txtStartTime.setText(_newAppointment.getFormattedStartTime());
             _txtEndTime.setText(_newAppointment.getFormattedEndTime());
         } else {
-            _newAppointment.setEndTime(_calendarTime.get(Calendar.HOUR_OF_DAY), _calendarTime.get(Calendar.MINUTE));
+            _newAppointment.setEndTime(_calendarTime);
             _txtEndTime.setText(_newAppointment.getFormattedEndTime());
         }
     }
@@ -208,8 +205,7 @@ public class AppointmentCreationActivity extends AppCompatActivity {
                         && (_newAppointment.gapWith(_now) >= StoreTaskModel.getInstance().getMinTimeInMinutes())) {
                     StoreAppointment.NullStoreAppointment nullStoreAppointment = _newAppointment.newNullInstance();
                     nullStoreAppointment.setStartTime(_now.get(Calendar.HOUR_OF_DAY), _now.get(Calendar.MINUTE));
-                    nullStoreAppointment.setEndTime(_newAppointment.getStartTime().get(Calendar.HOUR_OF_DAY),
-                            _newAppointment.getStartTime().get(Calendar.MINUTE));
+                    nullStoreAppointment.setEndTime(_newAppointment.getStartTime());
                     _newWorker.addStoreAppointment(nullStoreAppointment);
                 }
             } else {
@@ -218,8 +214,7 @@ public class AppointmentCreationActivity extends AppCompatActivity {
                     StoreAppointment.NullStoreAppointment nullStoreAppointment = _newAppointment.newNullInstance();
                     nullStoreAppointment.setStartTime(_newWorker.getLastAppointment().getEndTime().get(Calendar.HOUR_OF_DAY),
                             _newWorker.getLastAppointment().getEndTime().get(Calendar.MINUTE));
-                    nullStoreAppointment.setEndTime(_newAppointment.getStartTime().get(Calendar.HOUR_OF_DAY),
-                            _newAppointment.getStartTime().get(Calendar.MINUTE));
+                    nullStoreAppointment.setEndTime(_newAppointment.getStartTime());
                     _newWorker.addStoreAppointment(nullStoreAppointment);
                 }
             }

@@ -6,6 +6,7 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.support.v4.content.ContextCompat;
+import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 
@@ -13,7 +14,6 @@ import java.util.Calendar;
 
 public class OverallView extends View {
 
-    private static final int HOUR_GAP = 1;
     private static final int HOUR_MIN = 8;
     private static final int HOUR_MAX = 20;
 
@@ -23,6 +23,7 @@ public class OverallView extends View {
     private final Paint mBlackPaint = new Paint();
     private final Paint mGreyPaint = new Paint();
     private final Paint mAppointmentPaint = new Paint();
+    private final Paint mNowPaint = new Paint();
     private final int mTextSize;
     private final int mTopMargin;
     private final int mLeftMargin;
@@ -31,12 +32,10 @@ public class OverallView extends View {
     private final int mFinalX;
 
     private int mNumberOfColumns;
-    private int mFinalY;
-    private float mScaleFactor;
+    private float mScaleFactor = 1.0f;
     private int mCellHeight;
     private Point mScreenSize = new Point();
     private StoreWorkerModel mStoreWorkerModel = StoreWorkerModel.getInstance();
-    private Calendar mNow = Calendar.getInstance();
 
     public OverallView(Context context) {
         super(context);
@@ -48,6 +47,7 @@ public class OverallView extends View {
         int blackColor = ContextCompat.getColor(context, R.color.black);
         int greyColor = ContextCompat.getColor(context, R.color.grey_overlay);
         int mainColor = ContextCompat.getColor(context, R.color.colorPrimary);
+        int accentColor = ContextCompat.getColor(context, R.color.colorAccent);
         mTopMargin = (int) resources.getDimension(R.dimen.hour_top_margin);
         mLeftMargin = (int) resources.getDimension(R.dimen.hour_left_margin);
         mTextSize = (int) resources.getDimension(R.dimen.hour_text_size);
@@ -65,6 +65,8 @@ public class OverallView extends View {
         mGreyPaint.setAntiAlias(true);
         mAppointmentPaint.setColor(mainColor);
         mAppointmentPaint.setAntiAlias(true);
+        mNowPaint.setColor(accentColor);
+        mNowPaint.setAntiAlias(true);
     }
 
     @Override
@@ -72,30 +74,30 @@ public class OverallView extends View {
         super.onDraw(canvas);
         drawBackground(canvas);
         drawAppointments(canvas);
+        drawNowLine(canvas);
     }
 
     private void drawBackground(Canvas canvas) {
         int cellWidth = (mFinalX - mInitialX) / mNumberOfColumns;
-
-        mFinalY = mInitialY;
-        canvas.drawText(mHoursStrings[0], mLeftMargin, mFinalY + mTopMargin, mBlackPaint);
-        canvas.drawLine(mInitialX, mFinalY, mFinalX, mFinalY, mBlackPaint);
-        mFinalY += mCellHeight + HOUR_GAP;
+        int y = mInitialY;
+        canvas.drawText(mHoursStrings[0], mLeftMargin, y + mTopMargin, mBlackPaint);
+        canvas.drawLine(mInitialX, y, mFinalX, y, mBlackPaint);
+        y += mCellHeight;
         for (int i = 1; i < mNumberOfRows; i++) {
             String time = mHoursStrings[i];
-            canvas.drawText(time, mLeftMargin, mFinalY + mTopMargin, mBlackPaint);
-            canvas.drawLine(mInitialX, mFinalY, mFinalX, mFinalY, mGreyPaint);
-            mFinalY += mCellHeight + HOUR_GAP;
+            canvas.drawText(time, mLeftMargin, y + mTopMargin, mBlackPaint);
+            canvas.drawLine(mInitialX, y, mFinalX, y, mGreyPaint);
+            y += mCellHeight;
         }
-        canvas.drawText(mHoursStrings[mNumberOfRows], mLeftMargin, mFinalY + mTopMargin, mBlackPaint);
-        canvas.drawLine(mInitialX, mFinalY, mFinalX, mFinalY, mBlackPaint);
+        canvas.drawText(mHoursStrings[mNumberOfRows], mLeftMargin, y + mTopMargin, mBlackPaint);
+        canvas.drawLine(mInitialX, y, mFinalX, y, mBlackPaint);
 
         int x = mInitialX;
         for (int i = 0; i < mNumberOfColumns; i++) {
-            canvas.drawLine(x, mInitialY, x, mFinalY, mBlackPaint);
+            canvas.drawLine(x, mInitialY, x, y, mBlackPaint);
             x += cellWidth;
         }
-        canvas.drawLine(mFinalX, mInitialY, mFinalX, mFinalY, mBlackPaint);
+        canvas.drawLine(mFinalX, mInitialY, mFinalX, y, mBlackPaint);
     }
 
     private void drawAppointments(Canvas canvas) {
@@ -111,25 +113,34 @@ public class OverallView extends View {
                 int startMinute = currentAppointment.getStartTime().get(Calendar.MINUTE);
                 int endHour = currentAppointment.getEndTime().get(Calendar.HOUR_OF_DAY);
                 int endMinute = currentAppointment.getEndTime().get(Calendar.MINUTE);
-                int y1 = (int) (mInitialY + mCellHeight * (startHour - HOUR_MIN) + startMinute * mScaleFactor);
-                int y2 = (int) (mInitialY + mCellHeight * (endHour - HOUR_MIN) + endMinute * mScaleFactor);
+                int y1 = (int) (mInitialY + mCellHeight * (startHour - HOUR_MIN) + (mCellHeight * startMinute) / 60);
+                int y2 = (int) (mInitialY + mCellHeight * (endHour - HOUR_MIN) + (mCellHeight * endMinute) / 60);
                 canvas.drawRect(x1, y1, x2, y2, mAppointmentPaint);
             }
             x1 += cellWidth + 1;
         }
     }
 
+    private void drawNowLine(Canvas canvas) {
+        int hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
+        int minute = Calendar.getInstance().get(Calendar.MINUTE);
+        int y = (int) (mInitialY + mCellHeight * (hour - HOUR_MIN) + (mCellHeight * minute) / 60);
+        canvas.drawLine(mInitialX, y, mFinalX, y, mNowPaint);
+    }
+
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        int maxHeight = 2 * (mTextSize + mTopMargin) + mNumberOfRows * (mCellHeight + HOUR_GAP);
+        int maxHeight = 2 * (mTextSize + mTopMargin) + mNumberOfRows * mCellHeight;
         setMeasuredDimension(mScreenSize.x, maxHeight);
     }
 
     public void onScaleChanged(float scaleFactor_p) {
-        mScaleFactor = scaleFactor_p;
-        mCellHeight = (int) (mDefaultCellHeight * scaleFactor_p);
-        requestLayout();
-        invalidate();
+        if (scaleFactor_p != mScaleFactor) {
+            mScaleFactor = scaleFactor_p;
+            mCellHeight = (int) (mDefaultCellHeight * scaleFactor_p);
+            requestLayout();
+            invalidate();
+        }
     }
 
     public void onWorkersChanged() {

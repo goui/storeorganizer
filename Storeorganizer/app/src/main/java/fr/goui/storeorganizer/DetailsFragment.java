@@ -82,17 +82,15 @@ public class DetailsFragment extends Fragment implements OnAppointmentClickListe
 
         // if first item and gap after, remove appointment and extend gap between now to its end time
         else if (position_p == 0 && _currentWorker.getStoreAppointment(position_p + 1) instanceof StoreAppointment.NullStoreAppointment) {
-            _currentWorker.getStoreAppointment(position_p + 1).setStartTime(now.get(Calendar.HOUR_OF_DAY), now.get(Calendar.MINUTE));
+            _currentWorker.getStoreAppointment(position_p + 1).setStartTime(now);
             _currentWorker.getStoreAppointments().remove(position_p);
         }
 
         // if first item and appointment after, replace appointment with created gap between now and next appointment's start time
         else if (position_p == 0 && !(_currentWorker.getStoreAppointment(position_p + 1) instanceof StoreAppointment.NullStoreAppointment)) {
             StoreAppointment gap = new StoreAppointment().newNullInstance();
-            gap.setStartTime(now.get(Calendar.HOUR_OF_DAY), now.get(Calendar.MINUTE));
-            gap.setEndTime(
-                    _currentWorker.getStoreAppointment(position_p).getEndTime().get(Calendar.HOUR_OF_DAY),
-                    _currentWorker.getStoreAppointment(position_p).getEndTime().get(Calendar.MINUTE));
+            gap.setStartTime(now);
+            gap.setEndTime(_currentWorker.getStoreAppointment(position_p).getEndTime());
             if (gap.getDuration() >= StoreTaskModel.getInstance().getMinTimeInMinutes()) {
                 _currentWorker.getStoreAppointments().set(position_p, gap);
             } else {
@@ -116,27 +114,21 @@ public class DetailsFragment extends Fragment implements OnAppointmentClickListe
         // if gap only before, extend the gap end time and remove appointment
         else if (_currentWorker.getStoreAppointment(position_p - 1) instanceof StoreAppointment.NullStoreAppointment
                 && !(_currentWorker.getStoreAppointment(position_p + 1) instanceof StoreAppointment.NullStoreAppointment)) {
-            _currentWorker.getStoreAppointment(position_p - 1).setEndTime(
-                    _currentWorker.getStoreAppointment(position_p).getEndTime().get(Calendar.HOUR_OF_DAY),
-                    _currentWorker.getStoreAppointment(position_p).getEndTime().get(Calendar.MINUTE));
+            _currentWorker.getStoreAppointment(position_p - 1).setEndTime(_currentWorker.getStoreAppointment(position_p).getEndTime());
             _currentWorker.getStoreAppointments().remove(position_p);
         }
 
         // if gap only after, extend the gap start time and remove appointment
         else if (!(_currentWorker.getStoreAppointment(position_p - 1) instanceof StoreAppointment.NullStoreAppointment)
                 && _currentWorker.getStoreAppointment(position_p + 1) instanceof StoreAppointment.NullStoreAppointment) {
-            _currentWorker.getStoreAppointment(position_p + 1).setStartTime(
-                    _currentWorker.getStoreAppointment(position_p).getStartTime().get(Calendar.HOUR_OF_DAY),
-                    _currentWorker.getStoreAppointment(position_p).getStartTime().get(Calendar.MINUTE));
+            _currentWorker.getStoreAppointment(position_p + 1).setStartTime(_currentWorker.getStoreAppointment(position_p).getStartTime());
             _currentWorker.getStoreAppointments().remove(position_p);
         }
 
         // if gap before and after, change the before gap end time and remove after gap and appointment
         else if (_currentWorker.getStoreAppointment(position_p - 1) instanceof StoreAppointment.NullStoreAppointment
                 && _currentWorker.getStoreAppointment(position_p + 1) instanceof StoreAppointment.NullStoreAppointment) {
-            _currentWorker.getStoreAppointment(position_p - 1).setEndTime(
-                    _currentWorker.getStoreAppointment(position_p + 1).getEndTime().get(Calendar.HOUR_OF_DAY),
-                    _currentWorker.getStoreAppointment(position_p + 1).getEndTime().get(Calendar.MINUTE));
+            _currentWorker.getStoreAppointment(position_p - 1).setEndTime(_currentWorker.getStoreAppointment(position_p + 1).getEndTime());
             _currentWorker.getStoreAppointments().remove(position_p);
             _currentWorker.getStoreAppointments().remove(position_p);
         }
@@ -144,12 +136,8 @@ public class DetailsFragment extends Fragment implements OnAppointmentClickListe
         // if appointment before and after, remove appointment and create gap
         else {
             StoreAppointment gap = new StoreAppointment().newNullInstance();
-            gap.setStartTime(
-                    _currentWorker.getStoreAppointment(position_p - 1).getEndTime().get(Calendar.HOUR_OF_DAY),
-                    _currentWorker.getStoreAppointment(position_p - 1).getEndTime().get(Calendar.MINUTE));
-            gap.setEndTime(
-                    _currentWorker.getStoreAppointment(position_p + 1).getStartTime().get(Calendar.HOUR_OF_DAY),
-                    _currentWorker.getStoreAppointment(position_p + 1).getStartTime().get(Calendar.MINUTE));
+            gap.setStartTime(_currentWorker.getStoreAppointment(position_p - 1).getEndTime());
+            gap.setEndTime(_currentWorker.getStoreAppointment(position_p + 1).getStartTime());
             _currentWorker.getStoreAppointments().set(position_p, gap);
         }
 
