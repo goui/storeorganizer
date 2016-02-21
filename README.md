@@ -14,9 +14,10 @@ An app to help crew organize one day schedule
 
 3. A task creation activity
   - choose your worker
-  - choose the task (can be exclusive)
+  - choose the task
   - auto calculation (or manual specification) of the task's beginning and ending times
 
 4. A settings activity
   - manage your workers list (name, ...)
   - manage your tasks list (name, availability, duration, description, type, color, ...)
+  - manage your working beginning and ending times
