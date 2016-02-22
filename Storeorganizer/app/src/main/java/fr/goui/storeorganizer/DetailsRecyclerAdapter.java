@@ -21,7 +21,7 @@ public class DetailsRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vi
     private Context _context;
     private LayoutInflater _inflater;
     private List<StoreAppointment> _appointments;
-    private OnAppointmentClickListener _onAppointmentClickListener;
+    private OnAppointmentChangeListener _onAppointmentChangeListener;
 
     class NullAppointmentViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         TextView textView;
@@ -35,7 +35,7 @@ public class DetailsRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vi
 
         @Override
         public void onClick(View v) {
-            _onAppointmentClickListener.onAppointmentEdit(position);
+            _onAppointmentChangeListener.onAppointmentEdit(position);
         }
 
     }
@@ -62,7 +62,7 @@ public class DetailsRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vi
 
         @Override
         public void onClick(View v) {
-            _onAppointmentClickListener.onAppointmentEdit(position);
+            _onAppointmentChangeListener.onAppointmentEdit(position);
         }
 
         @Override
@@ -72,7 +72,7 @@ public class DetailsRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vi
             builder.setPositiveButton(_context.getString(R.string.yes), new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    _onAppointmentClickListener.onAppointmentDelete(position);
+                    _onAppointmentChangeListener.onAppointmentDelete(position);
                 }
             });
             builder.setNegativeButton(_context.getString(R.string.no), new DialogInterface.OnClickListener() {
@@ -86,11 +86,11 @@ public class DetailsRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vi
         }
     }
 
-    public DetailsRecyclerAdapter(Context context_p, List<StoreAppointment> appointments_p, OnAppointmentClickListener onAppointmentClickListener_p) {
+    public DetailsRecyclerAdapter(Context context_p, List<StoreAppointment> appointments_p, OnAppointmentChangeListener onAppointmentChangeListener_p) {
         _context = context_p;
         _inflater = LayoutInflater.from(context_p);
         _appointments = appointments_p;
-        _onAppointmentClickListener = onAppointmentClickListener_p;
+        _onAppointmentChangeListener = onAppointmentChangeListener_p;
     }
 
     @Override

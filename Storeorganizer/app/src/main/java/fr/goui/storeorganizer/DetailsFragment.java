@@ -15,9 +15,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.Calendar;
-import java.util.Date;
 
-public class DetailsFragment extends Fragment implements OnAppointmentClickListener {
+public class DetailsFragment extends Fragment implements OnAppointmentChangeListener {
 
     public static final String ARG_SECTION_NUMBER = "section_number";
     public static final String INTENT_EXTRA_APPOINTMENT_POSITION = "intent_extra_appointment_position";
