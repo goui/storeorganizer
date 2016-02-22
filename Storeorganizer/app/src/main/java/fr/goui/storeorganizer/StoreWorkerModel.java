@@ -2,60 +2,113 @@ package fr.goui.storeorganizer;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import java.util.Observable;
 
+/**
+ * {@code StoreWorkerModel} is a singleton class responsible for creating and getting {@code StoreWorker}s throughout the code.
+ * It manages the unique ids given to {@code StoreWorker}s.
+ * It has the global information about {@code StoreWorker}s like their number and the current maximum unique id.
+ */
 public class StoreWorkerModel extends Observable {
 
+    /**
+     * The unique instance of the {@code StoreWorkerModel}.
+     */
     private static StoreWorkerModel ourInstance = new StoreWorkerModel();
 
+    /**
+     * The list of all the {@code StoreWorker}s.
+     */
     private List<StoreWorker> _workers;
 
+    /**
+     * The current maximum unique id that can be given to {@code StoreWorker}s.
+     */
     private int _maxId;
 
+    /**
+     * Getter for the unique instance of {@code StoreWorkerModel}.
+     *
+     * @return the unique instance of {@code StoreWorkerModel}
+     */
     public static StoreWorkerModel getInstance() {
         return ourInstance;
     }
 
+    /**
+     * Private constructor of this singleton class.
+     */
     private StoreWorkerModel() {
         _workers = new ArrayList<>();
     }
 
+    /**
+     * Setter for the maximum unique id that can be given to {@code StoreWorker}s.
+     * Please do not use.
+     *
+     * @param maxId_p the maximum unique id
+     */
     public void setMaxId(int maxId_p) {
         _maxId = maxId_p;
     }
 
+    /**
+     * Getter for the maximum unique id that can be given to {@code StoreWorker}s.
+     *
+     * @return the maximum unique id {@code int}
+     */
     public int getMaxId() {
         return _maxId;
     }
 
+    /**
+     * Getter for the list of {@code StoreWorker}s.
+     * For creation, deletion and modification please use existing methods.
+     *
+     * @return the list of {@code StoreWorker}s
+     */
     public List<StoreWorker> getStoreWorkers() {
         return _workers;
     }
 
+    /**
+     * Getter for the number of {@code StoreWorker}s.
+     *
+     * @return the number of {@code StoreWorker}s
+     */
     public int getStoreWorkersNumber() {
         return _workers.size();
     }
 
+    /**
+     * Getter for a specific {@code StoreWorker} given its position.
+     *
+     * @param position_p the position of the {@code StoreWorker}
+     * @return the {@code StoreWorker} at the given position
+     */
     public StoreWorker getStoreWorker(int position_p) {
         return _workers.get(position_p);
     }
 
-    public int getStoreWorkerPosition(StoreWorker storeWorker_p) {
-        int position = -1;
-        for (int i = 0; i < _workers.size(); i++) {
-            if (_workers.get(i).getId() == storeWorker_p.getId()) {
-                position = i;
-            }
-        }
-        return position;
-    }
-
+    /**
+     * Adds a {@code StoreWorker} and specifying its unique id.
+     * Method used after recuperation in the SharedPreferences.
+     * Please do not use.
+     *
+     * @param name_p the name of the {@code StoreWorker}
+     * @param id_p   the unique id of the {@code StoreWorker}
+     */
     public void addStoreWorker(String name_p, int id_p) {
         _workers.add(new StoreWorker(name_p, id_p));
     }
 
+    /**
+     * Adds a {@code StoreWorker} and returns its unique id after creation.
+     *
+     * @param name_p the name of the {@code StoreWorker}
+     * @return the generated unique id of the {@code StoreWorker}
+     */
     public int addStoreWorker(String name_p) {
         _maxId++;
         StoreWorker storeWorker = new StoreWorker(name_p, _maxId);
@@ -65,6 +118,14 @@ public class StoreWorkerModel extends Observable {
         return _maxId;
     }
 
+    /**
+     * Updates the {@code StoreWorker} located at the given position.
+     * Its name and duration will be updated.
+     *
+     * @param position_p the position of the {@code StoreWorker} to update
+     * @param name_p     the new name of the {@code StoreWorker}
+     * @return the unique id of the updated {@code StoreWorker}
+     */
     public int updateStoreWorker(int position_p, String name_p) {
         StoreWorker storeWorker = _workers.get(position_p);
         storeWorker.setName(name_p);
@@ -73,6 +134,12 @@ public class StoreWorkerModel extends Observable {
         return storeWorker.getId();
     }
 
+    /**
+     * Removes the {@code StoreWorker} located at the given position.
+     *
+     * @param position_p the position of the {@code StoreWorker} to remove
+     * @return the unique id of the removed {@code StoreWorker}
+     */
     public int removeStoreWorker(int position_p) {
         StoreWorker worker = _workers.get(position_p);
         _workers.remove(position_p);
@@ -81,7 +148,13 @@ public class StoreWorkerModel extends Observable {
         return worker.getId();
     }
 
+    /**
+     * Getter for the first available {@code StoreWorker}.
+     *
+     * @return the first available {@code StoreWorker}
+     */
     public StoreWorker getFirstAvailableWorker() {
+        // TODO fix issue getFirstAvailableWorker and add comments
         Calendar now = Calendar.getInstance();
         StoreWorker firstWorker = _workers.get(0);
         StoreAppointment firstAvailableAppointment = firstWorker.getNextAvailability();
@@ -111,6 +184,11 @@ public class StoreWorkerModel extends Observable {
         return firstWorker;
     }
 
+    /**
+     * Clears all the {@code StoreWorker}s and creates a default one.
+     *
+     * @param name_p the name of the default {@code StoreWorker}
+     */
     public void clear(String name_p) {
         _maxId = 0;
         _workers.clear();
@@ -120,6 +198,10 @@ public class StoreWorkerModel extends Observable {
         notifyObservers(new ObsData(storeWorker, 0, ObsData.REMOVE_ALL));
     }
 
+    /**
+     * {@code ObsData} is a class used to send information when updating observers.
+     * It contains a {@code StoreWorker}, its position {@code int} and an update reason {@code int}.
+     */
     public class ObsData {
         public static final int CREATE = 0;
         public static final int UPDATE = 1;

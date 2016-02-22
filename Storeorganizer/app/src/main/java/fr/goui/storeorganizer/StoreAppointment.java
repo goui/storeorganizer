@@ -286,6 +286,11 @@ public class StoreAppointment {
         return _clientName + " - " + _storeTask.getName() + " - " + getFormattedStartTime();
     }
 
+    /**
+     * Creates a new instance of {@code NullStoreAppointment}.
+     *
+     * @return {@code NullStoreAppointment}
+     */
     public NullStoreAppointment newNullInstance() {
         return new NullStoreAppointment();
     }

@@ -24,7 +24,7 @@ public class StoreTask {
 
     /**
      * Constructor passing the name, the duration in minutes and the unique id.
-     * Please use {@link StoreTaskModel} for creation.
+     * Please use {@link StoreTaskModel} for creation, modification or deletion.
      *
      * @param name_p     the name of the task
      * @param duration_p the duration in minutes of the task
@@ -66,7 +66,7 @@ public class StoreTask {
     /**
      * Setter for the name of the {@code StoreTask}.
      *
-     * @param name_p the name of the task
+     * @param name_p the new name of the task
      */
     public void setName(String name_p) {
         _name = name_p;
