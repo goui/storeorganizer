@@ -56,9 +56,9 @@ public class AppointmentCreationActivity extends AppCompatActivity {
         _etClientsName = (EditText) findViewById(R.id.activity_appointment_creation_clients_name_edit_text);
         _etClientsPhoneNumber = (EditText) findViewById(R.id.activity_appointment_creation_clients_phone_number_edit_text);
         _spinnerWorker = (Spinner) findViewById(R.id.activity_appointment_creation_worker_spinner);
-        _spinnerWorker.setAdapter(new WorkerBaseAdapter(this, StoreWorkerModel.getInstance().getStoreWorkers()));
+        _spinnerWorker.setAdapter(new WorkerBaseAdapter(this));
         _spinnerTask = (Spinner) findViewById(R.id.activity_appointment_creation_task_spinner);
-        _spinnerTask.setAdapter(new TaskBaseAdapter(this, StoreTaskModel.getInstance().getStoreTasks()));
+        _spinnerTask.setAdapter(new TaskBaseAdapter(this));
         _txtStartTime = (TextView) findViewById(R.id.activity_appointment_creation_start_text_view);
         _txtEndTime = (TextView) findViewById(R.id.activity_appointment_creation_end_text_view);
 
