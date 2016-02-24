@@ -20,6 +20,7 @@
     <string name="tasks">Tasks</string>
     <string name="name">Name</string>
     <string name="duration">Duration</string>
+    <string name="duration_in_minutes">Duration in minutes</string>
     <string name="add_worker">Add worker</string>
     <string name="add_task">Add task</string>
     <string name="add_appointment">Add appointment</string>

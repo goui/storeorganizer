@@ -111,6 +111,7 @@ public class SettingsActivity extends AppCompatActivity implements OnCategoryCli
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        // creating menu
         getMenuInflater().inflate(R.menu.menu_settings, menu);
         return true;
     }
@@ -146,7 +147,7 @@ public class SettingsActivity extends AppCompatActivity implements OnCategoryCli
             @Override
             public void onClick(DialogInterface dialog, int which) {
 
-                // clearing models, it will create default worker and task
+                // clearing models and creating default worker and task
                 StoreWorkerModel.getInstance().clear(getString(R.string.worker));
                 StoreTaskModel.getInstance().clear(getString(R.string.task), mResources.getInteger(R.integer.task_default_duration));
 
