@@ -67,7 +67,7 @@ public class TasksCategoryFragment extends Fragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
         // creating the adapter for the recycler view
-        mAdapter = new TasksCategoryRecyclerAdapter(getActivity(), StoreTaskModel.getInstance().getStoreTasks());
+        mAdapter = new TasksCategoryRecyclerAdapter(getActivity());
         recyclerView.setAdapter(mAdapter);
 
         // getting the shared prefs

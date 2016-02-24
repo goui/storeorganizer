@@ -18,12 +18,12 @@ public class WorkerBaseAdapter extends BaseAdapter {
     /**
      * The {@code LayoutInflater} used to inflate views.
      */
-    private LayoutInflater _layoutInflater;
+    private LayoutInflater mLayoutInflater;
 
     /**
      * The list of all the {@code StoreWorker}s
      */
-    private List<StoreWorker> _workers;
+    private List<StoreWorker> mWorkers;
 
     /**
      * Constructor using a {@code Context} to get its {@code LayoutInflater}.
@@ -31,57 +31,57 @@ public class WorkerBaseAdapter extends BaseAdapter {
      * @param context_p the context
      */
     public WorkerBaseAdapter(Context context_p) {
-        _layoutInflater = LayoutInflater.from(context_p);
-        _workers = StoreWorkerModel.getInstance().getStoreWorkers();
+        mLayoutInflater = LayoutInflater.from(context_p);
+        mWorkers = StoreWorkerModel.getInstance().getStoreWorkers();
     }
 
     @Override
     public int getCount() {
-        return _workers.size();
+        return mWorkers.size();
     }
 
     @Override
-    public StoreWorker getItem(int position_p) {
-        return _workers.get(position_p);
+    public StoreWorker getItem(int position) {
+        return mWorkers.get(position);
     }
 
     @Override
-    public long getItemId(int position_p) {
-        return position_p;
+    public long getItemId(int position) {
+        return position;
     }
 
     @Override
-    public View getView(int position_p, View convertView_p, ViewGroup parent_p) {
+    public View getView(int position, View convertView, ViewGroup parent) {
         ViewHolder viewHolder;
 
         // first time creating the view
-        if (convertView_p == null) {
+        if (convertView == null) {
 
             // inflating the layout
-            convertView_p = _layoutInflater.inflate(R.layout.spinner_item_worker, null);
+            convertView = mLayoutInflater.inflate(R.layout.spinner_item_worker, parent);
 
             // creating the view holder and putting inflated views in it
             viewHolder = new ViewHolder();
-            viewHolder.txtName = (TextView) convertView_p.findViewById(R.id.spinner_item_worker_name_text_view);
+            viewHolder.txtName = (TextView) convertView.findViewById(R.id.spinner_item_worker_name_text_view);
 
             // keeping reference to the view holder
-            convertView_p.setTag(viewHolder);
+            convertView.setTag(viewHolder);
         }
 
         // when view has already been created, getting view holder
         else {
-            viewHolder = (ViewHolder) convertView_p.getTag();
+            viewHolder = (ViewHolder) convertView.getTag();
         }
 
         // getting the item at the current position
-        StoreWorker storeWorker = getItem(position_p);
+        StoreWorker storeWorker = getItem(position);
 
         // if it's not null, displaying its information in views
         if (storeWorker != null) {
             viewHolder.txtName.setText(storeWorker.getName());
         }
 
-        return convertView_p;
+        return convertView;
     }
 
     /**

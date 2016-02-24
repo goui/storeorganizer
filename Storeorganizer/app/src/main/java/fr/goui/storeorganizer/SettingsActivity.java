@@ -89,11 +89,11 @@ public class SettingsActivity extends AppCompatActivity implements OnCategoryCli
     }
 
     @Override
-    public void onCategoryClicked(int position_p) {
+    public void onCategoryClicked(int position) {
 
         // creating the right fragment depending on the category clicked
         Fragment fragment = null;
-        switch (position_p) {
+        switch (position) {
             case CATEGORY_WORKERS:
                 fragment = new WorkersCategoryFragment();
                 break;

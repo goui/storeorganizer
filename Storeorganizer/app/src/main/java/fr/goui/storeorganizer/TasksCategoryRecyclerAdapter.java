@@ -3,6 +3,7 @@ package fr.goui.storeorganizer;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.text.InputType;
@@ -17,159 +18,258 @@ import android.widget.Toast;
 
 import java.util.List;
 
+/**
+ * {@code TasksCategoryRecyclerAdapter} is a {@code RecyclerView.Adapter}.
+ * It is used to display {@code StoreTask}s in the {@code RecyclerView} of the {@code TasksCategoryFragment}.
+ */
 public class TasksCategoryRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
-    private Context _context;
-    private LayoutInflater _layoutInflater;
-    private List<StoreTask> _tasks;
+    /**
+     * The {@code Context} used to get {@code Resources} and {@code LayoutInflater}.
+     */
+    private Context mContext;
+
+    /**
+     * The {@code LayoutInflater} used to inflate views.
+     */
+    private LayoutInflater mLayoutInflater;
+
+    /**
+     * The list of all the {@code StoreTask}s.
+     */
+    private List<StoreTask> mTasks;
+
+    /**
+     * The {@code SharedPreferences}.
+     */
     private SharedPreferences mSharedPreferences;
 
+    /**
+     * The android resources to get project values.
+     */
+    private Resources mResources;
+
+    /**
+     * Constructor using a {@code Context} to get its {@code LayoutInflater}.
+     *
+     * @param context the context
+     */
+    public TasksCategoryRecyclerAdapter(Context context) {
+        mContext = context;
+        mResources = mContext.getResources();
+        mLayoutInflater = LayoutInflater.from(mContext);
+        mTasks = StoreTaskModel.getInstance().getStoreTasks();
+    }
+
+    @Override
+    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        // creating the view holder with the inflated layout
+        return new TasksViewHolder(mLayoutInflater.inflate(R.layout.fragment_settings_item_task, parent, false));
+    }
+
+    @Override
+    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+
+        // getting the item at the current position
+        StoreTask task = mTasks.get(position);
+        if (task != null) {
+
+            // if not null, displaying its information
+            ((TasksViewHolder) holder).setPosition(position);
+            ((TasksViewHolder) holder).mTxtName.setText(task.getName());
+            ((TasksViewHolder) holder).mTxtDuration.setText(task.getDuration() + "min");
+        }
+    }
+
+    @Override
+    public int getItemCount() {
+        return mTasks.size();
+    }
+
+    /**
+     * {@code TasksViewHolder} is a {@code RecyclerView.ViewHolder} used to store inflated views for one task.
+     */
     class TasksViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        TextView txtName;
-        TextView txtDuration;
-        ImageButton btnEdit;
-        ImageButton btnDelete;
-        int position;
 
-        public TasksViewHolder(View itemView_p) {
-            super(itemView_p);
-            txtName = (TextView) itemView_p.findViewById(R.id.fragment_settings_item_task_name_text_view);
-            txtDuration = (TextView) itemView_p.findViewById(R.id.fragment_settings_item_task_duration_text_view);
-            btnEdit = (ImageButton) itemView_p.findViewById(R.id.fragment_settings_item_task_edit_button);
-            btnDelete = (ImageButton) itemView_p.findViewById(R.id.fragment_settings_item_task_delete_button);
-            itemView_p.setOnClickListener(this);
+        // the views for one item
+        private TextView mTxtName;
+        private TextView mTxtDuration;
+        private ImageButton mBtnEdit;
+        private ImageButton mBtnDelete;
+        private int mPosition;
 
-            btnEdit.setOnClickListener(new View.OnClickListener() {
+        /**
+         * Constructor getting all the views in the passed layout and setting listener to them if needed.
+         *
+         * @param itemView the layout
+         */
+        public TasksViewHolder(View itemView) {
+            super(itemView);
+
+            // getting all the views for this item
+            mTxtName = (TextView) itemView.findViewById(R.id.fragment_settings_item_task_name_text_view);
+            mTxtDuration = (TextView) itemView.findViewById(R.id.fragment_settings_item_task_duration_text_view);
+            mBtnEdit = (ImageButton) itemView.findViewById(R.id.fragment_settings_item_task_edit_button);
+            mBtnDelete = (ImageButton) itemView.findViewById(R.id.fragment_settings_item_task_delete_button);
+            itemView.setOnClickListener(this);
+
+            // item edition listener
+            mBtnEdit.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     editCurrentItem();
                 }
             });
 
-            btnDelete.setOnClickListener(new View.OnClickListener() {
+            // item deletion listener
+            mBtnDelete.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     deleteCurrentItem();
                 }
             });
 
-            mSharedPreferences = _context.getSharedPreferences(_context.getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+            // getting the shared prefs
+            mSharedPreferences = mContext.getSharedPreferences(mResources.getString(R.string.preference_file_key), Context.MODE_PRIVATE);
         }
 
+        /**
+         * Method used to edit the item at the current position.
+         */
         private void editCurrentItem() {
-            StoreTask storeTask = _tasks.get(position);
-            LinearLayout layout = new LinearLayout(_context);
+
+            // getting the item at the current position
+            StoreTask storeTask = mTasks.get(mPosition);
+
+            // creating the layout manually
+            LinearLayout layout = new LinearLayout(mContext);
             layout.setOrientation(LinearLayout.VERTICAL);
-            final EditText etName = new EditText(_context);
+
+            // creating an edit text for the name of the task
+            final EditText etName = new EditText(mContext);
             etName.setInputType(InputType.TYPE_TEXT_VARIATION_PERSON_NAME | InputType.TYPE_TEXT_FLAG_CAP_SENTENCES);
             etName.setText(storeTask.getName());
-            etName.setHint(_context.getString(R.string.name));
-            final EditText etDuration = new EditText(_context);
+            etName.setHint(mContext.getString(R.string.name));
+
+            // creating an edit text for the task's duration
+            final EditText etDuration = new EditText(mContext);
             etDuration.setInputType(InputType.TYPE_CLASS_NUMBER);
             etDuration.setText(String.valueOf(storeTask.getDuration()));
-            etDuration.setHint(_context.getString(R.string.duration));
+            etDuration.setHint(mResources.getString(R.string.duration));
             layout.addView(etName);
             layout.addView(etDuration);
 
-            AlertDialog.Builder builder = new AlertDialog.Builder(_context);
-            builder.setTitle(_context.getString(R.string.edit));
+            // creating the dialog
+            AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+            builder.setTitle(mResources.getString(R.string.edit));
             builder.setView(layout);
-            builder.setPositiveButton(_context.getString(R.string.ok), new DialogInterface.OnClickListener() {
+            builder.setPositiveButton(mResources.getString(R.string.ok), new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    String oldName = txtName.getText().toString();
-                    String oldDuration = txtDuration.getText().toString();
+
+                    // the name and duration before edition
+                    String oldName = mTxtName.getText().toString();
+                    String oldDuration = mTxtDuration.getText().toString();
+
+                    // tha name and duration after edition
                     String newName = etName.getText().toString();
                     String newDuration = etDuration.getText().toString();
+
+                    // if name has been modified, displaying it
                     boolean modification = false;
                     if (!oldName.equals(newName)) {
-                        txtName.setText(newName);
+                        mTxtName.setText(newName);
                         modification = true;
                     }
+                    // if duration has been modified, displaying it
                     if (!oldDuration.equals(newDuration)) {
-                        txtDuration.setText(newDuration + "min");
+                        mTxtDuration.setText(newDuration + "min");
                         modification = true;
                     }
+
+                    // if there has been a modification
                     if (modification) {
-                        int id = StoreTaskModel.getInstance().updateStoreTask(position, newName, Integer.parseInt(newDuration));
-                        Toast.makeText(_context, _context.getString(R.string.modification_will_appear_for_later_tasks), Toast.LENGTH_LONG).show();
+
+                        // updating task in the model
+                        int id = StoreTaskModel.getInstance().updateStoreTask(mPosition, newName, Integer.parseInt(newDuration));
+                        Toast.makeText(mContext, mResources.getString(R.string.modification_will_appear_for_later_tasks), Toast.LENGTH_LONG).show();
+
+                        // updating the task in the shared prefs
                         SharedPreferences.Editor editor = mSharedPreferences.edit();
-                        editor.putString(_context.getString(R.string.task) + id, newName);
-                        editor.putInt(_context.getString(R.string.task) + id + _context.getString(R.string.duration), Integer.parseInt(newDuration));
+                        editor.putString(mResources.getString(R.string.task) + id, newName);
+                        editor.putInt(mResources.getString(R.string.task) + id + mResources.getString(R.string.duration), Integer.parseInt(newDuration));
                         editor.apply();
                     }
                 }
             });
-            builder.setNegativeButton(_context.getString(R.string.cancel), new DialogInterface.OnClickListener() {
+            builder.setNegativeButton(mResources.getString(R.string.cancel), new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
+                    // if cancel button was pressed discarding the dialog
                     dialog.cancel();
                 }
             });
             builder.show();
         }
 
+        /**
+         * Method used to delete the item at the current position.
+         */
         private void deleteCurrentItem() {
-            AlertDialog.Builder builder = new AlertDialog.Builder(_context);
-            builder.setTitle(_context.getString(R.string.question_remove));
-            builder.setPositiveButton(_context.getString(R.string.ok), new DialogInterface.OnClickListener() {
+
+            // creating an alert dialog asking for confirmation
+            AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+            builder.setTitle(mResources.getString(R.string.question_remove));
+            builder.setPositiveButton(mResources.getString(R.string.ok), new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
+
+                    // if there is only one task, informing the user that it can't be deleted
                     if (StoreTaskModel.getInstance().getStoreTaskNumber() == 1) {
-                        Toast.makeText(_context, _context.getString(R.string.cant_remove_last), Toast.LENGTH_LONG).show();
+                        Toast.makeText(mContext, mResources.getString(R.string.cant_remove_last), Toast.LENGTH_LONG).show();
                         dialog.cancel();
-                    } else {
-                        int id = StoreTaskModel.getInstance().removeStoreTask(position);
+                    }
+
+                    // if there is more than one task
+                    else {
+
+                        // removing task from the model
+                        int id = StoreTaskModel.getInstance().removeStoreTask(mPosition);
+
+                        // making adapter redraw everything
                         notifyDataSetChanged();
+
+                        // removing task from the shared prefs
                         SharedPreferences.Editor editor = mSharedPreferences.edit();
-                        editor.remove(_context.getString(R.string.task) + id);
-                        editor.remove(_context.getString(R.string.task) + id + _context.getString(R.string.duration));
+                        editor.remove(mResources.getString(R.string.task) + id);
+                        editor.remove(mResources.getString(R.string.task) + id + mResources.getString(R.string.duration));
                         editor.apply();
                     }
                 }
             });
-            builder.setNegativeButton(_context.getString(R.string.cancel), new DialogInterface.OnClickListener() {
+            builder.setNegativeButton(mResources.getString(R.string.cancel), new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
+                    // if cancel button was pressed discarding the dialog
                     dialog.cancel();
                 }
             });
             builder.show();
         }
 
-        public void setPosition(int position_p) {
-            position = position_p;
+        /**
+         * Method used to set the current position.
+         *
+         * @param position the current position
+         */
+        public void setPosition(int position) {
+            mPosition = position;
         }
 
         @Override
         public void onClick(View v) {
             // do nothing
+            // it has been added to display the ripple effect
         }
-    }
-
-    public TasksCategoryRecyclerAdapter(Context context_p, List<StoreTask> tasks_p) {
-        _context = context_p;
-        _layoutInflater = LayoutInflater.from(_context);
-        _tasks = tasks_p;
-    }
-
-    @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent_p, int viewType_p) {
-        return new TasksViewHolder(_layoutInflater.inflate(R.layout.fragment_settings_item_task, parent_p, false));
-    }
-
-    @Override
-    public void onBindViewHolder(RecyclerView.ViewHolder holder_p, int position_p) {
-        StoreTask task = _tasks.get(position_p);
-        if (task != null) {
-            ((TasksViewHolder) holder_p).setPosition(position_p);
-            ((TasksViewHolder) holder_p).txtName.setText(task.getName());
-            ((TasksViewHolder) holder_p).txtDuration.setText(task.getDuration() + "min");
-        }
-    }
-
-    @Override
-    public int getItemCount() {
-        return _tasks.size();
     }
 }

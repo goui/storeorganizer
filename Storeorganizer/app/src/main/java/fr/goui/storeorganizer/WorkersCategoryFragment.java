@@ -66,7 +66,7 @@ public class WorkersCategoryFragment extends Fragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
         // creating the adapter for the recycler view
-        mAdapter = new WorkersCategoryRecyclerAdapter(getActivity(), StoreWorkerModel.getInstance().getStoreWorkers());
+        mAdapter = new WorkersCategoryRecyclerAdapter(getActivity());
         recyclerView.setAdapter(mAdapter);
 
         // getting the shared prefs
