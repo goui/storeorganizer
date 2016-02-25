@@ -2,12 +2,14 @@ package fr.goui.storeorganizer;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Comparator;
 
 /**
  * {@code StoreAppointment} is a class containing the client's name, the client's phone number,
  * a {@link StoreTask} and 2 {@link Calendar} (one for the start time, one for the end time).
+ * This is a {@code Comparable} class.
  */
-public class StoreAppointment {
+public class StoreAppointment implements Comparable<StoreAppointment> {
 
     /**
      * The {@code String} representing the pattern used to format times.
@@ -286,6 +288,11 @@ public class StoreAppointment {
         return _clientName + " - " + _storeTask.getName() + " - " + getFormattedStartTime();
     }
 
+    @Override
+    public int compareTo(StoreAppointment another_p) {
+        return Comparators.START_TIME.compare(this, another_p);
+    }
+
     /**
      * Creates a new instance of {@code NullStoreAppointment}.
      *
@@ -293,6 +300,23 @@ public class StoreAppointment {
      */
     public NullStoreAppointment newNullInstance() {
         return new NullStoreAppointment();
+    }
+
+    /**
+     * Comparator class used to compare 2 {@code StoreAppointment}s.
+     */
+    public static class Comparators {
+
+        /**
+         * Comparing 2 {@code StoreAppointment}s depending on their start time.
+         */
+        public static final Comparator<StoreAppointment> START_TIME = new Comparator<StoreAppointment>() {
+
+            @Override
+            public int compare(StoreAppointment appointment1_p, StoreAppointment appointment2_p) {
+                return appointment1_p.getStartTime().compareTo(appointment2_p.getStartTime());
+            }
+        };
     }
 
     /**

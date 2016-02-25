@@ -2,6 +2,7 @@ package fr.goui.storeorganizer;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -110,6 +111,13 @@ public class StoreWorker {
      */
     public void removeStoreAppointment(StoreAppointment storeAppointment_p) {
         _appointments.remove(storeAppointment_p);
+    }
+
+    /**
+     * Sorts all {@code StoreAppointment}s depending on their start time.
+     */
+    public void sortAppointments() {
+        Collections.sort(_appointments, StoreAppointment.Comparators.START_TIME);
     }
 
     /**
