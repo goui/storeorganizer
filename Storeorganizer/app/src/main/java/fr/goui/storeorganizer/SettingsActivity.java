@@ -28,6 +28,11 @@ public class SettingsActivity extends AppCompatActivity implements OnCategoryCli
     private static final int CATEGORY_TASKS = 1;
 
     /**
+     * The constant for the working times' category.
+     */
+    private static final int CATEGORY_WORKING_TIMES = 2;
+
+    /**
      * The {@code SharedPreferences}.
      */
     private SharedPreferences mSharedPreferences;
@@ -99,6 +104,9 @@ public class SettingsActivity extends AppCompatActivity implements OnCategoryCli
                 break;
             case CATEGORY_TASKS:
                 fragment = new TasksCategoryFragment();
+                break;
+            case CATEGORY_WORKING_TIMES:
+                fragment = new WorkingTimesCategoryFragment();
                 break;
         }
 

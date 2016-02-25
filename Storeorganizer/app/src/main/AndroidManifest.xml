@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest package="fr.goui.storeorganizer"
-          xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest
+    package="fr.goui.storeorganizer"
+    xmlns:android="http://schemas.android.com/apk/res/android">
 
     <application
         android:allowBackup="true"
@@ -12,7 +13,6 @@
             android:name=".LauncherActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/app_name"
-            android:launchMode="singleInstance"
             android:theme="@style/FullscreenTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
@@ -41,9 +41,10 @@
             android:label="@string/appointment_edition"
             android:launchMode="singleInstance">
         </activity>
-        <activity android:name=".OverallActivity"
-                  android:label="@string/overall"
-                  android:launchMode="singleInstance">
+        <activity
+            android:name=".OverallActivity"
+            android:label="@string/overall"
+            android:launchMode="singleInstance">
         </activity>
     </application>
 

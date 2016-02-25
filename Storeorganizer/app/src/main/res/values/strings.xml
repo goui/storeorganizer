@@ -41,7 +41,9 @@
     <string name="from">From</string>
     <string name="to">To</string>
     <string name="at">at</string>
-    <string name="minutes">min</string>
+    <string name="working_times">Working times</string>
+    <string name="minutes">minutes</string>
+    <string name="min">min</string>
     <string name="next_availability">Next availability</string>
     <string name="no_phone_entered">No phone entered</string>
     <string name="restore_default">Restore default</string>
@@ -80,5 +82,13 @@
     <string name="worker_max_id">worker_max_id</string>
     <string name="task_max_id">task_max_id</string>
     <integer name="task_default_duration">30</integer>
+    <string name="starting_hour">starting_hour</string>
+    <string name="starting_minute">starting_minute</string>
+    <string name="ending_hour">ending_hour</string>
+    <string name="ending_minute">ending_minute</string>
+    <integer name="default_starting_hour">8</integer>
+    <integer name="default_starting_minute">0</integer>
+    <integer name="default_ending_hour">20</integer>
+    <integer name="default_ending_minute">0</integer>
 
 </resources>

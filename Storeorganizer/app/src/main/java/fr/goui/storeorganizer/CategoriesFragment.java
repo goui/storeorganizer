@@ -36,7 +36,7 @@ public class CategoriesFragment extends Fragment {
         Resources resources = getActivity().getResources();
 
         // getting the list of categories
-        String[] categories = {resources.getString(R.string.workers), resources.getString(R.string.tasks)};
+        String[] categories = {resources.getString(R.string.workers), resources.getString(R.string.tasks), resources.getString(R.string.working_times)};
 
         // setting a simple array adapter to the list view
         listView.setAdapter(new ArrayAdapter<String>(getActivity(), android.R.layout.simple_list_item_1, categories));
