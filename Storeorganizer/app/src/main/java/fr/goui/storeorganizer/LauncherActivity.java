@@ -214,17 +214,19 @@ public class LauncherActivity extends AppCompatActivity {
     private void getStoreInfo() {
         StoreModel storeModel = StoreModel.getInstance();
 
-        // getting saved starting times in the shared prefs
-        storeModel.setStartingHour(mSharedPreferences.getInt(mResources.getString(R.string.starting_hour),
-                mResources.getInteger(R.integer.default_starting_hour)));
-        storeModel.setStartingMinute(mSharedPreferences.getInt(mResources.getString(R.string.starting_minute),
-                mResources.getInteger(R.integer.default_starting_minute)));
+        // getting saved starting time in the shared prefs and putting it in the model
+        int startingHour = mSharedPreferences.getInt(mResources.getString(R.string.starting_hour),
+                mResources.getInteger(R.integer.default_starting_hour));
+        int startingMinute = mSharedPreferences.getInt(mResources.getString(R.string.starting_minute),
+                mResources.getInteger(R.integer.default_starting_minute));
+        storeModel.setStartingTime(startingHour, startingMinute);
 
-        // getting saved ending times in the shared prefs
-        storeModel.setEndingHour(mSharedPreferences.getInt(mResources.getString(R.string.ending_hour),
-                mResources.getInteger(R.integer.default_ending_hour)));
-        storeModel.setEndingMinute(mSharedPreferences.getInt(mResources.getString(R.string.ending_minute),
-                mResources.getInteger(R.integer.default_ending_minute)));
+        // getting saved ending time in the shared prefs and putting it in the model
+        int endingHour = mSharedPreferences.getInt(mResources.getString(R.string.ending_hour),
+                mResources.getInteger(R.integer.default_ending_hour));
+        int endingMinute = mSharedPreferences.getInt(mResources.getString(R.string.ending_minute),
+                mResources.getInteger(R.integer.default_ending_minute));
+        storeModel.setEndingTime(endingHour, endingMinute);
 
     }
 

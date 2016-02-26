@@ -1,9 +1,11 @@
 package fr.goui.storeorganizer;
 
+import java.util.Observable;
+
 /**
  * {@code StoreModel} is a singleton class responsible for holding all information about the store.
  */
-public class StoreModel {
+public class StoreModel extends Observable {
 
     /**
      * The unique instance of the {@code StoreModel}.
@@ -39,6 +41,9 @@ public class StoreModel {
         return _instance;
     }
 
+    /**
+     * Private constructor of this singleton class.
+     */
     private StoreModel() {
     }
 
@@ -56,7 +61,7 @@ public class StoreModel {
      *
      * @param startingHour_p the new starting hour {@code int}
      */
-    public void setStartingHour(int startingHour_p) {
+    private void setStartingHour(int startingHour_p) {
         _startingHour = startingHour_p;
     }
 
@@ -74,8 +79,21 @@ public class StoreModel {
      *
      * @param startingMinute_p the new starting minute {@code int}
      */
-    public void setStartingMinute(int startingMinute_p) {
+    private void setStartingMinute(int startingMinute_p) {
         _startingMinute = startingMinute_p;
+    }
+
+    /**
+     * Setter for the starting time.
+     *
+     * @param startingHour_p   the new starting hour {@code int}
+     * @param startingMinute_p the new starting minute {@code int}
+     */
+    public void setStartingTime(int startingHour_p, int startingMinute_p) {
+        setStartingHour(startingHour_p);
+        setStartingMinute(startingMinute_p);
+        setChanged();
+        notifyObservers();
     }
 
     /**
@@ -92,7 +110,7 @@ public class StoreModel {
      *
      * @param endingHour_p the new ending hour {@code int}
      */
-    public void setEndingHour(int endingHour_p) {
+    private void setEndingHour(int endingHour_p) {
         _endingHour = endingHour_p;
     }
 
@@ -110,7 +128,20 @@ public class StoreModel {
      *
      * @param endingMinute_p the new ending minute {@code int}
      */
-    public void setEndingMinute(int endingMinute_p) {
+    private void setEndingMinute(int endingMinute_p) {
         _endingMinute = endingMinute_p;
+    }
+
+    /**
+     * Setter for the starting time.
+     *
+     * @param endingHour_p   the new starting hour {@code int}
+     * @param endingMinute_p the new starting minute {@code int}
+     */
+    public void setEndingTime(int endingHour_p, int endingMinute_p) {
+        setEndingHour(endingHour_p);
+        setEndingMinute(endingMinute_p);
+        setChanged();
+        notifyObservers();
     }
 }

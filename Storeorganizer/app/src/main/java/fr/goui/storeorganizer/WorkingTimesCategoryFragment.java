@@ -185,8 +185,7 @@ public class WorkingTimesCategoryFragment extends Fragment {
             mTxtStart.setText(mSimpleDateFormat.format(mCalendarStartingTime.getTime()));
 
             // updating in the model
-            mStoreModel.setStartingHour(startingHour);
-            mStoreModel.setStartingMinute(startingMinute);
+            mStoreModel.setStartingTime(startingHour, startingMinute);
 
             // updating in shared prefs
             SharedPreferences.Editor editor = mSharedPreferences.edit();
@@ -215,15 +214,14 @@ public class WorkingTimesCategoryFragment extends Fragment {
         if (errorMessage == null) {
 
             // getting ending times
-            int endingHour = mCalendarStartingTime.get(Calendar.HOUR_OF_DAY);
-            int endingMinute = mCalendarStartingTime.get(Calendar.MINUTE);
+            int endingHour = mCalendarEndingTime.get(Calendar.HOUR_OF_DAY);
+            int endingMinute = mCalendarEndingTime.get(Calendar.MINUTE);
 
             // updating in settings view
             mTxtEnd.setText(mSimpleDateFormat.format(mCalendarEndingTime.getTime()));
 
             // updating in the model
-            mStoreModel.setEndingHour(endingHour);
-            mStoreModel.setEndingMinute(endingMinute);
+            mStoreModel.setEndingTime(endingHour, endingMinute);
 
             // updating in shared prefs
             SharedPreferences.Editor editor = mSharedPreferences.edit();

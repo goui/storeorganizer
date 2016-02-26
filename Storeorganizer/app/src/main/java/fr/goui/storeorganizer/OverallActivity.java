@@ -36,6 +36,7 @@ public class OverallActivity extends AppCompatActivity implements Observer {
         setContentView(R.layout.activity_overall);
 
         StoreWorkerModel.getInstance().addObserver(this);
+        StoreModel.getInstance().addObserver(this);
         getWindowManager().getDefaultDisplay().getSize(mScreenSize);
 
         mNamesLayout = (LinearLayout) findViewById(R.id.activity_overall_names_layout);
@@ -103,6 +104,8 @@ public class OverallActivity extends AppCompatActivity implements Observer {
             mNamesLayout.removeAllViews();
             fillNamesLayout();
             mOverallView.onWorkersChanged();
+        } else if (observable instanceof StoreModel) {
+            mOverallView.onWorkingTimesChanged();
         }
     }
 

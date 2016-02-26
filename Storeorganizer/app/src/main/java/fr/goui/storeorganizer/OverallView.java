@@ -7,6 +7,7 @@ import android.graphics.Paint;
 import android.graphics.Point;
 import android.os.Handler;
 import android.support.v4.content.ContextCompat;
+import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 
@@ -14,13 +15,9 @@ import java.util.Calendar;
 
 public class OverallView extends View {
 
-    private static final int HOUR_MIN = 8;
-    private static final int HOUR_MAX = 20;
     private static final int TIMER_PERIOD = 1000 * 60;
 
-    private final int mNumberOfRows;
     private final int mDefaultCellHeight;
-    private final String[] mHoursStrings;
     private final Paint mBlackPaint = new Paint();
     private final Paint mGreyPaint = new Paint();
     private final Paint mAppointmentPaint = new Paint();
@@ -32,20 +29,29 @@ public class OverallView extends View {
     private final int mInitialY;
     private final int mFinalX;
 
+    private int mHourMin;
+    private int mHourMax;
+    private String[] mHoursStrings;
     private int mNumberOfColumns;
+    private int mNumberOfRows;
     private int mCellWidth;
     private float mScaleFactor = 1.0f;
     private int mCellHeight;
     private int mNowLineY;
     private Point mScreenSize = new Point();
     private StoreWorkerModel mStoreWorkerModel = StoreWorkerModel.getInstance();
+    private StoreModel mStoreModel = StoreModel.getInstance();
 
     public OverallView(Context context) {
         super(context);
         ((WindowManager) context.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay().getSize(mScreenSize);
         Resources resources = context.getResources();
-        mHoursStrings = resources.getStringArray(R.array.working_hours_string_array);
-        mNumberOfRows = mHoursStrings.length - 1;
+        mHourMin = mStoreModel.getStartingHour();
+        mHourMax = mStoreModel.getEndingMinute() > 0 ? mStoreModel.getEndingHour() + 1 : mStoreModel.getEndingHour();
+        mNumberOfRows = mHourMax - mHourMin;
+        Log.d("OVERALL", "mHourMin: " + mHourMin + " mHourMax: " + mHourMax);
+        mHoursStrings = new String[mNumberOfRows + 1];
+        generateHoursStrings();
         mNumberOfColumns = mStoreWorkerModel.getStoreWorkersNumber();
         int blackColor = ContextCompat.getColor(context, R.color.black);
         int greyColor = ContextCompat.getColor(context, R.color.grey_overlay);
@@ -82,6 +88,14 @@ public class OverallView extends View {
                 }
             }
         }, TIMER_PERIOD);
+    }
+
+    private void generateHoursStrings() {
+        int counter = 0;
+        for (int i = mHourMin; i < mHourMax + 1; i++) {
+            mHoursStrings[counter] = i < 10 ? "0" + i : "" + i;
+            counter++;
+        }
     }
 
     @Override
@@ -128,8 +142,8 @@ public class OverallView extends View {
                     int startMinute = currentAppointment.getStartTime().get(Calendar.MINUTE);
                     int endHour = currentAppointment.getEndTime().get(Calendar.HOUR_OF_DAY);
                     int endMinute = currentAppointment.getEndTime().get(Calendar.MINUTE);
-                    int y1 = mInitialY + mCellHeight * (startHour - HOUR_MIN) + (mCellHeight * startMinute) / 60;
-                    int y2 = mInitialY + mCellHeight * (endHour - HOUR_MIN) + (mCellHeight * endMinute) / 60;
+                    int y1 = mInitialY + mCellHeight * (startHour - mHourMin) + (mCellHeight * startMinute) / 60;
+                    int y2 = mInitialY + mCellHeight * (endHour - mHourMin) + (mCellHeight * endMinute) / 60;
                     if (currentAppointment.getEndTime().after(Calendar.getInstance())) {
                         canvas.drawRect(x1, y1, x2, y2, mAppointmentPaint);
                     } else {
@@ -146,7 +160,7 @@ public class OverallView extends View {
     private void drawNowLine(Canvas canvas) {
         int hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
         int minute = Calendar.getInstance().get(Calendar.MINUTE);
-        mNowLineY = mInitialY + mCellHeight * (hour - HOUR_MIN) + (mCellHeight * minute) / 60;
+        mNowLineY = mInitialY + mCellHeight * (hour - mHourMin) + (mCellHeight * minute) / 60;
         canvas.drawLine(mInitialX, mNowLineY, mFinalX, mNowLineY, mNowPaint);
     }
 
@@ -167,6 +181,16 @@ public class OverallView extends View {
 
     public void onWorkersChanged() {
         mNumberOfColumns = mStoreWorkerModel.getStoreWorkersNumber();
+        invalidate();
+    }
+
+    public void onWorkingTimesChanged() {
+        mHourMin = mStoreModel.getStartingHour();
+        mHourMax = mStoreModel.getEndingMinute() > 0 ? mStoreModel.getEndingHour() + 1 : mStoreModel.getEndingHour();
+        mNumberOfRows = mHourMax - mHourMin;
+        mHoursStrings = new String[mNumberOfRows + 1];
+        generateHoursStrings();
+        requestLayout();
         invalidate();
     }
 
