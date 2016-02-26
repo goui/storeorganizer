@@ -157,7 +157,7 @@ public class SettingsActivity extends AppCompatActivity implements OnCategoryCli
 
                 // clearing models and creating default worker and task
                 StoreWorkerModel.getInstance().clear(getString(R.string.worker));
-                StoreTaskModel.getInstance().clear(getString(R.string.task), mResources.getInteger(R.integer.task_default_duration));
+                StoreTaskModel.getInstance().clear(getString(R.string.task), mResources.getInteger(R.integer.default_task_duration));
 
                 // clearing shared prefs
                 SharedPreferences.Editor editor = mSharedPreferences.edit();
@@ -171,7 +171,7 @@ public class SettingsActivity extends AppCompatActivity implements OnCategoryCli
                 editor.putInt(mResources.getString(R.string.task_max_id), 0);
                 editor.putString(mResources.getString(R.string.task) + 0, mResources.getString(R.string.task));
                 editor.putInt(mResources.getString(R.string.task) + 0 + mResources.getString(R.string.duration),
-                        mResources.getInteger(R.integer.task_default_duration));
+                        mResources.getInteger(R.integer.default_task_duration));
 
                 // putting them in the shared prefs
                 editor.apply();

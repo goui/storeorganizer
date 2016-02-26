@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.TimePicker;
+import android.widget.Toast;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -37,9 +38,24 @@ public class WorkingTimesCategoryFragment extends Fragment {
     private Resources mResources;
 
     /**
-     * The {@code Calendar} used to manage times.
+     * The {@code Calendar} used to manage starting time.
      */
-    private Calendar mCalendarTime = Calendar.getInstance();
+    private Calendar mCalendarStartingTime = Calendar.getInstance();
+
+    /**
+     * The {@code Calendar} used to manage ending time.
+     */
+    private Calendar mCalendarEndingTime = Calendar.getInstance();
+
+    /**
+     * The minimum allowed time {@code Calendar}.
+     */
+    private Calendar mCalendarMin = Calendar.getInstance();
+
+    /**
+     * The maximum allowed time {@code Calendar}.
+     */
+    private Calendar mCalendarMax = Calendar.getInstance();
 
     /**
      * The {@code TextView} for starting time.
@@ -51,13 +67,10 @@ public class WorkingTimesCategoryFragment extends Fragment {
      */
     private TextView mTxtEnd;
 
-    private int mStartingHour;
-
-    private int mStartingMinute;
-
-    private int mEndingHour;
-
-    private int mEndingMinute;
+    /**
+     * The model storing information about working times.
+     */
+    private StoreModel mStoreModel = StoreModel.getInstance();
 
     /**
      * The {@code SimpleDateFormat} used to format start and end times.
@@ -70,8 +83,8 @@ public class WorkingTimesCategoryFragment extends Fragment {
     private TimePickerDialog.OnTimeSetListener mStartTimePickerDialogListener = new TimePickerDialog.OnTimeSetListener() {
         public void onTimeSet(TimePicker view, int hourOfDay,
                               int minute) {
-            mCalendarTime.set(Calendar.HOUR_OF_DAY, hourOfDay);
-            mCalendarTime.set(Calendar.MINUTE, minute);
+            mCalendarStartingTime.set(Calendar.HOUR_OF_DAY, hourOfDay);
+            mCalendarStartingTime.set(Calendar.MINUTE, minute);
             updateStartingTime();
         }
     };
@@ -82,8 +95,8 @@ public class WorkingTimesCategoryFragment extends Fragment {
     private TimePickerDialog.OnTimeSetListener mEndTimePickerDialogListener = new TimePickerDialog.OnTimeSetListener() {
         public void onTimeSet(TimePicker view, int hourOfDay,
                               int minute) {
-            mCalendarTime.set(Calendar.HOUR_OF_DAY, hourOfDay);
-            mCalendarTime.set(Calendar.MINUTE, minute);
+            mCalendarEndingTime.set(Calendar.HOUR_OF_DAY, hourOfDay);
+            mCalendarEndingTime.set(Calendar.MINUTE, minute);
             updateEndingTime();
         }
     };
@@ -98,26 +111,21 @@ public class WorkingTimesCategoryFragment extends Fragment {
         // getting shared prefs
         mSharedPreferences = getActivity().getSharedPreferences(mResources.getString(R.string.preference_file_key), Context.MODE_PRIVATE);
 
-        // getting saved starting times in the shared prefs
-        mStartingHour = mSharedPreferences.getInt(mResources.getString(R.string.starting_hour), mResources.getInteger(R.integer.default_starting_hour));
-        mStartingMinute = mSharedPreferences.getInt(mResources.getString(R.string.starting_minute), mResources.getInteger(R.integer.default_starting_minute));
+        // setting starting time
+        mCalendarStartingTime.set(Calendar.HOUR_OF_DAY, mStoreModel.getStartingHour());
+        mCalendarStartingTime.set(Calendar.MINUTE, mStoreModel.getStartingMinute());
+        mTxtStart.setText(mSimpleDateFormat.format(mCalendarStartingTime.getTime()));
 
-        // updating in settings view
-        mCalendarTime.set(Calendar.HOUR_OF_DAY, mStartingHour);
-        mCalendarTime.set(Calendar.MINUTE, mStartingMinute);
-        mTxtStart.setText(mSimpleDateFormat.format(mCalendarTime.getTime()));
+        // setting ending time
+        mCalendarEndingTime.set(Calendar.HOUR_OF_DAY, mStoreModel.getEndingHour());
+        mCalendarEndingTime.set(Calendar.MINUTE, mStoreModel.getEndingMinute());
+        mTxtEnd.setText(mSimpleDateFormat.format(mCalendarEndingTime.getTime()));
 
-        // getting saved ending times in the shared prefs
-        mEndingHour = mSharedPreferences.getInt(mResources.getString(R.string.ending_hour), mResources.getInteger(R.integer.default_ending_hour));
-        mEndingMinute = mSharedPreferences.getInt(mResources.getString(R.string.ending_minute), mResources.getInteger(R.integer.default_ending_minute));
-
-        // updating in settings view
-        mCalendarTime.set(Calendar.HOUR_OF_DAY, mEndingHour);
-        mCalendarTime.set(Calendar.MINUTE, mEndingMinute);
-        mTxtEnd.setText(mSimpleDateFormat.format(mCalendarTime.getTime()));
-
-        // resetting calendar time
-        mCalendarTime = Calendar.getInstance();
+        // setting the min and max calendars
+        mCalendarMin.set(Calendar.HOUR_OF_DAY, mResources.getInteger(R.integer.minimum_starting_hour));
+        mCalendarMin.set(Calendar.MINUTE, mResources.getInteger(R.integer.minimum_starting_minute));
+        mCalendarMax.set(Calendar.HOUR_OF_DAY, mResources.getInteger(R.integer.maximum_ending_hour));
+        mCalendarMax.set(Calendar.MINUTE, mResources.getInteger(R.integer.maximum_ending_minute));
     }
 
     @Override
@@ -137,8 +145,8 @@ public class WorkingTimesCategoryFragment extends Fragment {
             public void onClick(View v) {
                 new TimePickerDialog(getActivity(),
                         mStartTimePickerDialogListener,
-                        mStartingHour,
-                        mStartingMinute,
+                        mStoreModel.getStartingHour(),
+                        mStoreModel.getStartingMinute(),
                         true).show();
             }
         });
@@ -149,8 +157,8 @@ public class WorkingTimesCategoryFragment extends Fragment {
             public void onClick(View v) {
                 new TimePickerDialog(getActivity(),
                         mEndTimePickerDialogListener,
-                        mEndingHour,
-                        mEndingMinute,
+                        mStoreModel.getEndingHour(),
+                        mStoreModel.getEndingMinute(),
                         true).show();
             }
         });
@@ -163,18 +171,36 @@ public class WorkingTimesCategoryFragment extends Fragment {
      */
     private void updateStartingTime() {
 
-        // updating values
-        mStartingHour = mCalendarTime.get(Calendar.HOUR_OF_DAY);
-        mStartingMinute = mCalendarTime.get(Calendar.MINUTE);
+        // getting potential error message
+        String errorMessage = checkValidity();
 
-        // updating in settings view
-        mTxtStart.setText(mSimpleDateFormat.format(mCalendarTime.getTime()));
+        // if there is no error
+        if (errorMessage == null) {
 
-        // updating in shared prefs
-        SharedPreferences.Editor editor = mSharedPreferences.edit();
-        editor.putInt(mResources.getString(R.string.starting_hour), mCalendarTime.get(Calendar.HOUR_OF_DAY));
-        editor.putInt(mResources.getString(R.string.starting_minute), mCalendarTime.get(Calendar.MINUTE));
-        editor.apply();
+            // getting starting times
+            int startingHour = mCalendarStartingTime.get(Calendar.HOUR_OF_DAY);
+            int startingMinute = mCalendarStartingTime.get(Calendar.MINUTE);
+
+            // updating in settings view
+            mTxtStart.setText(mSimpleDateFormat.format(mCalendarStartingTime.getTime()));
+
+            // updating in the model
+            mStoreModel.setStartingHour(startingHour);
+            mStoreModel.setStartingMinute(startingMinute);
+
+            // updating in shared prefs
+            SharedPreferences.Editor editor = mSharedPreferences.edit();
+            editor.putInt(mResources.getString(R.string.starting_hour), startingHour);
+            editor.putInt(mResources.getString(R.string.starting_minute), startingMinute);
+            editor.apply();
+        }
+
+        // resetting calendar and displaying detected error
+        else {
+            mCalendarStartingTime.set(Calendar.HOUR_OF_DAY, mStoreModel.getStartingHour());
+            mCalendarStartingTime.set(Calendar.MINUTE, mStoreModel.getStartingMinute());
+            Toast.makeText(getActivity(), errorMessage, Toast.LENGTH_LONG).show();
+        }
     }
 
     /**
@@ -182,18 +208,55 @@ public class WorkingTimesCategoryFragment extends Fragment {
      */
     private void updateEndingTime() {
 
-        // updating values
-        mEndingHour = mCalendarTime.get(Calendar.HOUR_OF_DAY);
-        mEndingMinute = mCalendarTime.get(Calendar.MINUTE);
+        // getting potential error message
+        String errorMessage = checkValidity();
 
-        // updating in settings view
-        mTxtEnd.setText(mSimpleDateFormat.format(mCalendarTime.getTime()));
+        // if there is no error
+        if (errorMessage == null) {
 
-        // updating in shared prefs
-        SharedPreferences.Editor editor = mSharedPreferences.edit();
-        editor.putInt(mResources.getString(R.string.ending_hour), mCalendarTime.get(Calendar.HOUR_OF_DAY));
-        editor.putInt(mResources.getString(R.string.ending_minute), mCalendarTime.get(Calendar.MINUTE));
-        editor.apply();
+            // getting ending times
+            int endingHour = mCalendarStartingTime.get(Calendar.HOUR_OF_DAY);
+            int endingMinute = mCalendarStartingTime.get(Calendar.MINUTE);
+
+            // updating in settings view
+            mTxtEnd.setText(mSimpleDateFormat.format(mCalendarEndingTime.getTime()));
+
+            // updating in the model
+            mStoreModel.setEndingHour(endingHour);
+            mStoreModel.setEndingMinute(endingMinute);
+
+            // updating in shared prefs
+            SharedPreferences.Editor editor = mSharedPreferences.edit();
+            editor.putInt(mResources.getString(R.string.ending_hour), endingHour);
+            editor.putInt(mResources.getString(R.string.ending_minute), endingMinute);
+            editor.apply();
+        }
+
+        // resetting calendar and displaying detected error
+        else {
+            mCalendarEndingTime.set(Calendar.HOUR_OF_DAY, mStoreModel.getEndingHour());
+            mCalendarEndingTime.set(Calendar.MINUTE, mStoreModel.getEndingMinute());
+            Toast.makeText(getActivity(), errorMessage, Toast.LENGTH_LONG).show();
+        }
     }
 
+    /**
+     * Method used to check if chosen times are valid.
+     * Starting time cannot be before minimum one.
+     * Ending time cannot be after maximum one.
+     * Ending time cannot be before starting time.
+     *
+     * @return error message {@code String}, {@code null} if no error
+     */
+    private String checkValidity() {
+        String errorMessage = null;
+        if (mCalendarStartingTime.before(mCalendarMin)) {
+            errorMessage = mResources.getString(R.string.starting_time_cannot_be_before) + " " + mSimpleDateFormat.format(mCalendarStartingTime.getTime());
+        } else if (mCalendarEndingTime.after(mCalendarMax)) {
+            errorMessage = mResources.getString(R.string.ending_time_cannot_be_after) + " " + mSimpleDateFormat.format(mCalendarEndingTime.getTime());
+        } else if (mCalendarEndingTime.before(mCalendarStartingTime)) {
+            errorMessage = mResources.getString(R.string.ending_time_cannot_be_prior_to_starting_time);
+        }
+        return errorMessage;
+    }
 }

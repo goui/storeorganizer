@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <integer name="default_task_duration">30</integer>
+    <integer name="default_starting_hour">8</integer>
+    <integer name="default_starting_minute">0</integer>
+    <integer name="default_ending_hour">20</integer>
+    <integer name="default_ending_minute">0</integer>
+    <integer name="minimum_starting_hour">0</integer>
+    <integer name="minimum_starting_minute">1</integer>
+    <integer name="maximum_ending_hour">23</integer>
+    <integer name="maximum_ending_minute">59</integer>
+</resources>

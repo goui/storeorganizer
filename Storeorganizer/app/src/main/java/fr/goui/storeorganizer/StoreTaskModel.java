@@ -13,7 +13,7 @@ public class StoreTaskModel {
     /**
      * The unique instance of the {@code StoreTaskModel}.
      */
-    private static StoreTaskModel ourInstance = new StoreTaskModel();
+    private static StoreTaskModel _instance = new StoreTaskModel();
 
     /**
      * The current maximum unique id that can be given to {@code StoreTask}s.
@@ -36,7 +36,7 @@ public class StoreTaskModel {
      * @return the unique instance of {@code StoreTaskModel}
      */
     public static StoreTaskModel getInstance() {
-        return ourInstance;
+        return _instance;
     }
 
     /**

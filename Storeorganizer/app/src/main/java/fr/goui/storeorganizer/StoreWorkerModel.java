@@ -15,7 +15,7 @@ public class StoreWorkerModel extends Observable {
     /**
      * The unique instance of the {@code StoreWorkerModel}.
      */
-    private static StoreWorkerModel ourInstance = new StoreWorkerModel();
+    private static StoreWorkerModel _instance = new StoreWorkerModel();
 
     /**
      * The list of all the {@code StoreWorker}s.
@@ -33,7 +33,7 @@ public class StoreWorkerModel extends Observable {
      * @return the unique instance of {@code StoreWorkerModel}
      */
     public static StoreWorkerModel getInstance() {
-        return ourInstance;
+        return _instance;
     }
 
     /**
