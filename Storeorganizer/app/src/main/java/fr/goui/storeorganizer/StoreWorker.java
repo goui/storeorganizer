@@ -160,7 +160,7 @@ public class StoreWorker {
         StoreAppointment appointment = null;
         boolean isThereAGap = false;
         for (StoreAppointment currentAppointment : _appointments) {
-            if (currentAppointment instanceof StoreAppointment.NullStoreAppointment
+            if (currentAppointment instanceof NullStoreAppointment
                     && !isThereAGap) {
                 appointment = currentAppointment;
                 isThereAGap = true;

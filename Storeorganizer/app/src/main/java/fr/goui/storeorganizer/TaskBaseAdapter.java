@@ -58,7 +58,7 @@ public class TaskBaseAdapter extends BaseAdapter {
         if (convertView == null) {
 
             // inflating the layout
-            convertView = mLayoutInflater.inflate(R.layout.spinner_item_task, parent);
+            convertView = mLayoutInflater.inflate(R.layout.spinner_item_task, null);
 
             // creating the view holder and putting inflated views in it
             viewHolder = new ViewHolder();

@@ -9,4 +9,5 @@
     <integer name="minimum_starting_minute">1</integer>
     <integer name="maximum_ending_hour">23</integer>
     <integer name="maximum_ending_minute">59</integer>
+    <integer name="conversion_millisecond_minute">60000</integer>
 </resources>

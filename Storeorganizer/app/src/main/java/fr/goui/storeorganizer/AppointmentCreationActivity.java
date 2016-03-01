@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -22,8 +23,11 @@ public class AppointmentCreationActivity extends AppCompatActivity {
 
     public static final String INTENT_EXTRA_WORKER_POSITION_STRING_KEY = "result_intent_position_string_key";
 
-    private StoreTask _newTask;
+    protected final static int CONVERSION_MILLISECOND_MINUTE = 60000;
 
+    private StoreWorkerModel mStoreWorkerModel;
+    private StoreTaskModel mStoreTaskModel;
+    private StoreTask _newTask;
     protected StoreAppointment _newAppointment;
     protected StoreWorker _newWorker;
     protected int _newWorkerPosition;
@@ -34,15 +38,38 @@ public class AppointmentCreationActivity extends AppCompatActivity {
     protected Spinner _spinnerTask;
     protected TextView _txtStartTime;
     protected TextView _txtEndTime;
-    protected boolean _isStartTimeModified;
-    protected Calendar _calendarTime = _now;
 
-    protected TimePickerDialog.OnTimeSetListener _timePickerDialogListener = new TimePickerDialog.OnTimeSetListener() {
+    /**
+     * The {@code Calendar} used to manage starting time.
+     */
+    private Calendar mCalendarStartingTime = Calendar.getInstance();
+
+    /**
+     * The {@code Calendar} used to manage ending time.
+     */
+    private Calendar mCalendarEndingTime = Calendar.getInstance();
+
+    /**
+     * The time picker dialog listener for starting time.
+     */
+    private TimePickerDialog.OnTimeSetListener mStartTimePickerDialogListener = new TimePickerDialog.OnTimeSetListener() {
         public void onTimeSet(TimePicker view, int hourOfDay,
                               int minute) {
-            _calendarTime.set(Calendar.HOUR_OF_DAY, hourOfDay);
-            _calendarTime.set(Calendar.MINUTE, minute);
-            updateTimes();
+            mCalendarStartingTime.set(Calendar.HOUR_OF_DAY, hourOfDay);
+            mCalendarStartingTime.set(Calendar.MINUTE, minute);
+            updateStartingTime();
+        }
+    };
+
+    /**
+     * The time picker dialog listener for ending time.
+     */
+    private TimePickerDialog.OnTimeSetListener mEndTimePickerDialogListener = new TimePickerDialog.OnTimeSetListener() {
+        public void onTimeSet(TimePicker view, int hourOfDay,
+                              int minute) {
+            mCalendarEndingTime.set(Calendar.HOUR_OF_DAY, hourOfDay);
+            mCalendarEndingTime.set(Calendar.MINUTE, minute);
+            updateEndingTime();
         }
     };
 
@@ -52,6 +79,9 @@ public class AppointmentCreationActivity extends AppCompatActivity {
         setContentView(R.layout.activity_appointment_creation);
         setupActionbar();
         setResult(RESULT_CANCELED);
+
+        mStoreWorkerModel = StoreWorkerModel.getInstance();
+        mStoreTaskModel = StoreTaskModel.getInstance();
 
         _etClientsName = (EditText) findViewById(R.id.activity_appointment_creation_clients_name_edit_text);
         _etClientsPhoneNumber = (EditText) findViewById(R.id.activity_appointment_creation_clients_phone_number_edit_text);
@@ -88,26 +118,26 @@ public class AppointmentCreationActivity extends AppCompatActivity {
             }
         });
 
+        // listener to trigger the time picker dialog for the starting time
         _txtStartTime.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                _isStartTimeModified = true;
                 new TimePickerDialog(AppointmentCreationActivity.this,
-                        _timePickerDialogListener,
-                        _calendarTime.get(Calendar.HOUR_OF_DAY),
-                        _calendarTime.get(Calendar.MINUTE),
+                        mStartTimePickerDialogListener,
+                        mCalendarStartingTime.get(Calendar.HOUR_OF_DAY),
+                        mCalendarStartingTime.get(Calendar.MINUTE),
                         true).show();
             }
         });
 
+        // listener to trigger the time picker dialog for the ending time
         _txtEndTime.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                _isStartTimeModified = false;
                 new TimePickerDialog(AppointmentCreationActivity.this,
-                        _timePickerDialogListener,
-                        _calendarTime.get(Calendar.HOUR_OF_DAY),
-                        _calendarTime.get(Calendar.MINUTE),
+                        mEndTimePickerDialogListener,
+                        mCalendarEndingTime.get(Calendar.HOUR_OF_DAY),
+                        mCalendarEndingTime.get(Calendar.MINUTE),
                         true).show();
             }
         });
@@ -117,17 +147,17 @@ public class AppointmentCreationActivity extends AppCompatActivity {
         _newAppointment = new StoreAppointment();
         int workerPosition = getIntent().getIntExtra(INTENT_EXTRA_WORKER_POSITION_STRING_KEY, 0);
         _spinnerWorker.setSelection(workerPosition);
-        _newWorker = StoreWorkerModel.getInstance().getStoreWorker(workerPosition);
+        _newWorker = mStoreWorkerModel.getStoreWorker(workerPosition);
     }
 
     protected void onWorkerSelected(int position_p) {
-        _newWorker = StoreWorkerModel.getInstance().getStoreWorker(position_p);
+        _newWorker = mStoreWorkerModel.getStoreWorker(position_p);
         _newWorkerPosition = position_p;
         updateAppointmentInformation();
     }
 
     protected void onTaskSelected(int position_p) {
-        _newTask = StoreTaskModel.getInstance().getStoreTask(position_p);
+        _newTask = mStoreTaskModel.getStoreTask(position_p);
         updateAppointmentInformation();
     }
 
@@ -135,29 +165,37 @@ public class AppointmentCreationActivity extends AppCompatActivity {
         if (_newTask != null) {
             _newAppointment.setStoreTask(_newTask);
             StoreAppointment appointment = _newWorker.getNextAvailability();
-            Calendar calendar = _now;
+            Calendar calendar = Calendar.getInstance();
+            calendar.set(Calendar.HOUR_OF_DAY, _now.get(Calendar.HOUR_OF_DAY));
+            calendar.set(Calendar.MINUTE, _now.get(Calendar.MINUTE));
             if (appointment != null) {
-                if (appointment instanceof StoreAppointment.NullStoreAppointment) {
-                    calendar = appointment.getStartTime();
+                if (appointment instanceof NullStoreAppointment) {
+                    calendar.set(Calendar.HOUR_OF_DAY, appointment.getStartTime().get(Calendar.HOUR_OF_DAY));
+                    calendar.set(Calendar.MINUTE, appointment.getStartTime().get(Calendar.MINUTE));
                 } else {
-                    calendar = appointment.getEndTime();
+                    calendar.set(Calendar.HOUR_OF_DAY, appointment.getEndTime().get(Calendar.HOUR_OF_DAY));
+                    calendar.set(Calendar.MINUTE, appointment.getEndTime().get(Calendar.MINUTE));
                 }
             }
             _newAppointment.setStartTime(calendar);
+            calendar.setTimeInMillis(calendar.getTimeInMillis() + _newAppointment.getDuration() * CONVERSION_MILLISECOND_MINUTE);
+            _newAppointment.setEndTime(calendar);
             _txtStartTime.setText(_newAppointment.getFormattedStartTime());
             _txtEndTime.setText(_newAppointment.getFormattedEndTime());
         }
     }
 
-    protected void updateTimes() {
-        if (_isStartTimeModified) {
-            _newAppointment.setStartTime(_calendarTime);
-            _txtStartTime.setText(_newAppointment.getFormattedStartTime());
-            _txtEndTime.setText(_newAppointment.getFormattedEndTime());
-        } else {
-            _newAppointment.setEndTime(_calendarTime);
-            _txtEndTime.setText(_newAppointment.getFormattedEndTime());
-        }
+    protected void updateStartingTime() {
+        _newAppointment.setStartTime(mCalendarStartingTime);
+        mCalendarEndingTime.setTimeInMillis(mCalendarStartingTime.getTimeInMillis() + _newAppointment.getDuration() * CONVERSION_MILLISECOND_MINUTE);
+        _newAppointment.setEndTime(mCalendarEndingTime);
+        _txtStartTime.setText(_newAppointment.getFormattedStartTime());
+        _txtEndTime.setText(_newAppointment.getFormattedEndTime());
+    }
+
+    protected void updateEndingTime() {
+        _newAppointment.setEndTime(mCalendarEndingTime);
+        _txtEndTime.setText(_newAppointment.getFormattedEndTime());
     }
 
     private void setupActionbar() {
@@ -203,7 +241,7 @@ public class AppointmentCreationActivity extends AppCompatActivity {
             if (_newWorker.getStoreAppointmentsNumber() == 0) {
                 if (_newAppointment.isAfter(_now)
                         && (_newAppointment.gapWith(_now) >= StoreTaskModel.getInstance().getMinTimeInMinutes())) {
-                    StoreAppointment.NullStoreAppointment nullStoreAppointment = _newAppointment.newNullInstance();
+                    NullStoreAppointment nullStoreAppointment = new NullStoreAppointment();
                     nullStoreAppointment.setStartTime(_now.get(Calendar.HOUR_OF_DAY), _now.get(Calendar.MINUTE));
                     nullStoreAppointment.setEndTime(_newAppointment.getStartTime());
                     _newWorker.addStoreAppointment(nullStoreAppointment);
@@ -211,7 +249,7 @@ public class AppointmentCreationActivity extends AppCompatActivity {
             } else {
                 if (_newAppointment.isAfter(_newWorker.getLastAppointment())
                         && (_newAppointment.gapWith(_newWorker.getLastAppointment()) >= StoreTaskModel.getInstance().getMinTimeInMinutes())) {
-                    StoreAppointment.NullStoreAppointment nullStoreAppointment = _newAppointment.newNullInstance();
+                    NullStoreAppointment nullStoreAppointment = new NullStoreAppointment();
                     nullStoreAppointment.setStartTime(_newWorker.getLastAppointment().getEndTime().get(Calendar.HOUR_OF_DAY),
                             _newWorker.getLastAppointment().getEndTime().get(Calendar.MINUTE));
                     nullStoreAppointment.setEndTime(_newAppointment.getStartTime());
@@ -236,7 +274,7 @@ public class AppointmentCreationActivity extends AppCompatActivity {
         String errorMessage = null;
         if (_etClientsName.getText().toString().equals("")) {
             errorMessage = getString(R.string.please_specify_a_name);
-        } else if (_newAppointment.getStartTime().before(_now)) {
+        } else if (_newAppointment.isBefore(_now)) {
             errorMessage = getString(R.string.starting_time_cannot_be_in_the_past);
         } else if (_newAppointment.getEndTime().before(_newAppointment.getStartTime())) {
             errorMessage = getString(R.string.ending_time_cannot_be_prior_to_starting_time);

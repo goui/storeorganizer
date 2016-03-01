@@ -9,8 +9,8 @@
         android:id="@+id/fragment_details_no_appointments_text_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
         android:layout_marginStart="8dp"
+        android:layout_marginTop="16dp"
         android:text="@string/no_appointments_scheduled"
         android:textSize="16sp"/>
 
@@ -18,7 +18,7 @@
         android:id="@+id/fragment_details_recycler_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginBottom="4dp"
-        android:layout_marginTop="4dp"/>
+        android:layout_marginBottom="2dp"
+        android:layout_marginTop="6dp"/>
 
 </RelativeLayout>

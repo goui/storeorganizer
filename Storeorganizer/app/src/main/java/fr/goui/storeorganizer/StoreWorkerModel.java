@@ -156,7 +156,7 @@ public class StoreWorkerModel extends Observable {
      */
     public StoreWorker getFirstAvailableWorker() {
         StoreWorker storeWorker = null;
-        
+
         // now calendar
         Calendar now = Calendar.getInstance();
 
@@ -169,14 +169,31 @@ public class StoreWorkerModel extends Observable {
             // getting the next availability
             StoreAppointment nextAvailability = currentWorker.getNextAvailability();
 
-            // if it is a gap getting the starting time, if not getting the ending time
-            Calendar firstAvailableTime = nextAvailability instanceof StoreAppointment.NullStoreAppointment ?
-                    nextAvailability.getStartTime() : nextAvailability.getEndTime();
+            // if this worker has at least one appointment
+            if (nextAvailability != null) {
 
-            // if it is after now and before the previous best time
-            if (firstAvailableTime.after(now) && (availability == null || firstAvailableTime.before(availability))) {
+                // if it is a gap getting the starting time, if not getting the ending time
+                Calendar firstAvailableTime = nextAvailability instanceof NullStoreAppointment ?
+                        nextAvailability.getStartTime() : nextAvailability.getEndTime();
+
+                // if it is after now and before the previous best time
+                if (firstAvailableTime.after(now) && (availability == null || firstAvailableTime.before(availability))) {
+                    storeWorker = currentWorker;
+                    availability = firstAvailableTime;
+
+                    // if newly set availability is now, there is no need to check next workers
+                    if (availability.get(Calendar.HOUR_OF_DAY) == now.get(Calendar.HOUR_OF_DAY) &&
+                            availability.get(Calendar.MINUTE) == now.get(Calendar.MINUTE)) {
+                        storeWorker = currentWorker;
+                        break;
+                    }
+                }
+            }
+
+            // if the worker has no appointment, there is no need to check next workers
+            else {
                 storeWorker = currentWorker;
-                availability = firstAvailableTime;
+                break;
             }
         }
 

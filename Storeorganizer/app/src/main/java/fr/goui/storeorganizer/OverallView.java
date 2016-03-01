@@ -137,7 +137,7 @@ public class OverallView extends View {
                 x2 = mFinalX - 1;
             }
             for (StoreAppointment currentAppointment : mStoreWorkerModel.getStoreWorker(i).getStoreAppointments()) {
-                if (!(currentAppointment instanceof StoreAppointment.NullStoreAppointment)) {
+                if (!(currentAppointment instanceof NullStoreAppointment)) {
                     int startHour = currentAppointment.getStartTime().get(Calendar.HOUR_OF_DAY);
                     int startMinute = currentAppointment.getStartTime().get(Calendar.MINUTE);
                     int endHour = currentAppointment.getEndTime().get(Calendar.HOUR_OF_DAY);

@@ -58,7 +58,7 @@ public class WorkerBaseAdapter extends BaseAdapter {
         if (convertView == null) {
 
             // inflating the layout
-            convertView = mLayoutInflater.inflate(R.layout.spinner_item_worker, parent);
+            convertView = mLayoutInflater.inflate(R.layout.spinner_item_worker, null);
 
             // creating the view holder and putting inflated views in it
             viewHolder = new ViewHolder();

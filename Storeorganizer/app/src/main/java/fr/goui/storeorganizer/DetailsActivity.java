@@ -146,7 +146,7 @@ public class DetailsActivity extends AppCompatActivity implements Observer {
         StoreAppointment appointment = worker.getNextAvailability();
         String availability = new SimpleDateFormat("HH:mm").format(new Date());
         if (appointment != null) {
-            if (appointment instanceof StoreAppointment.NullStoreAppointment) {
+            if (appointment instanceof NullStoreAppointment) {
                 availability = appointment.getFormattedStartTime();
                 availability += " during " + appointment.getDuration() + getString(R.string.minutes);
             } else {

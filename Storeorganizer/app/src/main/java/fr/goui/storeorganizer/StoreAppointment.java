@@ -1,5 +1,7 @@
 package fr.goui.storeorganizer;
 
+import android.util.Log;
+
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Comparator;
@@ -34,12 +36,12 @@ public class StoreAppointment implements Comparable<StoreAppointment> {
     /**
      * The {@code Calendar} representing the start time.
      */
-    private Calendar _startTime;
+    protected Calendar _startTime;
 
     /**
      * The {@code Calendar} representing the end time.
      */
-    private Calendar _endTime;
+    protected Calendar _endTime;
 
     /**
      * The {@code SimpleDateFormat} used to format start and end times.
@@ -165,7 +167,6 @@ public class StoreAppointment implements Comparable<StoreAppointment> {
     public void setStartTime(int startHour_p, int startMinute_p) {
         _startTime.set(Calendar.HOUR_OF_DAY, startHour_p);
         _startTime.set(Calendar.MINUTE, startMinute_p);
-        _endTime.setTimeInMillis(_startTime.getTimeInMillis() + getDuration() * 60000);
     }
 
     /**
@@ -244,13 +245,13 @@ public class StoreAppointment implements Comparable<StoreAppointment> {
      * @return an {@code int} which is the gap in minutes
      */
     public int gapWith(Calendar calendar_p) {
-        int gap;
-        if (isAfter(calendar_p)) {
-            gap = (int) (_startTime.getTimeInMillis() - calendar_p.getTimeInMillis()) / 60000;
-        } else {
-            gap = (int) (calendar_p.getTimeInMillis() - _endTime.getTimeInMillis()) / 60000;
-        }
-        return gap;
+        int thisMinute = isAfter(calendar_p) ?
+                _startTime.get(Calendar.HOUR_OF_DAY) * 60 + _startTime.get(Calendar.MINUTE) :
+                _endTime.get(Calendar.HOUR_OF_DAY) * 60 + _endTime.get(Calendar.MINUTE);
+        int calendarMinute = calendar_p.get(Calendar.HOUR_OF_DAY) * 60 + calendar_p.get(Calendar.MINUTE);
+        Log.d("CREATION", "thisMinute: " + thisMinute);
+        Log.d("CREATION", "calendarMinute: " + calendarMinute);
+        return Math.abs(thisMinute - calendarMinute);
     }
 
     /**
@@ -260,13 +261,13 @@ public class StoreAppointment implements Comparable<StoreAppointment> {
      * @return an {@code int} which is the gap in minutes
      */
     public int gapWith(StoreAppointment storeAppointment_p) {
-        int gap;
-        if (isAfter(storeAppointment_p)) {
-            gap = (int) (_startTime.getTimeInMillis() - storeAppointment_p.getEndTime().getTimeInMillis()) / 60000;
-        } else {
-            gap = (int) (storeAppointment_p.getStartTime().getTimeInMillis() - _endTime.getTimeInMillis()) / 60000;
-        }
-        return gap;
+        int thisMinute = isAfter(storeAppointment_p) ?
+                _startTime.get(Calendar.HOUR_OF_DAY) * 60 + _startTime.get(Calendar.MINUTE) :
+                _endTime.get(Calendar.HOUR_OF_DAY) * 60 + _endTime.get(Calendar.MINUTE);
+        int appointmentMinute = isAfter(storeAppointment_p) ?
+                storeAppointment_p.getEndTime().get(Calendar.HOUR_OF_DAY) * 60 + storeAppointment_p.getEndTime().get(Calendar.MINUTE) :
+                storeAppointment_p.getStartTime().get(Calendar.HOUR_OF_DAY) * 60 + storeAppointment_p.getStartTime().get(Calendar.MINUTE);
+        return Math.abs(thisMinute - appointmentMinute);
     }
 
     @Override
@@ -294,15 +295,6 @@ public class StoreAppointment implements Comparable<StoreAppointment> {
     }
 
     /**
-     * Creates a new instance of {@code NullStoreAppointment}.
-     *
-     * @return {@code NullStoreAppointment}
-     */
-    public NullStoreAppointment newNullInstance() {
-        return new NullStoreAppointment();
-    }
-
-    /**
      * Comparator class used to compare 2 {@code StoreAppointment}s.
      */
     public static class Comparators {
@@ -317,31 +309,6 @@ public class StoreAppointment implements Comparable<StoreAppointment> {
                 return appointment1_p.getStartTime().compareTo(appointment2_p.getStartTime());
             }
         };
-    }
-
-    /**
-     * A {@code NullStoreAppointment} is an empty {@code StoreAppointment} which represents a gap item.
-     * Its duration is the duration in minutes between its start and end times.
-     * Setting its start time doesn't compute its end time.
-     * Its {@code StoreTask} is {@code null}.
-     */
-    public class NullStoreAppointment extends StoreAppointment {
-
-        @Override
-        public void setStartTime(int startHour_p, int startMinute_p) {
-            _startTime.set(Calendar.HOUR_OF_DAY, startHour_p);
-            _startTime.set(Calendar.MINUTE, startMinute_p);
-        }
-
-        @Override
-        public StoreTask getStoreTask() {
-            return null;
-        }
-
-        @Override
-        public int getDuration() {
-            return (int) (_endTime.getTimeInMillis() - _startTime.getTimeInMillis()) / 60000;
-        }
     }
 
 }

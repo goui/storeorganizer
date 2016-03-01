@@ -160,7 +160,7 @@ public class DetailsRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vi
     @Override
     public int getItemViewType(int position_p) {
         int type = TYPE_NORMAL_APPOINTMENT;
-        if (_appointments.get(position_p) instanceof StoreAppointment.NullStoreAppointment) {
+        if (_appointments.get(position_p) instanceof NullStoreAppointment) {
             type = TYPE_NULL_APPOINTMENT;
         }
         ;
