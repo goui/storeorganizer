@@ -2,6 +2,7 @@ package fr.goui.storeorganizer;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
@@ -47,12 +48,15 @@ public class DetailsActivity extends AppCompatActivity implements Observer {
      */
     private TabLayout mTabLayout;
 
+    private Resources mResources;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_details);
 
         StoreWorkerModel.getInstance().addObserver(this);
+        mResources = getResources();
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -73,7 +77,7 @@ public class DetailsActivity extends AppCompatActivity implements Observer {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(DetailsActivity.this, AppointmentCreationActivity.class);
-                intent.putExtra(AppointmentCreationActivity.INTENT_EXTRA_WORKER_POSITION_STRING_KEY, mTabLayout.getSelectedTabPosition());
+                intent.putExtra(mResources.getString(R.string.intent_appointment_creation_worker_position), mTabLayout.getSelectedTabPosition());
                 startActivityForResult(intent, REQUEST_CODE_CREATE_APPOINTMENT);
             }
         });
@@ -85,7 +89,7 @@ public class DetailsActivity extends AppCompatActivity implements Observer {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_CODE_CREATE_APPOINTMENT) {
             if (resultCode == RESULT_OK) {
-                int position = data.getIntExtra(AppointmentCreationActivity.INTENT_EXTRA_WORKER_POSITION_STRING_KEY, -1);
+                int position = data.getIntExtra(mResources.getString(R.string.intent_appointment_creation_result_worker_position), -1);
                 DetailsFragment fragment = (DetailsFragment) getSupportFragmentManager()
                         .findFragmentByTag("android:switcher:" + R.id.container + ":" + position);
                 fragment.notifyDataSetChanged();

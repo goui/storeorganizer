@@ -5,7 +5,6 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import java.util.Calendar;
-import java.util.Date;
 
 public class AppointmentEditionActivity extends AppointmentCreationActivity {
 
@@ -31,7 +30,7 @@ public class AppointmentEditionActivity extends AppointmentCreationActivity {
             _oldWorker = StoreWorkerModel.getInstance().getStoreWorker(_oldWorkerPosition);
             if (_oldAppointmentPosition != -1) {
                 _oldAppointment = _oldWorker.getStoreAppointment(_oldAppointmentPosition);
-                _newAppointment = new StoreAppointment();
+                mNewAppointment = new StoreAppointment();
                 _oldTask = _oldAppointment.getStoreTask();
                 int taskPosition = -1;
                 if (_oldTask == null) {
@@ -53,7 +52,7 @@ public class AppointmentEditionActivity extends AppointmentCreationActivity {
 
     @Override
     protected void onWorkerSelected(int position_p) {
-        _newWorker = StoreWorkerModel.getInstance().getStoreWorker(position_p);
+        mNewWorker = StoreWorkerModel.getInstance().getStoreWorker(position_p);
         _newWorkerPosition = position_p;
         updateAppointmentInformation();
     }
@@ -67,12 +66,12 @@ public class AppointmentEditionActivity extends AppointmentCreationActivity {
     @Override
     protected void updateAppointmentInformation() {
         if (_newTask != null) {
-            _newAppointment.setStoreTask(_newTask);
-            if (_oldWorker.equals(_newWorker)) {
-                _newAppointment.setStartTime(_oldAppointment.getStartTime());
+            mNewAppointment.setStoreTask(_newTask);
+            if (_oldWorker.equals(mNewWorker)) {
+                mNewAppointment.setStartTime(_oldAppointment.getStartTime());
             } else {
-                StoreAppointment appointment = _newWorker.getNextAvailability();
-                Calendar calendar = _now;
+                StoreAppointment appointment = mNewWorker.getNextAvailability();
+                Calendar calendar = mNow;
                 if (appointment != null) {
                     if (appointment instanceof NullStoreAppointment) {
                         calendar = appointment.getStartTime();
@@ -80,25 +79,25 @@ public class AppointmentEditionActivity extends AppointmentCreationActivity {
                         calendar = appointment.getEndTime();
                     }
                 }
-                _newAppointment.setStartTime(calendar);
+                mNewAppointment.setStartTime(calendar);
             }
-            _txtStartTime.setText(_newAppointment.getFormattedStartTime());
-            _txtEndTime.setText(_newAppointment.getFormattedEndTime());
+            mTextViewStartingTime.setText(mNewAppointment.getFormattedStartTime());
+            mTextViewEndingTime.setText(mNewAppointment.getFormattedEndTime());
         }
     }
 
     private void fillInformation(int workerPosition_p, int taskPosition_p) {
-        _etClientsName.setText(_oldAppointment.getClientName());
-        _etClientsPhoneNumber.setText(_oldAppointment.getClientPhoneNumber());
-        _spinnerWorker.setSelection(workerPosition_p);
+        mEditTextClientName.setText(_oldAppointment.getClientName());
+        mEditTextClientPhoneNumber.setText(_oldAppointment.getClientPhoneNumber());
+        mSpinnerWorker.setSelection(workerPosition_p);
         if (_isAGap) {
-            _spinnerWorker.setEnabled(false);
-            _spinnerWorker.setBackgroundResource(R.color.light_grey);
+            mSpinnerWorker.setEnabled(false);
+            mSpinnerWorker.setBackgroundResource(R.color.light_grey);
         } else {
-            _spinnerTask.setSelection(taskPosition_p);
+            mSpinnerTask.setSelection(taskPosition_p);
         }
-        _txtStartTime.setText(_oldAppointment.getFormattedStartTime());
-        _txtEndTime.setText(_oldAppointment.getFormattedEndTime());
+        mTextViewStartingTime.setText(_oldAppointment.getFormattedStartTime());
+        mTextViewEndingTime.setText(_oldAppointment.getFormattedEndTime());
     }
 
     @Override
@@ -128,81 +127,81 @@ public class AppointmentEditionActivity extends AppointmentCreationActivity {
         boolean result = true;
         String errorMessage = checkValidity();
         if (errorMessage == null) {
-            _newAppointment.setClientName(_etClientsName.getText().toString());
-            _newAppointment.setClientPhoneNumber(_etClientsPhoneNumber.getText().toString());
+            mNewAppointment.setClientName(mEditTextClientName.getText().toString());
+            mNewAppointment.setClientPhoneNumber(mEditTextClientPhoneNumber.getText().toString());
             if (_isAGap) {
                 // if the new appointment replace the gap so there is still a gap before and not after, update the gap and create new appointment after
-                if ((_newAppointment.getStartTime().getTimeInMillis() - _oldAppointment.getStartTime().getTimeInMillis()) / 60000
+                if ((mNewAppointment.getStartTime().getTimeInMillis() - _oldAppointment.getStartTime().getTimeInMillis()) / 60000
                         >= StoreTaskModel.getInstance().getMinTimeInMinutes()
-                        && !((_oldAppointment.getEndTime().getTimeInMillis() - _newAppointment.getEndTime().getTimeInMillis()) / 60000
+                        && !((_oldAppointment.getEndTime().getTimeInMillis() - mNewAppointment.getEndTime().getTimeInMillis()) / 60000
                         >= StoreTaskModel.getInstance().getMinTimeInMinutes())) {
-                    _oldAppointment.setEndTime(_newAppointment.getStartTime());
-                    _newWorker.getStoreAppointments().add(_oldAppointmentPosition + 1, _newAppointment);
+                    _oldAppointment.setEndTime(mNewAppointment.getStartTime());
+                    mNewWorker.getStoreAppointments().add(_oldAppointmentPosition + 1, mNewAppointment);
                 }
                 // if the new appointment replace the gap so there is still a gap after and not before, update the gap and create new appointment before
-                else if ((_oldAppointment.getEndTime().getTimeInMillis() - _newAppointment.getEndTime().getTimeInMillis()) / 60000
+                else if ((_oldAppointment.getEndTime().getTimeInMillis() - mNewAppointment.getEndTime().getTimeInMillis()) / 60000
                         >= StoreTaskModel.getInstance().getMinTimeInMinutes()
-                        && !((_newAppointment.getStartTime().getTimeInMillis() - _oldAppointment.getStartTime().getTimeInMillis()) / 60000
+                        && !((mNewAppointment.getStartTime().getTimeInMillis() - _oldAppointment.getStartTime().getTimeInMillis()) / 60000
                         >= StoreTaskModel.getInstance().getMinTimeInMinutes())) {
-                    _oldAppointment.setStartTime(_newAppointment.getEndTime());
-                    _newWorker.getStoreAppointments().add(_oldAppointmentPosition, _newAppointment);
+                    _oldAppointment.setStartTime(mNewAppointment.getEndTime());
+                    mNewWorker.getStoreAppointments().add(_oldAppointmentPosition, mNewAppointment);
                 }
                 // if the new appointment replace the gap so there is still a gap before and after, update the gap, create new appointment and new gap after
-                else if ((_oldAppointment.getEndTime().getTimeInMillis() - _newAppointment.getEndTime().getTimeInMillis()) / 60000
+                else if ((_oldAppointment.getEndTime().getTimeInMillis() - mNewAppointment.getEndTime().getTimeInMillis()) / 60000
                         >= StoreTaskModel.getInstance().getMinTimeInMinutes()
-                        && (_newAppointment.getStartTime().getTimeInMillis() - _oldAppointment.getStartTime().getTimeInMillis()) / 60000
+                        && (mNewAppointment.getStartTime().getTimeInMillis() - _oldAppointment.getStartTime().getTimeInMillis()) / 60000
                         >= StoreTaskModel.getInstance().getMinTimeInMinutes()) {
                     NullStoreAppointment nullStoreAppointment = new NullStoreAppointment();
-                    nullStoreAppointment.setStartTime(_newAppointment.getEndTime());
+                    nullStoreAppointment.setStartTime(mNewAppointment.getEndTime());
                     nullStoreAppointment.setEndTime(_oldAppointment.getEndTime());
-                    _newWorker.getStoreAppointments().add(_oldAppointmentPosition + 1, nullStoreAppointment);
-                    _newWorker.getStoreAppointments().add(_oldAppointmentPosition + 1, _newAppointment);
-                    _oldAppointment.setEndTime(_newAppointment.getStartTime());
+                    mNewWorker.getStoreAppointments().add(_oldAppointmentPosition + 1, nullStoreAppointment);
+                    mNewWorker.getStoreAppointments().add(_oldAppointmentPosition + 1, mNewAppointment);
+                    _oldAppointment.setEndTime(mNewAppointment.getStartTime());
                 }
                 // if the new appointment replace the gap so there is no other gap, replace the gap with the new appointment
                 else {
-                    _newWorker.getStoreAppointments().set(_oldAppointmentPosition, _newAppointment);
+                    mNewWorker.getStoreAppointments().set(_oldAppointmentPosition, mNewAppointment);
                 }
             } else {
                 if (_hasWorkerChanged) {
                     // if the new appointment create an acceptable gap, create the gap and the new appointment
-                    if (_newWorker.getStoreAppointmentsNumber() == 0) {
-                        if (_newAppointment.getStartTime().after(_now)
-                                && ((_newAppointment.getStartTime().getTimeInMillis() - _now.getTimeInMillis()) / 60000)
+                    if (mNewWorker.getStoreAppointmentsNumber() == 0) {
+                        if (mNewAppointment.getStartTime().after(mNow)
+                                && ((mNewAppointment.getStartTime().getTimeInMillis() - mNow.getTimeInMillis()) / 60000)
                                 >= StoreTaskModel.getInstance().getMinTimeInMinutes()) {
                             NullStoreAppointment nullStoreAppointment = new NullStoreAppointment();
-                            nullStoreAppointment.setStartTime(_now);
-                            nullStoreAppointment.setEndTime(_newAppointment.getStartTime());
-                            _newWorker.addStoreAppointment(nullStoreAppointment);
+                            nullStoreAppointment.setStartTime(mNow);
+                            nullStoreAppointment.setEndTime(mNewAppointment.getStartTime());
+                            mNewWorker.addStoreAppointment(nullStoreAppointment);
                         }
                     } else {
-                        if (_newAppointment.getStartTime().after(_newWorker.getLastAppointment().getEndTime())
-                                && ((_newAppointment.getStartTime().getTimeInMillis() - _newWorker.getLastAppointment().getEndTime().getTimeInMillis()) / 60000)
+                        if (mNewAppointment.getStartTime().after(mNewWorker.getLastAppointment().getEndTime())
+                                && ((mNewAppointment.getStartTime().getTimeInMillis() - mNewWorker.getLastAppointment().getEndTime().getTimeInMillis()) / 60000)
                                 >= StoreTaskModel.getInstance().getMinTimeInMinutes()) {
                             NullStoreAppointment nullStoreAppointment = new NullStoreAppointment();
-                            nullStoreAppointment.setStartTime(_newWorker.getLastAppointment().getEndTime());
-                            nullStoreAppointment.setEndTime(_newAppointment.getStartTime());
-                            _newWorker.addStoreAppointment(nullStoreAppointment);
+                            nullStoreAppointment.setStartTime(mNewWorker.getLastAppointment().getEndTime());
+                            nullStoreAppointment.setEndTime(mNewAppointment.getStartTime());
+                            mNewWorker.addStoreAppointment(nullStoreAppointment);
                         }
                     }
-                    _newWorker.addStoreAppointment(_newAppointment);
+                    mNewWorker.addStoreAppointment(mNewAppointment);
                 } else {
                     // if there is nothing before nor after
                     if (!_oldWorker.isThereAppointmentBefore(_oldAppointmentPosition)
                             && !_oldWorker.isThereAppointmentAfter(_oldAppointmentPosition)) {
                         // if the new appointment creates an acceptable gap before, creates the gap
-                        if (_newAppointment.getStartTime().after(_now)
-                                && (_newAppointment.getStartTime().getTimeInMillis() - _now.getTimeInMillis()) / 60000
+                        if (mNewAppointment.getStartTime().after(mNow)
+                                && (mNewAppointment.getStartTime().getTimeInMillis() - mNow.getTimeInMillis()) / 60000
                                 >= StoreTaskModel.getInstance().getMinTimeInMinutes()) {
                             NullStoreAppointment nullStoreAppointment = new NullStoreAppointment();
-                            nullStoreAppointment.setStartTime(_now);
-                            nullStoreAppointment.setEndTime(_newAppointment.getStartTime());
+                            nullStoreAppointment.setStartTime(mNow);
+                            nullStoreAppointment.setEndTime(mNewAppointment.getStartTime());
                             _oldWorker.getStoreAppointments().add(_oldAppointmentPosition, nullStoreAppointment);
                         }
                         // update the appointment
                         _oldAppointment.setStoreTask(_newTask);
-                        _oldAppointment.setStartTime(_newAppointment.getStartTime());
-                        _oldAppointment.setEndTime(_newAppointment.getEndTime());
+                        _oldAppointment.setStartTime(mNewAppointment.getStartTime());
+                        _oldAppointment.setEndTime(mNewAppointment.getEndTime());
                     }
                     // if there is something before and not after
                     else if (_oldWorker.isThereAppointmentBefore(_oldAppointmentPosition)
@@ -210,7 +209,7 @@ public class AppointmentEditionActivity extends AppointmentCreationActivity {
                         // if there is a gap before
                         if (_oldWorker.getStoreAppointment(_oldAppointmentPosition - 1) instanceof NullStoreAppointment) {
                             // if the new appointment takes time to the gap to the point the gap is no longer acceptable, remove the gap and update the appointment
-                            if (((_newAppointment.getStartTime().getTimeInMillis()
+                            if (((mNewAppointment.getStartTime().getTimeInMillis()
                                     - _oldWorker.getStoreAppointment(_oldAppointmentPosition - 1).getStartTime().getTimeInMillis())
                                     / 60000)
                                     < StoreTaskModel.getInstance().getMinTimeInMinutes()) {
@@ -218,28 +217,28 @@ public class AppointmentEditionActivity extends AppointmentCreationActivity {
                             }
                             // if the new appointment takes time to the gap but it is still acceptable, update the gap and the appointment
                             else {
-                                _oldWorker.getStoreAppointment(_oldAppointmentPosition - 1).setEndTime(_newAppointment.getStartTime());
+                                _oldWorker.getStoreAppointment(_oldAppointmentPosition - 1).setEndTime(mNewAppointment.getStartTime());
                             }
                             // update the appointment
                             _oldAppointment.setStoreTask(_newTask);
-                            _oldAppointment.setStartTime(_newAppointment.getStartTime());
-                            _oldAppointment.setEndTime(_newAppointment.getEndTime());
+                            _oldAppointment.setStartTime(mNewAppointment.getStartTime());
+                            _oldAppointment.setEndTime(mNewAppointment.getEndTime());
                         }
                         // if there is an appointment before
                         else {
                             // if the new appointment creates an acceptable gap, creates the gap and update the appointment
-                            if (((_newAppointment.getStartTime().getTimeInMillis()
+                            if (((mNewAppointment.getStartTime().getTimeInMillis()
                                     - _oldWorker.getStoreAppointment(_oldAppointmentPosition - 1).getEndTime().getTimeInMillis())
                                     / 60000)
                                     >= StoreTaskModel.getInstance().getMinTimeInMinutes()) {
                                 NullStoreAppointment nullStoreAppointment = new NullStoreAppointment();
                                 nullStoreAppointment.setStartTime(_oldWorker.getStoreAppointment(_oldAppointmentPosition - 1).getEndTime());
-                                nullStoreAppointment.setEndTime(_newAppointment.getStartTime());
+                                nullStoreAppointment.setEndTime(mNewAppointment.getStartTime());
                                 _oldWorker.getStoreAppointments().add(_oldAppointmentPosition, nullStoreAppointment);
                             }
                             _oldAppointment.setStoreTask(_newTask);
-                            _oldAppointment.setStartTime(_newAppointment.getStartTime());
-                            _oldAppointment.setEndTime(_newAppointment.getEndTime());
+                            _oldAppointment.setStartTime(mNewAppointment.getStartTime());
+                            _oldAppointment.setEndTime(mNewAppointment.getEndTime());
                         }
                     }
                     // if there is something after and not before
@@ -249,35 +248,35 @@ public class AppointmentEditionActivity extends AppointmentCreationActivity {
                         if (_oldWorker.getStoreAppointment(_oldAppointmentPosition + 1) instanceof NullStoreAppointment) {
                             // if the new appointment takes time to the gap to the point the gap is no longer acceptable, remove the gap and update the appointment
                             if (((_oldWorker.getStoreAppointment(_oldAppointmentPosition + 1).getEndTime().getTimeInMillis()
-                                    - _newAppointment.getEndTime().getTimeInMillis())
+                                    - mNewAppointment.getEndTime().getTimeInMillis())
                                     / 60000)
                                     < StoreTaskModel.getInstance().getMinTimeInMinutes()) {
                                 _oldWorker.getStoreAppointments().remove(_oldAppointmentPosition + 1);
                             }
                             // if the new appointment takes time to the gap but it is still acceptable, update the gap and the appointment
                             else {
-                                _oldWorker.getStoreAppointment(_oldAppointmentPosition + 1).setStartTime(_newAppointment.getEndTime());
+                                _oldWorker.getStoreAppointment(_oldAppointmentPosition + 1).setStartTime(mNewAppointment.getEndTime());
                             }
                             // update the appointment
                             _oldAppointment.setStoreTask(_newTask);
-                            _oldAppointment.setStartTime(_newAppointment.getStartTime());
-                            _oldAppointment.setEndTime(_newAppointment.getEndTime());
+                            _oldAppointment.setStartTime(mNewAppointment.getStartTime());
+                            _oldAppointment.setEndTime(mNewAppointment.getEndTime());
                         }
                         // if there is an appointment after
                         else {
                             // if the new appointment creates an acceptable gap, creates the gap and update the appointment
                             if (((_oldWorker.getStoreAppointment(_oldAppointmentPosition + 1).getStartTime().getTimeInMillis()
-                                    - _newAppointment.getEndTime().getTimeInMillis())
+                                    - mNewAppointment.getEndTime().getTimeInMillis())
                                     / 60000)
                                     >= StoreTaskModel.getInstance().getMinTimeInMinutes()) {
                                 NullStoreAppointment nullStoreAppointment = new NullStoreAppointment();
-                                nullStoreAppointment.setStartTime(_newAppointment.getEndTime());
+                                nullStoreAppointment.setStartTime(mNewAppointment.getEndTime());
                                 nullStoreAppointment.setEndTime(_oldWorker.getStoreAppointment(_oldAppointmentPosition + 1).getStartTime());
                                 _oldWorker.getStoreAppointments().add(_oldAppointmentPosition + 1, nullStoreAppointment);
                             }
                             _oldAppointment.setStoreTask(_newTask);
-                            _oldAppointment.setStartTime(_newAppointment.getStartTime());
-                            _oldAppointment.setEndTime(_newAppointment.getEndTime());
+                            _oldAppointment.setStartTime(mNewAppointment.getStartTime());
+                            _oldAppointment.setEndTime(mNewAppointment.getEndTime());
                         }
                     }
                     // if there is something before and after
@@ -286,7 +285,7 @@ public class AppointmentEditionActivity extends AppointmentCreationActivity {
                         if (_oldWorker.getStoreAppointment(_oldAppointmentPosition - 1) instanceof NullStoreAppointment
                                 && _oldWorker.getStoreAppointment(_oldAppointmentPosition + 1) instanceof NullStoreAppointment) {
                             // if the new appointment consumes the gap before to the point it is not acceptable anymore, remove the gap
-                            if (((_newAppointment.getStartTime().getTimeInMillis()
+                            if (((mNewAppointment.getStartTime().getTimeInMillis()
                                     - _oldWorker.getStoreAppointment(_oldAppointmentPosition - 1).getStartTime().getTimeInMillis())
                                     / 60000)
                                     < StoreTaskModel.getInstance().getMinTimeInMinutes()) {
@@ -294,29 +293,29 @@ public class AppointmentEditionActivity extends AppointmentCreationActivity {
                             }
                             // if not update the gap
                             else {
-                                _oldWorker.getStoreAppointment(_oldAppointmentPosition - 1).setEndTime(_newAppointment.getStartTime());
+                                _oldWorker.getStoreAppointment(_oldAppointmentPosition - 1).setEndTime(mNewAppointment.getStartTime());
                             }
                             // if the new appointment consumes the gap after to the point it is not acceptable anymore, remove the gap
                             if (((_oldWorker.getStoreAppointment(_oldAppointmentPosition + 1).getEndTime().getTimeInMillis()
-                                    - _newAppointment.getEndTime().getTimeInMillis())
+                                    - mNewAppointment.getEndTime().getTimeInMillis())
                                     / 60000)
                                     < StoreTaskModel.getInstance().getMinTimeInMinutes()) {
                                 _oldWorker.getStoreAppointments().remove(_oldAppointmentPosition + 1);
                             }
                             // if not update the gap
                             else {
-                                _oldWorker.getStoreAppointment(_oldAppointmentPosition + 1).setStartTime(_newAppointment.getEndTime());
+                                _oldWorker.getStoreAppointment(_oldAppointmentPosition + 1).setStartTime(mNewAppointment.getEndTime());
                             }
                             // update the appointment
                             _oldAppointment.setStoreTask(_newTask);
-                            _oldAppointment.setStartTime(_newAppointment.getStartTime());
-                            _oldAppointment.setEndTime(_newAppointment.getEndTime());
+                            _oldAppointment.setStartTime(mNewAppointment.getStartTime());
+                            _oldAppointment.setEndTime(mNewAppointment.getEndTime());
                         }
                         // if there is a gap before and an appointment after
                         else if (_oldWorker.getStoreAppointment(_oldAppointmentPosition - 1) instanceof NullStoreAppointment
                                 && !(_oldWorker.getStoreAppointment(_oldAppointmentPosition + 1) instanceof NullStoreAppointment)) {
                             // if the new appointment consumes the gap before to the point it is not acceptable anymore, remove the gap
-                            if (((_newAppointment.getStartTime().getTimeInMillis()
+                            if (((mNewAppointment.getStartTime().getTimeInMillis()
                                     - _oldWorker.getStoreAppointment(_oldAppointmentPosition - 1).getStartTime().getTimeInMillis())
                                     / 60000)
                                     < StoreTaskModel.getInstance().getMinTimeInMinutes()) {
@@ -324,78 +323,78 @@ public class AppointmentEditionActivity extends AppointmentCreationActivity {
                             }
                             // if not update the gap
                             else {
-                                _oldWorker.getStoreAppointment(_oldAppointmentPosition - 1).setEndTime(_newAppointment.getStartTime());
+                                _oldWorker.getStoreAppointment(_oldAppointmentPosition - 1).setEndTime(mNewAppointment.getStartTime());
                             }
                             // if the new appointment creates a gap between its end time and the appointment after, create a gap
                             if (((_oldWorker.getStoreAppointment(_oldAppointmentPosition + 1).getStartTime().getTimeInMillis()
-                                    - _newAppointment.getEndTime().getTimeInMillis())
+                                    - mNewAppointment.getEndTime().getTimeInMillis())
                                     / 60000)
                                     >= StoreTaskModel.getInstance().getMinTimeInMinutes()) {
                                 NullStoreAppointment nullStoreAppointment = new NullStoreAppointment();
-                                nullStoreAppointment.setStartTime(_newAppointment.getEndTime());
+                                nullStoreAppointment.setStartTime(mNewAppointment.getEndTime());
                                 nullStoreAppointment.setEndTime(_oldWorker.getStoreAppointment(_oldAppointmentPosition + 1).getStartTime());
                                 _oldWorker.getStoreAppointments().add(_oldAppointmentPosition + 1, nullStoreAppointment);
                             }
                             // update the appointment
                             _oldAppointment.setStoreTask(_newTask);
-                            _oldAppointment.setStartTime(_newAppointment.getStartTime());
-                            _oldAppointment.setEndTime(_newAppointment.getEndTime());
+                            _oldAppointment.setStartTime(mNewAppointment.getStartTime());
+                            _oldAppointment.setEndTime(mNewAppointment.getEndTime());
                         }
                         // if there is an appointment before and a gap after
                         else if (!(_oldWorker.getStoreAppointment(_oldAppointmentPosition - 1) instanceof NullStoreAppointment)
                                 && _oldWorker.getStoreAppointment(_oldAppointmentPosition + 1) instanceof NullStoreAppointment) {
                             // if the new appointment consumes the gap after to the point it is not acceptable anymore, remove the gap
                             if (((_oldWorker.getStoreAppointment(_oldAppointmentPosition + 1).getEndTime().getTimeInMillis()
-                                    - _newAppointment.getEndTime().getTimeInMillis())
+                                    - mNewAppointment.getEndTime().getTimeInMillis())
                                     / 60000)
                                     < StoreTaskModel.getInstance().getMinTimeInMinutes()) {
                                 _oldWorker.getStoreAppointments().remove(_oldAppointmentPosition + 1);
                             }
                             // if not update the gap
                             else {
-                                _oldWorker.getStoreAppointment(_oldAppointmentPosition + 1).setStartTime(_newAppointment.getEndTime());
+                                _oldWorker.getStoreAppointment(_oldAppointmentPosition + 1).setStartTime(mNewAppointment.getEndTime());
                             }
                             // if the new appointment creates a gap between its start time and the appointment before, create a gap
-                            if (((_newAppointment.getStartTime().getTimeInMillis()
+                            if (((mNewAppointment.getStartTime().getTimeInMillis()
                                     - _oldWorker.getStoreAppointment(_oldAppointmentPosition - 1).getEndTime().getTimeInMillis())
                                     / 60000)
                                     >= StoreTaskModel.getInstance().getMinTimeInMinutes()) {
                                 NullStoreAppointment nullStoreAppointment = new NullStoreAppointment();
                                 nullStoreAppointment.setStartTime(_oldWorker.getStoreAppointment(_oldAppointmentPosition - 1).getEndTime());
-                                nullStoreAppointment.setEndTime(_newAppointment.getStartTime());
+                                nullStoreAppointment.setEndTime(mNewAppointment.getStartTime());
                                 _oldWorker.getStoreAppointments().add(_oldAppointmentPosition + 1, nullStoreAppointment);
                             }
                             // update the appointment
                             _oldAppointment.setStoreTask(_newTask);
-                            _oldAppointment.setStartTime(_newAppointment.getStartTime());
-                            _oldAppointment.setEndTime(_newAppointment.getEndTime());
+                            _oldAppointment.setStartTime(mNewAppointment.getStartTime());
+                            _oldAppointment.setEndTime(mNewAppointment.getEndTime());
                         }
                         // if there is an appointment before and after
                         else {
                             // if the new appointment creates a gap between its start time and the appointment before, create a gap
-                            if (((_newAppointment.getStartTime().getTimeInMillis()
+                            if (((mNewAppointment.getStartTime().getTimeInMillis()
                                     - _oldWorker.getStoreAppointment(_oldAppointmentPosition - 1).getEndTime().getTimeInMillis())
                                     / 60000)
                                     >= StoreTaskModel.getInstance().getMinTimeInMinutes()) {
                                 NullStoreAppointment nullStoreAppointment = new NullStoreAppointment();
                                 nullStoreAppointment.setStartTime(_oldWorker.getStoreAppointment(_oldAppointmentPosition - 1).getEndTime());
-                                nullStoreAppointment.setEndTime(_newAppointment.getStartTime());
+                                nullStoreAppointment.setEndTime(mNewAppointment.getStartTime());
                                 _oldWorker.getStoreAppointments().add(_oldAppointmentPosition, nullStoreAppointment);
                             }
                             // if the new appointment creates a gap between its end time and the appointment after, create a gap
                             if (((_oldWorker.getStoreAppointment(_oldAppointmentPosition + 1).getStartTime().getTimeInMillis()
-                                    - _newAppointment.getEndTime().getTimeInMillis())
+                                    - mNewAppointment.getEndTime().getTimeInMillis())
                                     / 60000)
                                     >= StoreTaskModel.getInstance().getMinTimeInMinutes()) {
                                 NullStoreAppointment nullStoreAppointment = new NullStoreAppointment();
-                                nullStoreAppointment.setStartTime(_newAppointment.getEndTime());
+                                nullStoreAppointment.setStartTime(mNewAppointment.getEndTime());
                                 nullStoreAppointment.setEndTime(_oldWorker.getStoreAppointment(_oldAppointmentPosition + 1).getStartTime());
                                 _oldWorker.getStoreAppointments().add(_oldAppointmentPosition + 1, nullStoreAppointment);
                             }
                             // update the appointment
                             _oldAppointment.setStoreTask(_newTask);
-                            _oldAppointment.setStartTime(_newAppointment.getStartTime());
-                            _oldAppointment.setEndTime(_newAppointment.getEndTime());
+                            _oldAppointment.setStartTime(mNewAppointment.getStartTime());
+                            _oldAppointment.setEndTime(mNewAppointment.getEndTime());
                         }
                     }
                 }
@@ -410,14 +409,14 @@ public class AppointmentEditionActivity extends AppointmentCreationActivity {
     @Override
     protected String checkValidity() {
         String errorMessage = null;
-        if (_etClientsName.getText().toString().equals("")) {
+        if (mEditTextClientName.getText().toString().equals("")) {
             errorMessage = getString(R.string.please_specify_a_name);
-        } else if (_newAppointment.getEndTime().before(_newAppointment.getStartTime())) {
+        } else if (mNewAppointment.getEndTime().before(mNewAppointment.getStartTime())) {
             errorMessage = getString(R.string.ending_time_cannot_be_prior_to_starting_time);
         } else if (doesAppointmentOverlap()) {
             errorMessage = getString(R.string.appointment_overlaps_with_at_least_another_one);
         }
-        if (_isAGap && _newAppointment.getStartTime().before(_now)) {
+        if (_isAGap && mNewAppointment.getStartTime().before(mNow)) {
             errorMessage = getString(R.string.starting_time_cannot_be_in_the_past);
         }
         return errorMessage;

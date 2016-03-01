@@ -2,10 +2,10 @@ package fr.goui.storeorganizer;
 
 import android.app.TimePickerDialog;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -17,27 +17,88 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 
 import java.util.Calendar;
-import java.util.Date;
 
+/**
+ * {@code AppointmentCreationActivity} is an {@code Activity} used to display a gui to create a {@link StoreAppointment}.
+ * The user can enter the client's name (required), the client's phone number (optional), the {@code StoreWorker} (required),
+ * the {@code StoreTask} (required) and the starting and ending times (required).
+ */
 public class AppointmentCreationActivity extends AppCompatActivity {
 
-    public static final String INTENT_EXTRA_WORKER_POSITION_STRING_KEY = "result_intent_position_string_key";
-
-    protected final static int CONVERSION_MILLISECOND_MINUTE = 60000;
-
+    /**
+     * The model managing all the {@code StoreWorker}s.
+     */
     private StoreWorkerModel mStoreWorkerModel;
+
+    /**
+     * The model managing all the {@code StoreTask}s.
+     */
     private StoreTaskModel mStoreTaskModel;
-    private StoreTask _newTask;
-    protected StoreAppointment _newAppointment;
-    protected StoreWorker _newWorker;
-    protected int _newWorkerPosition;
-    protected Calendar _now = Calendar.getInstance();
-    protected EditText _etClientsName;
-    protected EditText _etClientsPhoneNumber;
-    protected Spinner _spinnerWorker;
-    protected Spinner _spinnerTask;
-    protected TextView _txtStartTime;
-    protected TextView _txtEndTime;
+
+    /**
+     * The chosen {@code StoreTask}.
+     */
+    private StoreTask mNewTask;
+
+    /**
+     * The newly created {@code StoreAppointment}.
+     */
+    protected StoreAppointment mNewAppointment;
+
+    /**
+     * The chosen {@code StoreWorker}.
+     */
+    protected StoreWorker mNewWorker;
+
+    /**
+     * The position of the chosen {@code StoreWorker}.
+     */
+    protected int mNewWorkerPosition;
+
+    /**
+     * The {@code Calendar} used to keep a reference on current time.
+     */
+    protected Calendar mNow = Calendar.getInstance();
+
+    /**
+     * The client's name {@code EditText}.
+     */
+    protected EditText mEditTextClientName;
+
+    /**
+     * The client's phone number {@code EditText}.
+     */
+    protected EditText mEditTextClientPhoneNumber;
+
+    /**
+     * The {@code Spinner} used to choose the {@code StoreWorker}.
+     */
+    protected Spinner mSpinnerWorker;
+
+    /**
+     * The {@code Spinner} used to choose the {@code StoreTask}.
+     */
+    protected Spinner mSpinnerTask;
+
+    /**
+     * The {@code TextView} used to display starting time.
+     */
+    protected TextView mTextViewStartingTime;
+
+    /**
+     * The {@code TextView} used to display ending time.
+     */
+    protected TextView mTextViewEndingTime;
+
+    /**
+     * The android {@code Resources}.
+     */
+    private Resources mResources;
+
+    /**
+     * The millisecond / minute conversion {@code int}.
+     */
+    protected int mConversionMillisecondMinute;
 
     /**
      * The {@code Calendar} used to manage starting time.
@@ -76,25 +137,39 @@ public class AppointmentCreationActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // setting layout
         setContentView(R.layout.activity_appointment_creation);
+
+        // setting action bar
         setupActionbar();
+
+        // setting the result by default to canceled
         setResult(RESULT_CANCELED);
 
+        // getting models
         mStoreWorkerModel = StoreWorkerModel.getInstance();
         mStoreTaskModel = StoreTaskModel.getInstance();
 
-        _etClientsName = (EditText) findViewById(R.id.activity_appointment_creation_clients_name_edit_text);
-        _etClientsPhoneNumber = (EditText) findViewById(R.id.activity_appointment_creation_clients_phone_number_edit_text);
-        _spinnerWorker = (Spinner) findViewById(R.id.activity_appointment_creation_worker_spinner);
-        _spinnerWorker.setAdapter(new WorkerBaseAdapter(this));
-        _spinnerTask = (Spinner) findViewById(R.id.activity_appointment_creation_task_spinner);
-        _spinnerTask.setAdapter(new TaskBaseAdapter(this));
-        _txtStartTime = (TextView) findViewById(R.id.activity_appointment_creation_start_text_view);
-        _txtEndTime = (TextView) findViewById(R.id.activity_appointment_creation_end_text_view);
+        // getting resources
+        mResources = getResources();
+        mConversionMillisecondMinute = mResources.getInteger(R.integer.conversion_millisecond_minute);
 
+        // getting views
+        mEditTextClientName = (EditText) findViewById(R.id.activity_appointment_creation_clients_name_edit_text);
+        mEditTextClientPhoneNumber = (EditText) findViewById(R.id.activity_appointment_creation_clients_phone_number_edit_text);
+        mSpinnerWorker = (Spinner) findViewById(R.id.activity_appointment_creation_worker_spinner);
+        mSpinnerWorker.setAdapter(new WorkerBaseAdapter(this));
+        mSpinnerTask = (Spinner) findViewById(R.id.activity_appointment_creation_task_spinner);
+        mSpinnerTask.setAdapter(new TaskBaseAdapter(this));
+        mTextViewStartingTime = (TextView) findViewById(R.id.activity_appointment_creation_start_text_view);
+        mTextViewEndingTime = (TextView) findViewById(R.id.activity_appointment_creation_end_text_view);
+
+        // initialization method
         init();
 
-        _spinnerWorker.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        // the worker selection listener
+        mSpinnerWorker.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 onWorkerSelected(position);
@@ -106,7 +181,8 @@ public class AppointmentCreationActivity extends AppCompatActivity {
             }
         });
 
-        _spinnerTask.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+        // the task selection listener
+        mSpinnerTask.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 onTaskSelected(position);
@@ -119,7 +195,7 @@ public class AppointmentCreationActivity extends AppCompatActivity {
         });
 
         // listener to trigger the time picker dialog for the starting time
-        _txtStartTime.setOnClickListener(new View.OnClickListener() {
+        mTextViewStartingTime.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 new TimePickerDialog(AppointmentCreationActivity.this,
@@ -131,7 +207,7 @@ public class AppointmentCreationActivity extends AppCompatActivity {
         });
 
         // listener to trigger the time picker dialog for the ending time
-        _txtEndTime.setOnClickListener(new View.OnClickListener() {
+        mTextViewEndingTime.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 new TimePickerDialog(AppointmentCreationActivity.this,
@@ -143,31 +219,60 @@ public class AppointmentCreationActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Method used to initialize objects when creating the activity.
+     * Extending classes should override it if they do something different.
+     */
     protected void init() {
-        _newAppointment = new StoreAppointment();
-        int workerPosition = getIntent().getIntExtra(INTENT_EXTRA_WORKER_POSITION_STRING_KEY, 0);
-        _spinnerWorker.setSelection(workerPosition);
-        _newWorker = mStoreWorkerModel.getStoreWorker(workerPosition);
+
+        // creating a new appointment
+        mNewAppointment = new StoreAppointment();
+
+        // getting the worker at the specified position and selecting it
+        int workerPosition = getIntent().getIntExtra(mResources.getString(R.string.intent_appointment_creation_worker_position), 0);
+        mSpinnerWorker.setSelection(workerPosition);
+        mNewWorker = mStoreWorkerModel.getStoreWorker(workerPosition);
     }
 
+    /**
+     * When a new worker is selected by the user.
+     *
+     * @param position_p the position of the worker
+     */
     protected void onWorkerSelected(int position_p) {
-        _newWorker = mStoreWorkerModel.getStoreWorker(position_p);
-        _newWorkerPosition = position_p;
+        mNewWorker = mStoreWorkerModel.getStoreWorker(position_p);
+        mNewWorkerPosition = position_p;
         updateAppointmentInformation();
     }
 
+    /**
+     * When a new task is selected by the user.
+     *
+     * @param position_p the position of the task
+     */
     protected void onTaskSelected(int position_p) {
-        _newTask = mStoreTaskModel.getStoreTask(position_p);
+        mNewTask = mStoreTaskModel.getStoreTask(position_p);
         updateAppointmentInformation();
     }
 
+    /**
+     * Method used to update appointment information when the user has made a change.
+     */
     protected void updateAppointmentInformation() {
-        if (_newTask != null) {
-            _newAppointment.setStoreTask(_newTask);
-            StoreAppointment appointment = _newWorker.getNextAvailability();
+
+        // if the chosen task is not null
+        if (mNewTask != null) {
+
+            // setting it to the appointment
+            mNewAppointment.setStoreTask(mNewTask);
+
+            // getting the next availability
+            StoreAppointment appointment = mNewWorker.getNextAvailability();
+
+            // setting the times
             Calendar calendar = Calendar.getInstance();
-            calendar.set(Calendar.HOUR_OF_DAY, _now.get(Calendar.HOUR_OF_DAY));
-            calendar.set(Calendar.MINUTE, _now.get(Calendar.MINUTE));
+            calendar.set(Calendar.HOUR_OF_DAY, mNow.get(Calendar.HOUR_OF_DAY));
+            calendar.set(Calendar.MINUTE, mNow.get(Calendar.MINUTE));
             if (appointment != null) {
                 if (appointment instanceof NullStoreAppointment) {
                     calendar.set(Calendar.HOUR_OF_DAY, appointment.getStartTime().get(Calendar.HOUR_OF_DAY));
@@ -177,27 +282,38 @@ public class AppointmentCreationActivity extends AppCompatActivity {
                     calendar.set(Calendar.MINUTE, appointment.getEndTime().get(Calendar.MINUTE));
                 }
             }
-            _newAppointment.setStartTime(calendar);
-            calendar.setTimeInMillis(calendar.getTimeInMillis() + _newAppointment.getDuration() * CONVERSION_MILLISECOND_MINUTE);
-            _newAppointment.setEndTime(calendar);
-            _txtStartTime.setText(_newAppointment.getFormattedStartTime());
-            _txtEndTime.setText(_newAppointment.getFormattedEndTime());
+            mNewAppointment.setStartTime(calendar);
+            calendar.setTimeInMillis(calendar.getTimeInMillis() + mNewAppointment.getDuration() * mConversionMillisecondMinute);
+            mNewAppointment.setEndTime(calendar);
+
+            // updating the views
+            mTextViewStartingTime.setText(mNewAppointment.getFormattedStartTime());
+            mTextViewEndingTime.setText(mNewAppointment.getFormattedEndTime());
         }
     }
 
+    /**
+     * When the user has changed the starting time.
+     */
     protected void updateStartingTime() {
-        _newAppointment.setStartTime(mCalendarStartingTime);
-        mCalendarEndingTime.setTimeInMillis(mCalendarStartingTime.getTimeInMillis() + _newAppointment.getDuration() * CONVERSION_MILLISECOND_MINUTE);
-        _newAppointment.setEndTime(mCalendarEndingTime);
-        _txtStartTime.setText(_newAppointment.getFormattedStartTime());
-        _txtEndTime.setText(_newAppointment.getFormattedEndTime());
+        mNewAppointment.setStartTime(mCalendarStartingTime);
+        mCalendarEndingTime.setTimeInMillis(mCalendarStartingTime.getTimeInMillis() + mNewAppointment.getDuration() * mConversionMillisecondMinute);
+        mNewAppointment.setEndTime(mCalendarEndingTime);
+        mTextViewStartingTime.setText(mNewAppointment.getFormattedStartTime());
+        mTextViewEndingTime.setText(mNewAppointment.getFormattedEndTime());
     }
 
+    /**
+     * When the user has changed the ending time.
+     */
     protected void updateEndingTime() {
-        _newAppointment.setEndTime(mCalendarEndingTime);
-        _txtEndTime.setText(_newAppointment.getFormattedEndTime());
+        mNewAppointment.setEndTime(mCalendarEndingTime);
+        mTextViewEndingTime.setText(mNewAppointment.getFormattedEndTime());
     }
 
+    /**
+     * Using the up navigation for this activity.
+     */
     private void setupActionbar() {
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
@@ -209,6 +325,7 @@ public class AppointmentCreationActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        // creating menu
         getMenuInflater().inflate(R.menu.menu_appointment_creation, menu);
         return true;
     }
@@ -217,66 +334,126 @@ public class AppointmentCreationActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         boolean ret = super.onOptionsItemSelected(item);
         int id = item.getItemId();
+
+        // if we press the up button, going back
         if (id == android.R.id.home) {
             onBackPressed();
             ret = true;
-        } else if (id == R.id.action_validate_prestation) {
+        }
+
+        // trying to validate the appointment creation
+        if (id == R.id.action_validate_prestation) {
+
+            // if there is no error
             if (confirmAppointment()) {
+
+                // passing the worker position, setting the result to ok and finishing this activity
                 Intent intent = new Intent();
-                intent.putExtra(INTENT_EXTRA_WORKER_POSITION_STRING_KEY, _newWorkerPosition);
+                intent.putExtra(mResources.getString(R.string.intent_appointment_creation_result_worker_position), mNewWorkerPosition);
                 setResult(RESULT_OK, intent);
                 finish();
             }
             ret = true;
         }
+
         return ret;
     }
 
+    /**
+     * Method used to create the {@code StoreAppointment} if there is no error.
+     *
+     * @return {@code true} if there is an error, {@code false} otherwise
+     */
     protected boolean confirmAppointment() {
         boolean result = true;
+
+        // checking errors
         String errorMessage = checkValidity();
+
+        // if there is no error
         if (errorMessage == null) {
-            _newAppointment.setClientName(_etClientsName.getText().toString());
-            _newAppointment.setClientPhoneNumber(_etClientsPhoneNumber.getText().toString());
-            if (_newWorker.getStoreAppointmentsNumber() == 0) {
-                if (_newAppointment.isAfter(_now)
-                        && (_newAppointment.gapWith(_now) >= StoreTaskModel.getInstance().getMinTimeInMinutes())) {
-                    NullStoreAppointment nullStoreAppointment = new NullStoreAppointment();
-                    nullStoreAppointment.setStartTime(_now.get(Calendar.HOUR_OF_DAY), _now.get(Calendar.MINUTE));
-                    nullStoreAppointment.setEndTime(_newAppointment.getStartTime());
-                    _newWorker.addStoreAppointment(nullStoreAppointment);
-                }
-            } else {
-                if (_newAppointment.isAfter(_newWorker.getLastAppointment())
-                        && (_newAppointment.gapWith(_newWorker.getLastAppointment()) >= StoreTaskModel.getInstance().getMinTimeInMinutes())) {
-                    NullStoreAppointment nullStoreAppointment = new NullStoreAppointment();
-                    nullStoreAppointment.setStartTime(_newWorker.getLastAppointment().getEndTime().get(Calendar.HOUR_OF_DAY),
-                            _newWorker.getLastAppointment().getEndTime().get(Calendar.MINUTE));
-                    nullStoreAppointment.setEndTime(_newAppointment.getStartTime());
-                    _newWorker.addStoreAppointment(nullStoreAppointment);
-                }
+
+            // setting the client's name and phone number
+            mNewAppointment.setClientName(mEditTextClientName.getText().toString());
+            mNewAppointment.setClientPhoneNumber(mEditTextClientPhoneNumber.getText().toString());
+
+            // if this worker had no appointment scheduled and the creation leads to creating a gap
+            if (mNewWorker.getStoreAppointmentsNumber() == 0 && mNewAppointment.isAfter(mNow)
+                    && (mNewAppointment.gapWith(mNow) >= StoreTaskModel.getInstance().getMinTimeInMinutes())) {
+
+                // creating the gap
+                NullStoreAppointment nullStoreAppointment = new NullStoreAppointment();
+                nullStoreAppointment.setStartTime(mNow.get(Calendar.HOUR_OF_DAY), mNow.get(Calendar.MINUTE));
+                nullStoreAppointment.setEndTime(mNewAppointment.getStartTime());
+                mNewWorker.addStoreAppointment(nullStoreAppointment);
             }
-            _newWorker.addStoreAppointment(_newAppointment);
-        } else {
+
+            // if this worker had at least one appointment scheduled and the creation leads to creating a gap
+            else if (mNewWorker.getStoreAppointmentsNumber() > 0 && mNewAppointment.isAfter(mNewWorker.getLastAppointment())
+                    && (mNewAppointment.gapWith(mNewWorker.getLastAppointment()) >= StoreTaskModel.getInstance().getMinTimeInMinutes())) {
+
+                // creating the gap
+                NullStoreAppointment nullStoreAppointment = new NullStoreAppointment();
+                nullStoreAppointment.setStartTime(mNewWorker.getLastAppointment().getEndTime().get(Calendar.HOUR_OF_DAY),
+                        mNewWorker.getLastAppointment().getEndTime().get(Calendar.MINUTE));
+                nullStoreAppointment.setEndTime(mNewAppointment.getStartTime());
+                mNewWorker.addStoreAppointment(nullStoreAppointment);
+            }
+
+            // creating the appointment
+            mNewWorker.addStoreAppointment(mNewAppointment);
+        }
+
+        // if there is an error, displaying it
+        else {
             Toast.makeText(this, errorMessage, Toast.LENGTH_LONG).show();
             result = false;
         }
         return result;
     }
 
+    /**
+     * Method used to check if the creation process leads to an appointment overlapping.
+     *
+     * @return {@code true} if there is an overlapping, {@code false} otherwise
+     */
     protected boolean doesAppointmentOverlap() {
         boolean overlaps = false;
-        // TODO overlapping algorithm
+
+        // if there is at least one appointment
+        if (mNewWorker.getStoreAppointmentsNumber() >= 1) {
+            for (StoreAppointment currentAppointment : mNewWorker.getStoreAppointments()) {
+
+                // being over current appointment's starting time
+                // || being over current appointment's ending time
+                // || being contained in current appointment
+                if ((mNewAppointment.getStartTime().before(currentAppointment.getStartTime())
+                        && mNewAppointment.getEndTime().after(currentAppointment.getStartTime()))
+                        || (mNewAppointment.getEndTime().before(currentAppointment.getEndTime())
+                        && mNewAppointment.getStartTime().after(currentAppointment.getEndTime()))
+                        || (mNewAppointment.getStartTime().after(currentAppointment.getStartTime())
+                        && mNewAppointment.getEndTime().before(currentAppointment.getEndTime()))) {
+                    overlaps = true;
+                    break;
+                }
+            }
+        }
+
         return overlaps;
     }
 
+    /**
+     * Method used to check if there are errors in the creation process.
+     *
+     * @return {@code true} if there is an error, {@code false} otherwise
+     */
     protected String checkValidity() {
         String errorMessage = null;
-        if (_etClientsName.getText().toString().equals("")) {
+        if (mEditTextClientName.getText().toString().equals("")) {
             errorMessage = getString(R.string.please_specify_a_name);
-        } else if (_newAppointment.isBefore(_now)) {
+        } else if (mNewAppointment.isBefore(mNow)) {
             errorMessage = getString(R.string.starting_time_cannot_be_in_the_past);
-        } else if (_newAppointment.getEndTime().before(_newAppointment.getStartTime())) {
+        } else if (mNewAppointment.getEndTime().before(mNewAppointment.getStartTime())) {
             errorMessage = getString(R.string.ending_time_cannot_be_prior_to_starting_time);
         } else if (doesAppointmentOverlap()) {
             errorMessage = getString(R.string.appointment_overlaps_with_at_least_another_one);
