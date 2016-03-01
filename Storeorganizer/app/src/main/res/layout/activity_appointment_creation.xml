@@ -1,97 +1,108 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent"
-              android:layout_margin="16dp"
-              android:orientation="vertical">
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="8dp">
 
-    <android.support.design.widget.TextInputLayout
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
 
-        <EditText
-            android:id="@+id/activity_appointment_creation_clients_name_edit_text"
+        <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/clients_name"
-            android:inputType="textPersonName|textCapSentences"
-            android:textColor="@color/black"/>
-    </android.support.design.widget.TextInputLayout>
+            android:layout_marginTop="16dp">
 
-    <android.support.design.widget.TextInputLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+            <EditText
+                android:id="@+id/activity_appointment_creation_clients_name_edit_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/clients_name"
+                android:inputType="textPersonName|textCapSentences"
+                android:textColor="@color/black"/>
+        </android.support.design.widget.TextInputLayout>
 
-        <EditText
-            android:id="@+id/activity_appointment_creation_clients_phone_number_edit_text"
+        <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginTop="16dp">
+
+            <EditText
+                android:id="@+id/activity_appointment_creation_clients_phone_number_edit_text"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/clients_phone_number"
+                android:inputType="phone"
+                android:textColor="@color/black"/>
+        </android.support.design.widget.TextInputLayout>
+
+        <TextView
+            android:id="@+id/activity_appointment_creation_worker_text_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:layout_marginTop="24dp"
+            android:text="@string/worker"/>
+
+        <Spinner
+            android:id="@+id/activity_appointment_creation_worker_spinner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+        <TextView
+            android:id="@+id/activity_appointment_creation_task_text_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
             android:layout_marginTop="16dp"
-            android:hint="@string/clients_phone_number"
-            android:inputType="phone"
-            android:textColor="@color/black"/>
-    </android.support.design.widget.TextInputLayout>
+            android:text="@string/task"/>
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="4dp"
-        android:layout_marginTop="24dp"
-        android:text="@string/worker"/>
+        <Spinner
+            android:id="@+id/activity_appointment_creation_task_spinner"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
 
-    <Spinner
-        android:id="@+id/activity_appointment_creation_worker_spinner"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        <TextView
+            android:id="@+id/activity_appointment_creation_from_text_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:layout_marginTop="16dp"
+            android:text="@string/from"/>
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="4dp"
-        android:layout_marginTop="16dp"
-        android:text="@string/task"/>
+        <TextView
+            android:id="@+id/activity_appointment_creation_start_text_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:paddingBottom="8dp"
+            android:paddingTop="8dp"
+            android:textColor="@color/black"
+            android:textSize="18sp"/>
 
-    <Spinner
-        android:id="@+id/activity_appointment_creation_task_spinner"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+        <TextView
+            android:id="@+id/activity_appointment_creation_to_text_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:layout_marginTop="8dp"
+            android:text="@string/to"/>
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="4dp"
-        android:layout_marginTop="24dp"
-        android:text="@string/from"/>
+        <TextView
+            android:id="@+id/activity_appointment_creation_end_text_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:paddingBottom="8dp"
+            android:paddingTop="8dp"
+            android:textColor="@color/black"
+            android:textSize="18sp"/>
 
-    <TextView
-        android:id="@+id/activity_appointment_creation_start_text_view"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="4dp"
-        android:background="?attr/selectableItemBackground"
-        android:clickable="true"
-        android:paddingBottom="8dp"
-        android:paddingTop="8dp"
-        android:textColor="@color/black"
-        android:textSize="18sp"/>
+    </LinearLayout>
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="4dp"
-        android:layout_marginTop="16dp"
-        android:text="@string/to"/>
-
-    <TextView
-        android:id="@+id/activity_appointment_creation_end_text_view"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="4dp"
-        android:background="?attr/selectableItemBackground"
-        android:clickable="true"
-        android:paddingBottom="8dp"
-        android:paddingTop="8dp"
-        android:textColor="@color/black"
-        android:textSize="18sp"/>
-
-</LinearLayout>
+</ScrollView>
