@@ -3,6 +3,7 @@ package fr.goui.storeorganizer;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.NavigableMap;
 import java.util.Observable;
 
 /**
@@ -154,34 +155,32 @@ public class StoreWorkerModel extends Observable {
      * @return the first available {@code StoreWorker}
      */
     public StoreWorker getFirstAvailableWorker() {
-        // TODO fix issue getFirstAvailableWorker and add comments
+        StoreWorker storeWorker = null;
+        
+        // now calendar
         Calendar now = Calendar.getInstance();
-        StoreWorker firstWorker = _workers.get(0);
-        StoreAppointment firstAvailableAppointment = firstWorker.getNextAvailability();
-        Calendar firstAvailableTime = now;
-        if (firstAvailableAppointment != null) {
-            if (firstAvailableAppointment instanceof StoreAppointment.NullStoreAppointment) {
-                firstAvailableTime = firstAvailableAppointment.getStartTime();
-            } else {
-                firstAvailableTime = firstAvailableAppointment.getEndTime();
+
+        // temp calendar
+        Calendar availability = null;
+
+        // for every worker
+        for (StoreWorker currentWorker : _workers) {
+
+            // getting the next availability
+            StoreAppointment nextAvailability = currentWorker.getNextAvailability();
+
+            // if it is a gap getting the starting time, if not getting the ending time
+            Calendar firstAvailableTime = nextAvailability instanceof StoreAppointment.NullStoreAppointment ?
+                    nextAvailability.getStartTime() : nextAvailability.getEndTime();
+
+            // if it is after now and before the previous best time
+            if (firstAvailableTime.after(now) && (availability == null || firstAvailableTime.before(availability))) {
+                storeWorker = currentWorker;
+                availability = firstAvailableTime;
             }
         }
-        for (int i = 1; i < _workers.size(); i++) {
-            StoreWorker currentWorker = _workers.get(i);
-            StoreAppointment currentAvailableAppointment = currentWorker.getNextAvailability();
-            Calendar currentAvailableTime = now;
-            if (currentAvailableAppointment != null) {
-                if (currentAvailableAppointment instanceof StoreAppointment.NullStoreAppointment) {
-                    currentAvailableTime = currentAvailableAppointment.getStartTime();
-                } else {
-                    currentAvailableTime = currentAvailableAppointment.getEndTime();
-                }
-            }
-            if (currentAvailableTime.before(firstAvailableTime)) {
-                firstWorker = _workers.get(i);
-            }
-        }
-        return firstWorker;
+
+        return storeWorker;
     }
 
     /**
