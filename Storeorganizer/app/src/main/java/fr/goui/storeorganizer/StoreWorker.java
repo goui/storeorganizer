@@ -168,6 +168,9 @@ public class StoreWorker {
         }
         if (!isThereAGap) {
             Calendar now = Calendar.getInstance();
+            // we don't want to consider seconds and milliseconds
+            now.set(Calendar.SECOND, 0);
+            now.set(Calendar.MILLISECOND, 0);
             StoreAppointment lastAppointment = getLastAppointment();
             if (lastAppointment != null) {
                 if (lastAppointment.getEndTime().after(now)) {

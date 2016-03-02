@@ -55,6 +55,12 @@ public class StoreAppointment implements Comparable<StoreAppointment> {
         _startTime = Calendar.getInstance();
         _endTime = Calendar.getInstance();
         _simpleDateFormat = new SimpleDateFormat(DATE_FORMAT_PATTERN);
+
+        // we don't want to consider seconds and milliseconds
+        _startTime.set(Calendar.SECOND, 0);
+        _startTime.set(Calendar.MILLISECOND, 0);
+        _endTime.set(Calendar.SECOND, 0);
+        _endTime.set(Calendar.MILLISECOND, 0);
     }
 
     /**

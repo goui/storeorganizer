@@ -217,6 +217,14 @@ public class AppointmentCreationActivity extends AppCompatActivity {
                         true).show();
             }
         });
+
+        // we don't want to consider seconds and milliseconds
+        mNow.set(Calendar.SECOND, 0);
+        mNow.set(Calendar.MILLISECOND, 0);
+        mCalendarStartingTime.set(Calendar.SECOND, 0);
+        mCalendarStartingTime.set(Calendar.MILLISECOND, 0);
+        mCalendarEndingTime.set(Calendar.SECOND, 0);
+        mCalendarEndingTime.set(Calendar.MILLISECOND, 0);
     }
 
     /**
@@ -273,6 +281,9 @@ public class AppointmentCreationActivity extends AppCompatActivity {
             Calendar calendar = Calendar.getInstance();
             calendar.set(Calendar.HOUR_OF_DAY, mNow.get(Calendar.HOUR_OF_DAY));
             calendar.set(Calendar.MINUTE, mNow.get(Calendar.MINUTE));
+            // we don't want to consider seconds and milliseconds
+            calendar.set(Calendar.SECOND, 0);
+            calendar.set(Calendar.MILLISECOND, 0);
             if (appointment != null) {
                 if (appointment instanceof NullStoreAppointment) {
                     calendar.set(Calendar.HOUR_OF_DAY, appointment.getStartTime().get(Calendar.HOUR_OF_DAY));
@@ -429,8 +440,8 @@ public class AppointmentCreationActivity extends AppCompatActivity {
                 // || being contained in current appointment
                 if ((mNewAppointment.getStartTime().before(currentAppointment.getStartTime())
                         && mNewAppointment.getEndTime().after(currentAppointment.getStartTime()))
-                        || (mNewAppointment.getEndTime().before(currentAppointment.getEndTime())
-                        && mNewAppointment.getStartTime().after(currentAppointment.getEndTime()))
+                        || (mNewAppointment.getStartTime().before(currentAppointment.getEndTime())
+                        && mNewAppointment.getEndTime().after(currentAppointment.getEndTime()))
                         || (mNewAppointment.getStartTime().after(currentAppointment.getStartTime())
                         && mNewAppointment.getEndTime().before(currentAppointment.getEndTime()))) {
                     overlaps = true;
@@ -452,7 +463,7 @@ public class AppointmentCreationActivity extends AppCompatActivity {
         if (mEditTextClientName.getText().toString().equals("")) {
             errorMessage = getString(R.string.please_specify_a_name);
         } else if (mNewAppointment.isBefore(mNow)) {
-            errorMessage = getString(R.string.starting_time_cannot_be_in_the_past);
+            errorMessage = getString(R.string.appointment_cannot_be_in_the_past);
         } else if (mNewAppointment.getEndTime().before(mNewAppointment.getStartTime())) {
             errorMessage = getString(R.string.ending_time_cannot_be_prior_to_starting_time);
         } else if (doesAppointmentOverlap()) {

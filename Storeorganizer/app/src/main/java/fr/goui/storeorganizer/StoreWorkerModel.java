@@ -3,7 +3,6 @@ package fr.goui.storeorganizer;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
-import java.util.NavigableMap;
 import java.util.Observable;
 
 /**
@@ -159,6 +158,9 @@ public class StoreWorkerModel extends Observable {
 
         // now calendar
         Calendar now = Calendar.getInstance();
+        // we don't want to consider seconds and milliseconds
+        now.set(Calendar.SECOND, 0);
+        now.set(Calendar.MILLISECOND, 0);
 
         // temp calendar
         Calendar availability = null;

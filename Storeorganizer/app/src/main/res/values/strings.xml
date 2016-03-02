@@ -55,7 +55,7 @@
     <string name="cant_remove_last">You cannot remove the last one</string>
     <string name="please_specify_a_name">Please specify a name</string>
     <string name="please_specify_a_duration">Please specify a duration</string>
-    <string name="starting_time_cannot_be_in_the_past">Starting time cannot be in the past</string>
+    <string name="appointment_cannot_be_in_the_past">Appointment cannot be in the past</string>
     <string name="ending_time_cannot_be_prior_to_starting_time">Ending time cannot be prior to starting time</string>
     <string name="appointment_overlaps_with_at_least_another_one">Appointment overlaps with at least another one</string>
     <string name="modification_will_appear_for_later_tasks">Modification will appear for later tasks</string>

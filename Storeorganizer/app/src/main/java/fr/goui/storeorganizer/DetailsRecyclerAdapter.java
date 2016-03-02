@@ -141,6 +141,9 @@ public class DetailsRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vi
             holder_p.position = position_p;
 
             Calendar now = Calendar.getInstance();
+            // we don't want to consider seconds and milliseconds
+            now.set(Calendar.SECOND, 0);
+            now.set(Calendar.MILLISECOND, 0);
             int color;
             if (appointment.isBefore(now)) {
                 color = R.color.grey_overlay;

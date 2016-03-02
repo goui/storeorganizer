@@ -144,7 +144,11 @@ public class OverallView extends View {
                     int endMinute = currentAppointment.getEndTime().get(Calendar.MINUTE);
                     int y1 = mInitialY + mCellHeight * (startHour - mHourMin) + (mCellHeight * startMinute) / 60;
                     int y2 = mInitialY + mCellHeight * (endHour - mHourMin) + (mCellHeight * endMinute) / 60;
-                    if (currentAppointment.getEndTime().after(Calendar.getInstance())) {
+                    Calendar calendar = Calendar.getInstance();
+                    // we don't want to consider seconds and milliseconds
+                    calendar.set(Calendar.SECOND, 0);
+                    calendar.set(Calendar.MILLISECOND, 0);
+                    if (currentAppointment.getEndTime().after(calendar)) {
                         canvas.drawRect(x1, y1, x2, y2, mAppointmentPaint);
                     } else {
                         canvas.drawRect(x1, y1, x2, y2, mGreyPaint);
@@ -158,8 +162,12 @@ public class OverallView extends View {
     }
 
     private void drawNowLine(Canvas canvas) {
-        int hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY);
-        int minute = Calendar.getInstance().get(Calendar.MINUTE);
+        Calendar calendar = Calendar.getInstance();
+        // we don't want to consider seconds and milliseconds
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+        int hour = calendar.get(Calendar.HOUR_OF_DAY);
+        int minute = calendar.get(Calendar.MINUTE);
         mNowLineY = mInitialY + mCellHeight * (hour - mHourMin) + (mCellHeight * minute) / 60;
         canvas.drawLine(mInitialX, mNowLineY, mFinalX, mNowLineY, mNowPaint);
     }

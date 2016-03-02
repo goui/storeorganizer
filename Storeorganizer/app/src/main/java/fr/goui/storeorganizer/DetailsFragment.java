@@ -49,6 +49,9 @@ public class DetailsFragment extends Fragment implements OnAppointmentChangeList
         _detailsRecyclerAdapter = new DetailsRecyclerAdapter(getActivity(), _currentWorker.getStoreAppointments(), this);
         _recyclerView.setAdapter(_detailsRecyclerAdapter);
         _calendar = Calendar.getInstance();
+        // we don't want to consider seconds and milliseconds
+        _calendar.set(Calendar.SECOND, 0);
+        _calendar.set(Calendar.MILLISECOND, 0);
     }
 
     @Override
@@ -73,6 +76,9 @@ public class DetailsFragment extends Fragment implements OnAppointmentChangeList
     public void onAppointmentDelete(int position_p) {
         // TODO simplify appointment deletion
         Calendar now = Calendar.getInstance();
+        // we don't want to consider seconds and milliseconds
+        now.set(Calendar.SECOND, 0);
+        now.set(Calendar.MILLISECOND, 0);
 
         // if only item, remove appointment
         if (position_p == 0 && _currentWorker.getStoreAppointmentsNumber() == 1) {

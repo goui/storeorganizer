@@ -126,6 +126,16 @@ public class WorkingTimesCategoryFragment extends Fragment {
         mCalendarMin.set(Calendar.MINUTE, mResources.getInteger(R.integer.minimum_starting_minute));
         mCalendarMax.set(Calendar.HOUR_OF_DAY, mResources.getInteger(R.integer.maximum_ending_hour));
         mCalendarMax.set(Calendar.MINUTE, mResources.getInteger(R.integer.maximum_ending_minute));
+
+        // we don't want to consider seconds and milliseconds
+        mCalendarStartingTime.set(Calendar.SECOND, 0);
+        mCalendarStartingTime.set(Calendar.MILLISECOND, 0);
+        mCalendarEndingTime.set(Calendar.SECOND, 0);
+        mCalendarEndingTime.set(Calendar.MILLISECOND, 0);
+        mCalendarMin.set(Calendar.SECOND, 0);
+        mCalendarMin.set(Calendar.MILLISECOND, 0);
+        mCalendarMax.set(Calendar.SECOND, 0);
+        mCalendarMax.set(Calendar.MILLISECOND, 0);
     }
 
     @Override
