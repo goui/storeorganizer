@@ -36,6 +36,11 @@ public class AppointmentCreationActivity extends AppCompatActivity {
     private StoreTaskModel mStoreTaskModel;
 
     /**
+     * The model managing all the working times.
+     */
+    private StoreModel mStoreModel;
+
+    /**
      * The chosen {@code StoreTask}.
      */
     private StoreTask mNewTask;
@@ -461,13 +466,19 @@ public class AppointmentCreationActivity extends AppCompatActivity {
     protected String checkValidity() {
         String errorMessage = null;
         if (mEditTextClientName.getText().toString().equals("")) {
-            errorMessage = getString(R.string.please_specify_a_name);
+            errorMessage = mResources.getString(R.string.please_specify_a_name);
         } else if (mNewAppointment.isBefore(mNow)) {
-            errorMessage = getString(R.string.appointment_cannot_be_in_the_past);
+            errorMessage = mResources.getString(R.string.appointment_cannot_be_in_the_past);
         } else if (mNewAppointment.getEndTime().before(mNewAppointment.getStartTime())) {
-            errorMessage = getString(R.string.ending_time_cannot_be_prior_to_starting_time);
+            errorMessage = mResources.getString(R.string.ending_time_cannot_be_prior_to_starting_time);
         } else if (doesAppointmentOverlap()) {
-            errorMessage = getString(R.string.appointment_overlaps_with_at_least_another_one);
+            errorMessage = mResources.getString(R.string.appointment_overlaps_with_at_least_another_one);
+        } else if (mNewAppointment.getStartTime().before(mStoreModel.getStartingTime())) {
+            errorMessage = mResources.getString(R.string.starting_time_cannot_be_before) + " "
+                    + mStoreModel.getFormattedStartingTime();
+        } else if (mNewAppointment.getEndTime().after(mStoreModel.getEndingTime())) {
+            errorMessage = mResources.getString(R.string.ending_time_cannot_be_after) + " "
+                    + mStoreModel.getFormattedEndingTime();
         }
         return errorMessage;
     }

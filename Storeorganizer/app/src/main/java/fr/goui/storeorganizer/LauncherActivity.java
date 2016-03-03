@@ -11,6 +11,8 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ProgressBar;
 
+import java.util.Calendar;
+
 /**
  * {@code LauncherActivity} is the first activity started.
  * It is displayed in fullscreen and presents a {@code ProgressBar} followed by a {@code TextView}.
@@ -213,6 +215,14 @@ public class LauncherActivity extends AppCompatActivity {
      */
     private void getStoreInfo() {
         StoreModel storeModel = StoreModel.getInstance();
+
+        // setting the min and max calendars
+        int minHour = mResources.getInteger(R.integer.minimum_starting_hour);
+        int minMinute = mResources.getInteger(R.integer.minimum_starting_minute);
+        storeModel.setMinTime(minHour, minMinute);
+        int maxHour = mResources.getInteger(R.integer.maximum_ending_hour);
+        int maxMinute = mResources.getInteger(R.integer.maximum_ending_minute);
+        storeModel.setMaxTime(maxHour, maxMinute);
 
         // getting saved starting time in the shared prefs and putting it in the model
         int startingHour = mSharedPreferences.getInt(mResources.getString(R.string.starting_hour),

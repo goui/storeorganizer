@@ -23,11 +23,6 @@ import java.util.Calendar;
 public class WorkingTimesCategoryFragment extends Fragment {
 
     /**
-     * The {@code String} representing the pattern used to format times.
-     */
-    private static final String DATE_FORMAT_PATTERN = "HH:mm";
-
-    /**
      * The {@code SharedPreferences}.
      */
     private SharedPreferences mSharedPreferences;
@@ -48,16 +43,6 @@ public class WorkingTimesCategoryFragment extends Fragment {
     private Calendar mCalendarEndingTime = Calendar.getInstance();
 
     /**
-     * The minimum allowed time {@code Calendar}.
-     */
-    private Calendar mCalendarMin = Calendar.getInstance();
-
-    /**
-     * The maximum allowed time {@code Calendar}.
-     */
-    private Calendar mCalendarMax = Calendar.getInstance();
-
-    /**
      * The {@code TextView} for starting time.
      */
     private TextView mTxtStart;
@@ -71,11 +56,6 @@ public class WorkingTimesCategoryFragment extends Fragment {
      * The model storing information about working times.
      */
     private StoreModel mStoreModel = StoreModel.getInstance();
-
-    /**
-     * The {@code SimpleDateFormat} used to format start and end times.
-     */
-    private SimpleDateFormat mSimpleDateFormat = new SimpleDateFormat(DATE_FORMAT_PATTERN);
 
     /**
      * The time picker dialog listener for starting time.
@@ -114,28 +94,18 @@ public class WorkingTimesCategoryFragment extends Fragment {
         // setting starting time
         mCalendarStartingTime.set(Calendar.HOUR_OF_DAY, mStoreModel.getStartingHour());
         mCalendarStartingTime.set(Calendar.MINUTE, mStoreModel.getStartingMinute());
-        mTxtStart.setText(mSimpleDateFormat.format(mCalendarStartingTime.getTime()));
+        mTxtStart.setText(mStoreModel.getFormattedStartingTime());
 
         // setting ending time
         mCalendarEndingTime.set(Calendar.HOUR_OF_DAY, mStoreModel.getEndingHour());
         mCalendarEndingTime.set(Calendar.MINUTE, mStoreModel.getEndingMinute());
-        mTxtEnd.setText(mSimpleDateFormat.format(mCalendarEndingTime.getTime()));
-
-        // setting the min and max calendars
-        mCalendarMin.set(Calendar.HOUR_OF_DAY, mResources.getInteger(R.integer.minimum_starting_hour));
-        mCalendarMin.set(Calendar.MINUTE, mResources.getInteger(R.integer.minimum_starting_minute));
-        mCalendarMax.set(Calendar.HOUR_OF_DAY, mResources.getInteger(R.integer.maximum_ending_hour));
-        mCalendarMax.set(Calendar.MINUTE, mResources.getInteger(R.integer.maximum_ending_minute));
+        mTxtEnd.setText(mStoreModel.getFormattedEndingTime());
 
         // we don't want to consider seconds and milliseconds
         mCalendarStartingTime.set(Calendar.SECOND, 0);
         mCalendarStartingTime.set(Calendar.MILLISECOND, 0);
         mCalendarEndingTime.set(Calendar.SECOND, 0);
         mCalendarEndingTime.set(Calendar.MILLISECOND, 0);
-        mCalendarMin.set(Calendar.SECOND, 0);
-        mCalendarMin.set(Calendar.MILLISECOND, 0);
-        mCalendarMax.set(Calendar.SECOND, 0);
-        mCalendarMax.set(Calendar.MILLISECOND, 0);
     }
 
     @Override
@@ -191,11 +161,11 @@ public class WorkingTimesCategoryFragment extends Fragment {
             int startingHour = mCalendarStartingTime.get(Calendar.HOUR_OF_DAY);
             int startingMinute = mCalendarStartingTime.get(Calendar.MINUTE);
 
-            // updating in settings view
-            mTxtStart.setText(mSimpleDateFormat.format(mCalendarStartingTime.getTime()));
-
             // updating in the model
             mStoreModel.setStartingTime(startingHour, startingMinute);
+
+            // updating in settings view
+            mTxtStart.setText(mStoreModel.getFormattedStartingTime());
 
             // updating in shared prefs
             SharedPreferences.Editor editor = mSharedPreferences.edit();
@@ -227,11 +197,11 @@ public class WorkingTimesCategoryFragment extends Fragment {
             int endingHour = mCalendarEndingTime.get(Calendar.HOUR_OF_DAY);
             int endingMinute = mCalendarEndingTime.get(Calendar.MINUTE);
 
-            // updating in settings view
-            mTxtEnd.setText(mSimpleDateFormat.format(mCalendarEndingTime.getTime()));
-
             // updating in the model
             mStoreModel.setEndingTime(endingHour, endingMinute);
+
+            // updating in settings view
+            mTxtEnd.setText(mStoreModel.getFormattedEndingTime());
 
             // updating in shared prefs
             SharedPreferences.Editor editor = mSharedPreferences.edit();
@@ -258,10 +228,10 @@ public class WorkingTimesCategoryFragment extends Fragment {
      */
     private String checkValidity() {
         String errorMessage = null;
-        if (mCalendarStartingTime.before(mCalendarMin)) {
-            errorMessage = mResources.getString(R.string.starting_time_cannot_be_before) + " " + mSimpleDateFormat.format(mCalendarStartingTime.getTime());
-        } else if (mCalendarEndingTime.after(mCalendarMax)) {
-            errorMessage = mResources.getString(R.string.ending_time_cannot_be_after) + " " + mSimpleDateFormat.format(mCalendarEndingTime.getTime());
+        if (mCalendarStartingTime.before(mStoreModel.getMinTime())) {
+            errorMessage = mResources.getString(R.string.starting_time_cannot_be_before) + " " + mStoreModel.getFormattedMinTime();
+        } else if (mCalendarEndingTime.after(mStoreModel.getMaxTime())) {
+            errorMessage = mResources.getString(R.string.ending_time_cannot_be_after) + " " + mStoreModel.getFormattedMaxTime();
         } else if (mCalendarEndingTime.before(mCalendarStartingTime)) {
             errorMessage = mResources.getString(R.string.ending_time_cannot_be_prior_to_starting_time);
         }
