@@ -149,11 +149,11 @@ public class OverallView extends View {
                     calendar.set(Calendar.SECOND, 0);
                     calendar.set(Calendar.MILLISECOND, 0);
                     if (currentAppointment.getEndTime().after(calendar)) {
-                        canvas.drawRect(x1, y1, x2, y2, mAppointmentPaint);
+                        canvas.drawRect(x1, y1 + 1, x2, y2, mAppointmentPaint);
                     } else {
-                        canvas.drawRect(x1, y1, x2, y2, mGreyPaint);
+                        canvas.drawRect(x1, y1 + 1, x2, y2, mGreyPaint);
                     }
-                    canvas.drawLine(x1, y1, x2, y1, mBlackPaint);
+                    canvas.drawLine(x1, y1 + 1, x2, y1 + 1, mBlackPaint);
                     canvas.drawLine(x1, y2, x2, y2, mBlackPaint);
                 }
             }

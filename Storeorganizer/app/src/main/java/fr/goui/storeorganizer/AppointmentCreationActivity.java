@@ -155,6 +155,7 @@ public class AppointmentCreationActivity extends AppCompatActivity {
         // getting models
         mStoreWorkerModel = StoreWorkerModel.getInstance();
         mStoreTaskModel = StoreTaskModel.getInstance();
+        mStoreModel = StoreModel.getInstance();
 
         // getting resources
         mResources = getResources();
@@ -392,29 +393,6 @@ public class AppointmentCreationActivity extends AppCompatActivity {
             // setting the client's name and phone number
             mNewAppointment.setClientName(mEditTextClientName.getText().toString());
             mNewAppointment.setClientPhoneNumber(mEditTextClientPhoneNumber.getText().toString());
-
-            // if this worker had no appointment scheduled and the creation leads to creating a gap
-            if (mNewWorker.getStoreAppointmentsNumber() == 0 && mNewAppointment.isAfter(mNow)
-                    && (mNewAppointment.gapWith(mNow) >= StoreTaskModel.getInstance().getMinTimeInMinutes())) {
-
-                // creating the gap
-                NullStoreAppointment nullStoreAppointment = new NullStoreAppointment();
-                nullStoreAppointment.setStartTime(mNow.get(Calendar.HOUR_OF_DAY), mNow.get(Calendar.MINUTE));
-                nullStoreAppointment.setEndTime(mNewAppointment.getStartTime());
-                mNewWorker.addStoreAppointment(nullStoreAppointment);
-            }
-
-            // if this worker had at least one appointment scheduled and the creation leads to creating a gap
-            else if (mNewWorker.getStoreAppointmentsNumber() > 0 && mNewAppointment.isAfter(mNewWorker.getLastAppointment())
-                    && (mNewAppointment.gapWith(mNewWorker.getLastAppointment()) >= StoreTaskModel.getInstance().getMinTimeInMinutes())) {
-
-                // creating the gap
-                NullStoreAppointment nullStoreAppointment = new NullStoreAppointment();
-                nullStoreAppointment.setStartTime(mNewWorker.getLastAppointment().getEndTime().get(Calendar.HOUR_OF_DAY),
-                        mNewWorker.getLastAppointment().getEndTime().get(Calendar.MINUTE));
-                nullStoreAppointment.setEndTime(mNewAppointment.getStartTime());
-                mNewWorker.addStoreAppointment(nullStoreAppointment);
-            }
 
             // creating the appointment
             mNewWorker.addStoreAppointment(mNewAppointment);

@@ -75,6 +75,7 @@ public class DetailsFragment extends Fragment implements OnAppointmentChangeList
     @Override
     public void onAppointmentDelete(int position_p) {
         // TODO simplify appointment deletion
+        // maybe by using removeAppointment method in StoreWorker
         Calendar now = Calendar.getInstance();
         // we don't want to consider seconds and milliseconds
         now.set(Calendar.SECOND, 0);

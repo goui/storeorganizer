@@ -1,5 +1,7 @@
 package fr.goui.storeorganizer;
 
+import android.util.Log;
+
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -97,11 +99,19 @@ public class StoreWorker {
 
     /**
      * Adds a {@code StoreAppointment}.
+     * It will sort the list of {@code StoreAppointment}s
+     * and create gap items if needed.
      *
      * @param storeAppointment_p the {@code StoreAppointment} to add
      */
     public void addStoreAppointment(StoreAppointment storeAppointment_p) {
+        StoreAppointment lastAppointment = getLastAppointment();
+        storeAppointment_p.getStartTime().add(Calendar.SECOND, 1);
         _appointments.add(storeAppointment_p);
+        if (lastAppointment != null && storeAppointment_p.getEndTime().before(lastAppointment.getEndTime())) {
+            sortAppointments();
+        }
+        createGapsIfNeeded();
     }
 
     /**
@@ -111,6 +121,7 @@ public class StoreWorker {
      */
     public void removeStoreAppointment(StoreAppointment storeAppointment_p) {
         _appointments.remove(storeAppointment_p);
+        createGapsIfNeeded();
     }
 
     /**
@@ -179,6 +190,65 @@ public class StoreWorker {
             }
         }
         return appointment;
+    }
+
+    /**
+     * Method used to create {@link NullStoreAppointment}s
+     * if there are gaps between two consecutive {@code StoreAppointment}s.
+     */
+    private void createGapsIfNeeded() {
+
+        // if there is at least one appointment in the list
+        if (_appointments.size() > 0) {
+
+            // getting the current time
+            Calendar now = Calendar.getInstance();
+            // we don't want to consider seconds and milliseconds
+            now.add(Calendar.MINUTE, -1);
+            now.set(Calendar.SECOND, 0);
+            now.set(Calendar.MILLISECOND, 0);
+
+            // the index to begin the list traversal
+            int beginIndex = 1;
+
+            // if the first appointment is not a gap
+            // if we are not dealing with past appointments0
+            // if there is a gap between now and the first appointment
+            if (!(_appointments.get(0) instanceof NullStoreAppointment)
+                    && !_appointments.get(0).isBefore(now)
+                    && _appointments.get(0).gapWith(now) >= StoreTaskModel.getInstance().getMinTimeInMinutes()) {
+
+                // creating the gap and adding it to the list
+                NullStoreAppointment nullStoreAppointment = new NullStoreAppointment();
+                nullStoreAppointment.setStartTime(now);
+                nullStoreAppointment.setEndTime(_appointments.get(0).getStartTime());
+                _appointments.add(0, nullStoreAppointment);
+
+                // updating the index
+                beginIndex = 2;
+            }
+
+            // for all items of the list
+            for (int i = beginIndex; i < _appointments.size(); i++) {
+
+                // if one of the appointments is not a gap
+                // if we are not dealing with past appointments
+                // checking if there is a gap between current item and the previous
+                if ((!(_appointments.get(i - 1) instanceof NullStoreAppointment) && !(_appointments.get(i) instanceof NullStoreAppointment))
+                        && !_appointments.get(i).isBefore(now)
+                        && _appointments.get(i).gapWith(_appointments.get(i - 1)) >= StoreTaskModel.getInstance().getMinTimeInMinutes()) {
+
+                    // creating the gap and adding it to the list
+                    NullStoreAppointment nullStoreAppointment = new NullStoreAppointment();
+                    nullStoreAppointment.setStartTime(_appointments.get(i - 1).getEndTime());
+                    nullStoreAppointment.setEndTime(_appointments.get(i).getStartTime());
+                    _appointments.add(i, nullStoreAppointment);
+
+                    // updating the index
+                    i++;
+                }
+            }
+        }
     }
 
     @Override

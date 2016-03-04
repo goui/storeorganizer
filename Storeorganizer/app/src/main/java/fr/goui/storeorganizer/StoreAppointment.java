@@ -255,8 +255,6 @@ public class StoreAppointment implements Comparable<StoreAppointment> {
                 _startTime.get(Calendar.HOUR_OF_DAY) * 60 + _startTime.get(Calendar.MINUTE) :
                 _endTime.get(Calendar.HOUR_OF_DAY) * 60 + _endTime.get(Calendar.MINUTE);
         int calendarMinute = calendar_p.get(Calendar.HOUR_OF_DAY) * 60 + calendar_p.get(Calendar.MINUTE);
-        Log.d("CREATION", "thisMinute: " + thisMinute);
-        Log.d("CREATION", "calendarMinute: " + calendarMinute);
         return Math.abs(thisMinute - calendarMinute);
     }
 
