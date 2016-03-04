@@ -5,17 +5,23 @@ import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Point;
+import android.graphics.Rect;
 import android.os.Handler;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 
 import java.util.Calendar;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class OverallView extends View {
 
     private static final int TIMER_PERIOD = 1000 * 60;
+    private static final int SCROLL_DETECTION_OFFSET_VALUE = 20;
 
     private final int mDefaultCellHeight;
     private final Paint mBlackPaint = new Paint();
@@ -29,6 +35,11 @@ public class OverallView extends View {
     private final int mInitialY;
     private final int mFinalX;
 
+    private OnAppointmentClickListener mOnAppointmentClickListener;
+    private Map<Rect, StoreAppointment> items = new HashMap<>();
+    private boolean mTouched;
+    private int mTouchedPositionX;
+    private int mTouchedPositionY;
     private int mHourMin;
     private int mHourMax;
     private String[] mHoursStrings;
@@ -44,6 +55,7 @@ public class OverallView extends View {
 
     public OverallView(Context context) {
         super(context);
+        mOnAppointmentClickListener = (OnAppointmentClickListener) context;
         ((WindowManager) context.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay().getSize(mScreenSize);
         Resources resources = context.getResources();
         mHourMin = mStoreModel.getStartingHour();
@@ -148,11 +160,10 @@ public class OverallView extends View {
                     // we don't want to consider seconds and milliseconds
                     calendar.set(Calendar.SECOND, 0);
                     calendar.set(Calendar.MILLISECOND, 0);
-                    if (currentAppointment.getEndTime().after(calendar)) {
-                        canvas.drawRect(x1, y1 + 1, x2, y2, mAppointmentPaint);
-                    } else {
-                        canvas.drawRect(x1, y1 + 1, x2, y2, mGreyPaint);
-                    }
+                    Paint p = currentAppointment.getEndTime().after(calendar) ? mAppointmentPaint : mGreyPaint;
+                    Rect r = new Rect(x1, y1 + 1, x2, y2);
+                    items.put(r, currentAppointment);
+                    canvas.drawRect(r, p);
                     canvas.drawLine(x1, y1 + 1, x2, y1 + 1, mBlackPaint);
                     canvas.drawLine(x1, y2, x2, y2, mBlackPaint);
                 }
@@ -200,6 +211,43 @@ public class OverallView extends View {
         generateHoursStrings();
         requestLayout();
         invalidate();
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        int action = event.getAction();
+        switch (action) {
+            case MotionEvent.ACTION_DOWN:
+                mTouchedPositionX = (int) event.getX();
+                mTouchedPositionY = (int) event.getY();
+                mTouched = true;
+                break;
+            case MotionEvent.ACTION_MOVE:
+                int x = (int) event.getX();
+                int y = (int) event.getY();
+                if (Math.abs(x - mTouchedPositionX) > SCROLL_DETECTION_OFFSET_VALUE || Math.abs(y - mTouchedPositionY) > SCROLL_DETECTION_OFFSET_VALUE) {
+                    mTouched = false;
+                }
+                break;
+            case MotionEvent.ACTION_UP:
+                if (mTouched) {
+                    onClick();
+                    mTouched = false;
+                }
+                break;
+        }
+        return true;
+    }
+
+    private void onClick() {
+        // getting the appointment clicked based on the touched position
+        for (Rect r : items.keySet()) {
+            if (r.contains(mTouchedPositionX, mTouchedPositionY)) {
+                // displaying a dialog about appointment's details
+                mOnAppointmentClickListener.onAppointmentClicked(items.get(r));
+                break;
+            }
+        }
     }
 
 }

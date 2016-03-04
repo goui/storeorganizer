@@ -1,5 +1,7 @@
 package fr.goui.storeorganizer;
 
+import android.support.v7.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Point;
@@ -10,7 +12,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
-import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
@@ -19,7 +20,7 @@ import android.widget.TextView;
 import java.util.Observable;
 import java.util.Observer;
 
-public class OverallActivity extends AppCompatActivity implements Observer {
+public class OverallActivity extends AppCompatActivity implements Observer, OnAppointmentClickListener {
 
     private static final float SCALE_FACTOR_MIN_VALUE = 1.0f;
     private static final float SCALE_FACTOR_MAX_VALUE = 3.0f;
@@ -90,6 +91,22 @@ public class OverallActivity extends AppCompatActivity implements Observer {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onAppointmentClicked(StoreAppointment storeAppointment_p) {
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.CustomDialogTheme);
+        String message = storeAppointment_p.getStoreTask().getName()
+                + "\n" + storeAppointment_p.getClientName()
+                + "\n" + storeAppointment_p.getFormattedStartTime();
+        builder.setMessage(message)
+                .setCancelable(true)
+                .setPositiveButton(getString(R.string.ok), new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        dialog.dismiss();
+                    }
+                });
+        builder.show();
     }
 
     @Override
