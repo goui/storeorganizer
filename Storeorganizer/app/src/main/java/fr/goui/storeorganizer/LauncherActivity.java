@@ -141,34 +141,36 @@ public class LauncherActivity extends AppCompatActivity {
      */
     private void createWorkers() {
         StoreWorkerModel storeWorkerModel = StoreWorkerModel.getInstance();
+        if (!storeWorkerModel.isInit()) {
 
-        // getting the unique max id for the workers
-        int workerMaxId = mSharedPreferences.getInt(mResources.getString(R.string.worker_max_id), -1);
+            // getting the unique max id for the workers
+            int workerMaxId = mSharedPreferences.getInt(mResources.getString(R.string.worker_max_id), -1);
 
-        // if there is information about workers
-        if (workerMaxId != -1) {
+            // if there is information about workers
+            if (workerMaxId != -1) {
 
-            // creating workers model and setting the unique max id
-            storeWorkerModel.setMaxId(workerMaxId);
+                // creating workers model and setting the unique max id
+                storeWorkerModel.setMaxId(workerMaxId);
 
-            // create all the workers in the model
-            for (int i = 0; i < workerMaxId + 1; i++) {
-                String workersName = mSharedPreferences.getString(mResources.getString(R.string.worker) + i, "");
-                if (!workersName.equals("")) {
-                    storeWorkerModel.addStoreWorker(workersName, i);
+                // create all the workers in the model
+                for (int i = 0; i < workerMaxId + 1; i++) {
+                    String workersName = mSharedPreferences.getString(mResources.getString(R.string.worker) + i, "");
+                    if (!workersName.equals("")) {
+                        storeWorkerModel.addStoreWorker(workersName, i);
+                    }
                 }
             }
-        }
 
-        // if there is nothing about workers in the shared prefs, creating the model and a default worker
-        // then putting it in the shared prefs
-        else {
-            storeWorkerModel.setMaxId(0);
-            storeWorkerModel.addStoreWorker(mResources.getString(R.string.worker), 0);
-            SharedPreferences.Editor editor = mSharedPreferences.edit();
-            editor.putInt(mResources.getString(R.string.worker_max_id), 0);
-            editor.putString(mResources.getString(R.string.worker) + 0, mResources.getString(R.string.worker));
-            editor.apply();
+            // if there is nothing about workers in the shared prefs, creating the model and a default worker
+            // then putting it in the shared prefs
+            else {
+                storeWorkerModel.setMaxId(0);
+                storeWorkerModel.addStoreWorker(mResources.getString(R.string.worker), 0);
+                SharedPreferences.Editor editor = mSharedPreferences.edit();
+                editor.putInt(mResources.getString(R.string.worker_max_id), 0);
+                editor.putString(mResources.getString(R.string.worker) + 0, mResources.getString(R.string.worker));
+                editor.apply();
+            }
         }
     }
 
@@ -177,36 +179,38 @@ public class LauncherActivity extends AppCompatActivity {
      */
     private void createTasks() {
         StoreTaskModel storeTaskModel = StoreTaskModel.getInstance();
+        if (!storeTaskModel.isInit()) {
 
-        // getting the unique max id for the tasks
-        int taskMaxId = mSharedPreferences.getInt(mResources.getString(R.string.task_max_id), -1);
+            // getting the unique max id for the tasks
+            int taskMaxId = mSharedPreferences.getInt(mResources.getString(R.string.task_max_id), -1);
 
-        // if there is information about tasks
-        if (taskMaxId != -1) {
+            // if there is information about tasks
+            if (taskMaxId != -1) {
 
-            // creating tasks model and setting the unique max id
-            storeTaskModel.setMaxId(taskMaxId);
+                // creating tasks model and setting the unique max id
+                storeTaskModel.setMaxId(taskMaxId);
 
-            // create all the tasks in the model
-            for (int i = 0; i < taskMaxId + 1; i++) {
-                String tasksName = mSharedPreferences.getString(mResources.getString(R.string.task) + i, "");
-                int tasksDuration = mSharedPreferences.getInt(mResources.getString(R.string.task) + i + mResources.getString(R.string.duration), 0);
-                if (!tasksName.equals("") && tasksDuration != 0) {
-                    storeTaskModel.addStoreTask(tasksName, tasksDuration, i);
+                // create all the tasks in the model
+                for (int i = 0; i < taskMaxId + 1; i++) {
+                    String tasksName = mSharedPreferences.getString(mResources.getString(R.string.task) + i, "");
+                    int tasksDuration = mSharedPreferences.getInt(mResources.getString(R.string.task) + i + mResources.getString(R.string.duration), 0);
+                    if (!tasksName.equals("") && tasksDuration != 0) {
+                        storeTaskModel.addStoreTask(tasksName, tasksDuration, i);
+                    }
                 }
             }
-        }
 
-        // if there is nothing about tasks in the shared prefs, creating the model and a default task
-        // then putting it in the shared prefs
-        else {
-            storeTaskModel.setMaxId(0);
-            storeTaskModel.addStoreTask(mResources.getString(R.string.task), mResources.getInteger(R.integer.default_task_duration), 0);
-            SharedPreferences.Editor editor = mSharedPreferences.edit();
-            editor.putInt(mResources.getString(R.string.task_max_id), 0);
-            editor.putString(mResources.getString(R.string.task) + 0, mResources.getString(R.string.task));
-            editor.putInt(mResources.getString(R.string.task) + 0 + mResources.getString(R.string.duration), mResources.getInteger(R.integer.default_task_duration));
-            editor.apply();
+            // if there is nothing about tasks in the shared prefs, creating the model and a default task
+            // then putting it in the shared prefs
+            else {
+                storeTaskModel.setMaxId(0);
+                storeTaskModel.addStoreTask(mResources.getString(R.string.task), mResources.getInteger(R.integer.default_task_duration), 0);
+                SharedPreferences.Editor editor = mSharedPreferences.edit();
+                editor.putInt(mResources.getString(R.string.task_max_id), 0);
+                editor.putString(mResources.getString(R.string.task) + 0, mResources.getString(R.string.task));
+                editor.putInt(mResources.getString(R.string.task) + 0 + mResources.getString(R.string.duration), mResources.getInteger(R.integer.default_task_duration));
+                editor.apply();
+            }
         }
     }
 
@@ -215,29 +219,30 @@ public class LauncherActivity extends AppCompatActivity {
      */
     private void getStoreInfo() {
         StoreModel storeModel = StoreModel.getInstance();
+        if (!storeModel.isInit()) {
 
-        // setting the min and max calendars
-        int minHour = mResources.getInteger(R.integer.minimum_starting_hour);
-        int minMinute = mResources.getInteger(R.integer.minimum_starting_minute);
-        storeModel.setMinTime(minHour, minMinute);
-        int maxHour = mResources.getInteger(R.integer.maximum_ending_hour);
-        int maxMinute = mResources.getInteger(R.integer.maximum_ending_minute);
-        storeModel.setMaxTime(maxHour, maxMinute);
+            // setting the min and max calendars
+            int minHour = mResources.getInteger(R.integer.minimum_starting_hour);
+            int minMinute = mResources.getInteger(R.integer.minimum_starting_minute);
+            storeModel.setMinTime(minHour, minMinute);
+            int maxHour = mResources.getInteger(R.integer.maximum_ending_hour);
+            int maxMinute = mResources.getInteger(R.integer.maximum_ending_minute);
+            storeModel.setMaxTime(maxHour, maxMinute);
 
-        // getting saved starting time in the shared prefs and putting it in the model
-        int startingHour = mSharedPreferences.getInt(mResources.getString(R.string.starting_hour),
-                mResources.getInteger(R.integer.default_starting_hour));
-        int startingMinute = mSharedPreferences.getInt(mResources.getString(R.string.starting_minute),
-                mResources.getInteger(R.integer.default_starting_minute));
-        storeModel.setStartingTime(startingHour, startingMinute);
+            // getting saved starting time in the shared prefs and putting it in the model
+            int startingHour = mSharedPreferences.getInt(mResources.getString(R.string.starting_hour),
+                    mResources.getInteger(R.integer.default_starting_hour));
+            int startingMinute = mSharedPreferences.getInt(mResources.getString(R.string.starting_minute),
+                    mResources.getInteger(R.integer.default_starting_minute));
+            storeModel.setStartingTime(startingHour, startingMinute);
 
-        // getting saved ending time in the shared prefs and putting it in the model
-        int endingHour = mSharedPreferences.getInt(mResources.getString(R.string.ending_hour),
-                mResources.getInteger(R.integer.default_ending_hour));
-        int endingMinute = mSharedPreferences.getInt(mResources.getString(R.string.ending_minute),
-                mResources.getInteger(R.integer.default_ending_minute));
-        storeModel.setEndingTime(endingHour, endingMinute);
-
+            // getting saved ending time in the shared prefs and putting it in the model
+            int endingHour = mSharedPreferences.getInt(mResources.getString(R.string.ending_hour),
+                    mResources.getInteger(R.integer.default_ending_hour));
+            int endingMinute = mSharedPreferences.getInt(mResources.getString(R.string.ending_minute),
+                    mResources.getInteger(R.integer.default_ending_minute));
+            storeModel.setEndingTime(endingHour, endingMinute);
+        }
     }
 
 }

@@ -46,6 +46,7 @@ public class DetailsRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vi
         TextView txtClientsPhone;
         TextView txtTaskName;
         TextView txtEndTime;
+        RelativeLayout cardLayout;
         int position;
 
         public AppointmentViewHolder(View itemView_p) {
@@ -55,9 +56,9 @@ public class DetailsRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vi
             txtClientsPhone = (TextView) itemView_p.findViewById(R.id.fragment_details_item_appointment_clients_phone_text_view);
             txtTaskName = (TextView) itemView_p.findViewById(R.id.fragment_details_item_appointment_task_name_text_view);
             txtEndTime = (TextView) itemView_p.findViewById(R.id.fragment_details_item_appointment_end_time_text_view);
-            RelativeLayout layout = (RelativeLayout) itemView_p.findViewById(R.id.fragment_details_item_appointment_layout);
-            layout.setOnClickListener(this);
-            layout.setOnLongClickListener(this);
+            cardLayout = (RelativeLayout) itemView_p.findViewById(R.id.fragment_details_item_appointment_layout);
+            cardLayout.setOnClickListener(this);
+            cardLayout.setOnLongClickListener(this);
         }
 
         @Override
@@ -144,14 +145,7 @@ public class DetailsRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vi
             // we don't want to consider seconds and milliseconds
             now.set(Calendar.SECOND, 0);
             now.set(Calendar.MILLISECOND, 0);
-            int color;
-            if (appointment.isBefore(now)) {
-                color = R.color.grey_overlay;
-            } else {
-                color = R.color.colorAccentPale;
-            }
-            holder_p.txtStartTime.setBackgroundResource(color);
-            holder_p.txtEndTime.setBackgroundResource(color);
+            holder_p.cardLayout.setEnabled(!appointment.isBefore(now));
         }
     }
 

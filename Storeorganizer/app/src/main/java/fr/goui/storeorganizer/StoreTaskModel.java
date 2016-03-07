@@ -16,6 +16,11 @@ public class StoreTaskModel {
     private static StoreTaskModel _instance = new StoreTaskModel();
 
     /**
+     * The initialization {@code boolean}.
+     */
+    private boolean _init;
+
+    /**
      * The current maximum unique id that can be given to {@code StoreTask}s.
      */
     private int _maxId;
@@ -44,6 +49,16 @@ public class StoreTaskModel {
      */
     private StoreTaskModel() {
         _tasks = new ArrayList<>();
+    }
+
+    /**
+     * Method used to know if this model has been initialized.
+     * Avoid multiple initialization.
+     *
+     * @return {@code true} if model initialized, {@code false} otherwise
+     */
+    public boolean isInit() {
+        return _init;
     }
 
     /**
@@ -124,6 +139,7 @@ public class StoreTaskModel {
      * @param id_p       the unique id of the {@code StoreTask}
      */
     public void addStoreTask(String name_p, int duration_p, int id_p) {
+        _init = true;
         _tasks.add(new StoreTask(name_p, duration_p, id_p));
         updateMinTime(duration_p);
     }

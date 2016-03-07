@@ -15,6 +15,11 @@ public class StoreModel extends Observable {
     private static StoreModel _instance = new StoreModel();
 
     /**
+     * The initialization {@code boolean}.
+     */
+    private boolean _init;
+
+    /**
      * The {@code String} representing the pattern used to format times.
      */
     private static final String DATE_FORMAT_PATTERN = "HH:mm";
@@ -69,6 +74,16 @@ public class StoreModel extends Observable {
     }
 
     /**
+     * Method used to know if this model has been initialized.
+     * Avoid multiple initialization.
+     *
+     * @return {@code true} if model initialized, {@code false} otherwise
+     */
+    public boolean isInit() {
+        return _init;
+    }
+
+    /**
      * Getter for the starting hour.
      *
      * @return the starting hour {@code int}
@@ -120,6 +135,7 @@ public class StoreModel extends Observable {
      * @param startingMinute_p the new starting minute {@code int}
      */
     public void setStartingTime(int startingHour_p, int startingMinute_p) {
+        _init = true;
         setStartingHour(startingHour_p);
         setStartingMinute(startingMinute_p);
         setChanged();
@@ -178,6 +194,7 @@ public class StoreModel extends Observable {
      * @param endingMinute_p the new ending minute {@code int}
      */
     public void setEndingTime(int endingHour_p, int endingMinute_p) {
+        _init = true;
         setEndingHour(endingHour_p);
         setEndingMinute(endingMinute_p);
         setChanged();
@@ -236,6 +253,7 @@ public class StoreModel extends Observable {
      * @param minMinute_p the new minimum minute {@code int}
      */
     public void setMinTime(int minHour_p, int minMinute_p) {
+        _init = true;
         setMinHour(minHour_p);
         setMinMinute(minMinute_p);
     }
@@ -292,6 +310,7 @@ public class StoreModel extends Observable {
      * @param maxMinute_p the new maximum minute {@code int}
      */
     public void setMaxTime(int maxHour_p, int maxMinute_p) {
+        _init = true;
         setMaxHour(maxHour_p);
         setMaxMinute(maxMinute_p);
     }

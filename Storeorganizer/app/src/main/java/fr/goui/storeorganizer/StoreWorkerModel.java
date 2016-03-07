@@ -18,6 +18,11 @@ public class StoreWorkerModel extends Observable {
     private static StoreWorkerModel _instance = new StoreWorkerModel();
 
     /**
+     * The initialization {@code boolean}.
+     */
+    private boolean _init;
+
+    /**
      * The list of all the {@code StoreWorker}s.
      */
     private List<StoreWorker> _workers;
@@ -41,6 +46,16 @@ public class StoreWorkerModel extends Observable {
      */
     private StoreWorkerModel() {
         _workers = new ArrayList<>();
+    }
+
+    /**
+     * Method used to know if this model has been initialized.
+     * Avoid multiple initialization.
+     *
+     * @return {@code true} if model initialized, {@code false} otherwise
+     */
+    public boolean isInit() {
+        return _init;
     }
 
     /**
@@ -100,6 +115,7 @@ public class StoreWorkerModel extends Observable {
      * @param id_p   the unique id of the {@code StoreWorker}
      */
     public void addStoreWorker(String name_p, int id_p) {
+        _init = true;
         _workers.add(new StoreWorker(name_p, id_p));
     }
 
