@@ -88,6 +88,7 @@ public class OverallView extends View {
         mAppointmentPaint.setColor(mainColor);
         mAppointmentPaint.setAntiAlias(true);
         mNowPaint.setColor(accentColor);
+        mNowPaint.setStrokeWidth(3);
         mNowPaint.setAntiAlias(true);
 
         final Handler handler = new Handler();
@@ -164,8 +165,8 @@ public class OverallView extends View {
                     Rect r = new Rect(x1, y1 + 1, x2, y2);
                     items.put(r, currentAppointment);
                     canvas.drawRect(r, p);
-                    canvas.drawLine(x1, y1 + 1, x2, y1 + 1, mBlackPaint);
-                    canvas.drawLine(x1, y2, x2, y2, mBlackPaint);
+                    canvas.drawLine(x1, y1 + 1, x2, y1 + 1, mGreyPaint);
+                    canvas.drawLine(x1, y2, x2, y2, mGreyPaint);
                 }
             }
             x1 += mCellWidth;

@@ -2,6 +2,7 @@ package fr.goui.storeorganizer;
 
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.res.TypedArray;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -46,6 +47,8 @@ public class DetailsRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vi
         TextView txtClientsPhone;
         TextView txtTaskName;
         TextView txtEndTime;
+        TextView txtState;
+        RelativeLayout timeLayout;
         RelativeLayout cardLayout;
         int position;
 
@@ -56,6 +59,8 @@ public class DetailsRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vi
             txtClientsPhone = (TextView) itemView_p.findViewById(R.id.fragment_details_item_appointment_clients_phone_text_view);
             txtTaskName = (TextView) itemView_p.findViewById(R.id.fragment_details_item_appointment_task_name_text_view);
             txtEndTime = (TextView) itemView_p.findViewById(R.id.fragment_details_item_appointment_end_time_text_view);
+            txtState = (TextView) itemView_p.findViewById(R.id.fragment_details_item_appointment_state_text_view);
+            timeLayout = (RelativeLayout) itemView_p.findViewById(R.id.fragment_details_item_appointment_time_layout);
             cardLayout = (RelativeLayout) itemView_p.findViewById(R.id.fragment_details_item_appointment_layout);
             cardLayout.setOnClickListener(this);
             cardLayout.setOnLongClickListener(this);
@@ -145,7 +150,40 @@ public class DetailsRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vi
             // we don't want to consider seconds and milliseconds
             now.set(Calendar.SECOND, 0);
             now.set(Calendar.MILLISECOND, 0);
-            holder_p.cardLayout.setEnabled(!appointment.isBefore(now));
+
+            // if appointment is in the past
+            if (appointment.isBefore(now)) {
+                holder_p.cardLayout.setEnabled(false);
+                holder_p.cardLayout.setBackgroundResource(R.color.light_grey);
+                holder_p.txtState.setVisibility(View.VISIBLE);
+                holder_p.txtState.setText(_context.getString(R.string.ended));
+                holder_p.timeLayout.setBackgroundResource(R.color.light_grey);
+            }
+
+            // if appointment is in progress
+            else if (appointment.getStartTime().before(now) && appointment.getEndTime().after(now)) {
+                holder_p.cardLayout.setEnabled(true);
+                int[] attrs = new int[]{R.attr.selectableItemBackground};
+                TypedArray typedArray = _context.obtainStyledAttributes(attrs);
+                int backgroundResource = typedArray.getResourceId(0, 0);
+                holder_p.cardLayout.setBackgroundResource(backgroundResource);
+                typedArray.recycle();
+                holder_p.txtState.setVisibility(View.VISIBLE);
+                holder_p.txtState.setText(_context.getString(R.string.now));
+                holder_p.timeLayout.setBackgroundResource(R.color.colorAccentPale);
+            }
+
+            // if appointment is in the future
+            else {
+                holder_p.cardLayout.setEnabled(true);
+                int[] attrs = new int[]{R.attr.selectableItemBackground};
+                TypedArray typedArray = _context.obtainStyledAttributes(attrs);
+                int backgroundResource = typedArray.getResourceId(0, 0);
+                holder_p.cardLayout.setBackgroundResource(backgroundResource);
+                typedArray.recycle();
+                holder_p.txtState.setVisibility(View.GONE);
+                holder_p.timeLayout.setBackgroundResource(android.R.color.transparent);
+            }
         }
     }
 
