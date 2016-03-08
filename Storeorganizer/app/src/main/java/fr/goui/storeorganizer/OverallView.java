@@ -20,7 +20,6 @@ import java.util.Map;
 
 public class OverallView extends View {
 
-    private static final int TIMER_PERIOD = 1000 * 60;
     private static final int SCROLL_DETECTION_OFFSET_VALUE = 20;
 
     private final int mDefaultCellHeight;
@@ -65,6 +64,7 @@ public class OverallView extends View {
         mHoursStrings = new String[mNumberOfRows + 1];
         generateHoursStrings();
         mNumberOfColumns = mStoreWorkerModel.getStoreWorkersNumber();
+        final int timer_period = resources.getInteger(R.integer.conversion_millisecond_minute);
         int blackColor = ContextCompat.getColor(context, R.color.black);
         int greyColor = ContextCompat.getColor(context, R.color.grey_overlay);
         int mainColor = ContextCompat.getColor(context, R.color.colorPrimary);
@@ -97,10 +97,10 @@ public class OverallView extends View {
             public void run() {
                 if (mNowLineY != 0) {
                     invalidate();
-                    handler.postDelayed(this, TIMER_PERIOD);
+                    handler.postDelayed(this, timer_period);
                 }
             }
-        }, TIMER_PERIOD);
+        }, timer_period);
     }
 
     private void generateHoursStrings() {

@@ -2,6 +2,7 @@ package fr.goui.storeorganizer;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -52,6 +53,19 @@ public class DetailsFragment extends Fragment implements OnAppointmentChangeList
         // we don't want to consider seconds and milliseconds
         _calendar.set(Calendar.SECOND, 0);
         _calendar.set(Calendar.MILLISECOND, 0);
+
+        // getting the timer period
+        final int timer_period = getResources().getInteger(R.integer.conversion_millisecond_minute);
+
+        // notifying every minute
+        final Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                _detailsRecyclerAdapter.notifyDataSetChanged();
+                handler.postDelayed(this, timer_period);
+            }
+        }, timer_period);
     }
 
     @Override
