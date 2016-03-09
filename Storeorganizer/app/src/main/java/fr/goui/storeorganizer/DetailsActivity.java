@@ -4,6 +4,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -81,6 +82,23 @@ public class DetailsActivity extends AppCompatActivity implements Observer {
                 startActivityForResult(intent, REQUEST_CODE_CREATE_APPOINTMENT);
             }
         });
+
+        // getting the timer period
+        final int timer_period = mResources.getInteger(R.integer.conversion_millisecond_minute);
+
+        // notifying every fragment every minute
+        final Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                for(int i = 0; i < StoreWorkerModel.getInstance().getStoreWorkersNumber(); i++) {
+                    DetailsFragment fragment = (DetailsFragment) getSupportFragmentManager()
+                            .findFragmentByTag("android:switcher:" + R.id.container + ":" + i);
+                    fragment.updateList();
+                }
+                handler.postDelayed(this, timer_period);
+            }
+        }, timer_period);
 
     }
 

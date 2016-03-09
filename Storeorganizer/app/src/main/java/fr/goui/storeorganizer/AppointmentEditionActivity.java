@@ -414,7 +414,7 @@ public class AppointmentEditionActivity extends AppointmentCreationActivity {
         } else if (mNewAppointment.getEndTime().before(mNewAppointment.getStartTime())) {
             errorMessage = getString(R.string.ending_time_cannot_be_prior_to_starting_time);
         } else if (doesAppointmentOverlap()) {
-            errorMessage = getString(R.string.appointment_overlaps_with_at_least_another_one);
+            errorMessage = getString(R.string.appointment_overlapping);
         }
         if (_isAGap && mNewAppointment.isBefore(mNow)) {
             errorMessage = getString(R.string.appointment_cannot_be_in_the_past);

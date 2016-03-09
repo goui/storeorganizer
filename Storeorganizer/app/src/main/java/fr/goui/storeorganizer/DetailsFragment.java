@@ -53,19 +53,6 @@ public class DetailsFragment extends Fragment implements OnAppointmentChangeList
         // we don't want to consider seconds and milliseconds
         _calendar.set(Calendar.SECOND, 0);
         _calendar.set(Calendar.MILLISECOND, 0);
-
-        // getting the timer period
-        final int timer_period = getResources().getInteger(R.integer.conversion_millisecond_minute);
-
-        // notifying every minute
-        final Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                _detailsRecyclerAdapter.notifyDataSetChanged();
-                handler.postDelayed(this, timer_period);
-            }
-        }, timer_period);
     }
 
     @Override
@@ -88,79 +75,7 @@ public class DetailsFragment extends Fragment implements OnAppointmentChangeList
 
     @Override
     public void onAppointmentDelete(int position_p) {
-        // TODO simplify appointment deletion
-        // maybe by using removeAppointment method in StoreWorker
-        Calendar now = Calendar.getInstance();
-        // we don't want to consider seconds and milliseconds
-        now.set(Calendar.SECOND, 0);
-        now.set(Calendar.MILLISECOND, 0);
-
-        // if only item, remove appointment
-        if (position_p == 0 && _currentWorker.getStoreAppointmentsNumber() == 1) {
-            _currentWorker.getStoreAppointments().remove(position_p);
-        }
-
-        // if first item and gap after, remove appointment and extend gap between now to its end time
-        else if (position_p == 0 && _currentWorker.getStoreAppointment(position_p + 1) instanceof NullStoreAppointment) {
-            _currentWorker.getStoreAppointment(position_p + 1).setStartTime(now);
-            _currentWorker.getStoreAppointments().remove(position_p);
-        }
-
-        // if first item and appointment after, replace appointment with created gap between now and next appointment's start time
-        else if (position_p == 0 && !(_currentWorker.getStoreAppointment(position_p + 1) instanceof NullStoreAppointment)) {
-            StoreAppointment gap = new NullStoreAppointment();
-            gap.setStartTime(now);
-            gap.setEndTime(_currentWorker.getStoreAppointment(position_p).getEndTime());
-            if (gap.getDuration() >= StoreTaskModel.getInstance().getMinTimeInMinutes()) {
-                _currentWorker.getStoreAppointments().set(position_p, gap);
-            } else {
-                _currentWorker.getStoreAppointments().remove(position_p);
-            }
-        }
-
-        // if last item and gap before, remove appointment and gap before
-        else if (position_p == _currentWorker.getStoreAppointmentsNumber() - 1
-                && _currentWorker.getStoreAppointment(position_p - 1) instanceof NullStoreAppointment) {
-            _currentWorker.getStoreAppointments().remove(position_p - 1);
-            _currentWorker.getStoreAppointments().remove(position_p - 1);
-        }
-
-        // if last item and appointment before, remove appointment
-        else if (position_p == _currentWorker.getStoreAppointmentsNumber() - 1
-                && !(_currentWorker.getStoreAppointment(position_p - 1) instanceof NullStoreAppointment)) {
-            _currentWorker.getStoreAppointments().remove(position_p);
-        }
-
-        // if gap only before, extend the gap end time and remove appointment
-        else if (_currentWorker.getStoreAppointment(position_p - 1) instanceof NullStoreAppointment
-                && !(_currentWorker.getStoreAppointment(position_p + 1) instanceof NullStoreAppointment)) {
-            _currentWorker.getStoreAppointment(position_p - 1).setEndTime(_currentWorker.getStoreAppointment(position_p).getEndTime());
-            _currentWorker.getStoreAppointments().remove(position_p);
-        }
-
-        // if gap only after, extend the gap start time and remove appointment
-        else if (!(_currentWorker.getStoreAppointment(position_p - 1) instanceof NullStoreAppointment)
-                && _currentWorker.getStoreAppointment(position_p + 1) instanceof NullStoreAppointment) {
-            _currentWorker.getStoreAppointment(position_p + 1).setStartTime(_currentWorker.getStoreAppointment(position_p).getStartTime());
-            _currentWorker.getStoreAppointments().remove(position_p);
-        }
-
-        // if gap before and after, change the before gap end time and remove after gap and appointment
-        else if (_currentWorker.getStoreAppointment(position_p - 1) instanceof NullStoreAppointment
-                && _currentWorker.getStoreAppointment(position_p + 1) instanceof NullStoreAppointment) {
-            _currentWorker.getStoreAppointment(position_p - 1).setEndTime(_currentWorker.getStoreAppointment(position_p + 1).getEndTime());
-            _currentWorker.getStoreAppointments().remove(position_p);
-            _currentWorker.getStoreAppointments().remove(position_p);
-        }
-
-        // if appointment before and after, remove appointment and create gap
-        else {
-            StoreAppointment gap = new NullStoreAppointment();
-            gap.setStartTime(_currentWorker.getStoreAppointment(position_p - 1).getEndTime());
-            gap.setEndTime(_currentWorker.getStoreAppointment(position_p + 1).getStartTime());
-            _currentWorker.getStoreAppointments().set(position_p, gap);
-        }
-
+        _currentWorker.removeStoreAppointment(_currentWorker.getStoreAppointment(position_p));
         notifyDataSetChanged();
     }
 
@@ -191,6 +106,13 @@ public class DetailsFragment extends Fragment implements OnAppointmentChangeList
             ((LinearLayoutManager) _recyclerView.getLayoutManager()).scrollToPositionWithOffset(position + 1, 10);
             Toast.makeText(getActivity(), getString(R.string.scrolling_to_the_current_appointment), Toast.LENGTH_SHORT).show();
         }
+    }
+
+    public void updateList() {
+        if(_currentWorker.getStoreAppointmentsNumber() > 0 && _currentWorker.getStoreAppointment(0) instanceof NullStoreAppointment) {
+            _currentWorker.getStoreAppointment(0).setStartTime(Calendar.getInstance());
+        }
+        notifyDataSetChanged();
     }
 
     public void notifyDataSetChanged() {

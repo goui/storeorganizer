@@ -4,6 +4,7 @@ import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
@@ -418,17 +419,20 @@ public class AppointmentCreationActivity extends AppCompatActivity {
         if (mNewWorker.getStoreAppointmentsNumber() >= 1) {
             for (StoreAppointment currentAppointment : mNewWorker.getStoreAppointments()) {
 
-                // being over current appointment's starting time
-                // || being over current appointment's ending time
-                // || being contained in current appointment
-                if ((mNewAppointment.getStartTime().before(currentAppointment.getStartTime())
-                        && mNewAppointment.getEndTime().after(currentAppointment.getStartTime()))
-                        || (mNewAppointment.getStartTime().before(currentAppointment.getEndTime())
-                        && mNewAppointment.getEndTime().after(currentAppointment.getEndTime()))
-                        || (mNewAppointment.getStartTime().after(currentAppointment.getStartTime())
-                        && mNewAppointment.getEndTime().before(currentAppointment.getEndTime()))) {
-                    overlaps = true;
-                    break;
+                // we can only overlap an appointment
+                if (!(currentAppointment instanceof NullStoreAppointment)) {
+                    // being over current appointment's starting time
+                    // || being over current appointment's ending time
+                    // || being contained in current appointment
+                    if ((mNewAppointment.getStartTime().before(currentAppointment.getStartTime())
+                            && mNewAppointment.getEndTime().after(currentAppointment.getStartTime()))
+                            || (mNewAppointment.getStartTime().before(currentAppointment.getEndTime())
+                            && mNewAppointment.getEndTime().after(currentAppointment.getEndTime()))
+                            || (mNewAppointment.getStartTime().after(currentAppointment.getStartTime())
+                            && mNewAppointment.getEndTime().before(currentAppointment.getEndTime()))) {
+                        overlaps = true;
+                        break;
+                    }
                 }
             }
         }
@@ -450,7 +454,7 @@ public class AppointmentCreationActivity extends AppCompatActivity {
         } else if (mNewAppointment.getEndTime().before(mNewAppointment.getStartTime())) {
             errorMessage = mResources.getString(R.string.ending_time_cannot_be_prior_to_starting_time);
         } else if (doesAppointmentOverlap()) {
-            errorMessage = mResources.getString(R.string.appointment_overlaps_with_at_least_another_one);
+            errorMessage = mResources.getString(R.string.appointment_overlapping);
         } else if (mNewAppointment.getStartTime().before(mStoreModel.getStartingTime())) {
             errorMessage = mResources.getString(R.string.starting_time_cannot_be_before) + " "
                     + mStoreModel.getFormattedStartingTime();

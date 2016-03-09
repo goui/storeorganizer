@@ -1,7 +1,5 @@
 package fr.goui.storeorganizer;
 
-import android.util.Log;
-
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -25,9 +23,16 @@ public class StoreWorker {
     private String _name;
 
     /**
-     * The list of {@code StoreAppointment}s.
+     * The list of {@code StoreAppointment}s that can be accessed.
+     * Can contain gaps (aka {@link NullStoreAppointment}).
      */
-    private List<StoreAppointment> _appointments;
+    private List<StoreAppointment> _publicAppointmentsList;
+
+    /**
+     * The list of {@code StoreAppointment}s we use locally.
+     * It is free from gaps.
+     */
+    private List<StoreAppointment> _internalAppointmentsList;
 
     /**
      * Constructor passing the name and the unique id.
@@ -39,7 +44,8 @@ public class StoreWorker {
     public StoreWorker(String name_p, int id_p) {
         _id = id_p;
         _name = name_p;
-        _appointments = new ArrayList<>();
+        _publicAppointmentsList = new ArrayList<>();
+        _internalAppointmentsList = new ArrayList<>();
     }
 
     /**
@@ -75,7 +81,7 @@ public class StoreWorker {
      * @return the number of appointments {@code int}
      */
     public int getStoreAppointmentsNumber() {
-        return _appointments.size();
+        return _publicAppointmentsList.size();
     }
 
     /**
@@ -85,7 +91,7 @@ public class StoreWorker {
      * @return the {@code StoreAppointment} at the given position
      */
     public StoreAppointment getStoreAppointment(int position_p) {
-        return _appointments.get(position_p);
+        return _publicAppointmentsList.get(position_p);
     }
 
     /**
@@ -94,7 +100,7 @@ public class StoreWorker {
      * @return the list of {@code StoreAppointment}s
      */
     public List<StoreAppointment> getStoreAppointments() {
-        return _appointments;
+        return _publicAppointmentsList;
     }
 
     /**
@@ -107,7 +113,7 @@ public class StoreWorker {
     public void addStoreAppointment(StoreAppointment storeAppointment_p) {
         StoreAppointment lastAppointment = getLastAppointment();
         storeAppointment_p.getStartTime().add(Calendar.SECOND, 1);
-        _appointments.add(storeAppointment_p);
+        _internalAppointmentsList.add(storeAppointment_p);
         if (lastAppointment != null && storeAppointment_p.getEndTime().before(lastAppointment.getEndTime())) {
             sortAppointments();
         }
@@ -120,7 +126,7 @@ public class StoreWorker {
      * @param storeAppointment_p the {@code StoreAppointment} to remove
      */
     public void removeStoreAppointment(StoreAppointment storeAppointment_p) {
-        _appointments.remove(storeAppointment_p);
+        _internalAppointmentsList.remove(storeAppointment_p);
         createGapsIfNeeded();
     }
 
@@ -128,7 +134,7 @@ public class StoreWorker {
      * Sorts all {@code StoreAppointment}s depending on their start time.
      */
     public void sortAppointments() {
-        Collections.sort(_appointments, StoreAppointment.Comparators.START_TIME);
+        Collections.sort(_internalAppointmentsList, StoreAppointment.Comparators.START_TIME);
     }
 
     /**
@@ -138,7 +144,7 @@ public class StoreWorker {
      * @return the last {@code StoreAppointment}
      */
     public StoreAppointment getLastAppointment() {
-        return _appointments != null && _appointments.size() > 0 ? _appointments.get(_appointments.size() - 1) : null;
+        return _publicAppointmentsList != null && _publicAppointmentsList.size() > 0 ? _publicAppointmentsList.get(_publicAppointmentsList.size() - 1) : null;
     }
 
     /**
@@ -148,7 +154,7 @@ public class StoreWorker {
      * @return {@code true} if there is a {@code StoreAppointment} before the given position, {@code false} otherwise
      */
     public boolean isThereAppointmentBefore(int position_p) {
-        return _appointments != null && _appointments.size() > 0 && position_p > 0;
+        return _publicAppointmentsList != null && _publicAppointmentsList.size() > 0 && position_p > 0;
     }
 
     /**
@@ -158,7 +164,7 @@ public class StoreWorker {
      * @return {@code true} if there is a {@code StoreAppointment} after the given position, {@code false} otherwise
      */
     public boolean isThereAppointmentAfter(int position_p) {
-        return _appointments != null && _appointments.size() > 0 && position_p < _appointments.size() - 1;
+        return _publicAppointmentsList != null && _publicAppointmentsList.size() > 0 && position_p < _publicAppointmentsList.size() - 1;
     }
 
     /**
@@ -170,7 +176,7 @@ public class StoreWorker {
     public StoreAppointment getNextAvailability() {
         StoreAppointment appointment = null;
         boolean isThereAGap = false;
-        for (StoreAppointment currentAppointment : _appointments) {
+        for (StoreAppointment currentAppointment : _publicAppointmentsList) {
             if (currentAppointment instanceof NullStoreAppointment
                     && !isThereAGap) {
                 appointment = currentAppointment;
@@ -198,8 +204,14 @@ public class StoreWorker {
      */
     private void createGapsIfNeeded() {
 
+        // resetting the public list of appointments
+        _publicAppointmentsList.clear();
+
         // if there is at least one appointment in the list
-        if (_appointments.size() > 0) {
+        if (_internalAppointmentsList.size() > 0) {
+
+            // copying the first element of the list
+            _publicAppointmentsList.add(_internalAppointmentsList.get(0));
 
             // getting the current time
             Calendar now = Calendar.getInstance();
@@ -211,38 +223,39 @@ public class StoreWorker {
             // the index to begin the list traversal
             int beginIndex = 1;
 
-            // if the first appointment is not a gap
-            // if we are not dealing with past appointments0
+            // if we are not dealing with past appointments
             // if there is a gap between now and the first appointment
-            if (!(_appointments.get(0) instanceof NullStoreAppointment)
-                    && !_appointments.get(0).isBefore(now)
-                    && _appointments.get(0).gapWith(now) >= StoreTaskModel.getInstance().getMinTimeInMinutes()) {
+            if (!_internalAppointmentsList.get(0).isBefore(now)
+                    && _internalAppointmentsList.get(0).gapWith(now) >= StoreTaskModel.getInstance().getMinTimeInMinutes()) {
 
                 // creating the gap and adding it to the list
                 NullStoreAppointment nullStoreAppointment = new NullStoreAppointment();
                 nullStoreAppointment.setStartTime(now);
-                nullStoreAppointment.setEndTime(_appointments.get(0).getStartTime());
-                _appointments.add(0, nullStoreAppointment);
+                nullStoreAppointment.setEndTime(_publicAppointmentsList.get(0).getStartTime());
+                _publicAppointmentsList.add(0, nullStoreAppointment);
 
                 // updating the index
                 beginIndex = 2;
             }
 
             // for all items of the list
-            for (int i = beginIndex; i < _appointments.size(); i++) {
+            for (int i = beginIndex; i < _internalAppointmentsList.size(); i++) {
+
+                // copying current appointment
+                _publicAppointmentsList.add(_internalAppointmentsList.get(i));
 
                 // if one of the appointments is not a gap
                 // if we are not dealing with past appointments
                 // checking if there is a gap between current item and the previous
-                if ((!(_appointments.get(i - 1) instanceof NullStoreAppointment) && !(_appointments.get(i) instanceof NullStoreAppointment))
-                        && !_appointments.get(i).isBefore(now)
-                        && _appointments.get(i).gapWith(_appointments.get(i - 1)) >= StoreTaskModel.getInstance().getMinTimeInMinutes()) {
+                if ((!(_publicAppointmentsList.get(i - 1) instanceof NullStoreAppointment) && !(_publicAppointmentsList.get(i) instanceof NullStoreAppointment))
+                        && !_publicAppointmentsList.get(i).isBefore(now)
+                        && _publicAppointmentsList.get(i).gapWith(_publicAppointmentsList.get(i - 1)) >= StoreTaskModel.getInstance().getMinTimeInMinutes()) {
 
                     // creating the gap and adding it to the list
                     NullStoreAppointment nullStoreAppointment = new NullStoreAppointment();
-                    nullStoreAppointment.setStartTime(_appointments.get(i - 1).getEndTime());
-                    nullStoreAppointment.setEndTime(_appointments.get(i).getStartTime());
-                    _appointments.add(i, nullStoreAppointment);
+                    nullStoreAppointment.setStartTime(_publicAppointmentsList.get(i - 1).getEndTime());
+                    nullStoreAppointment.setEndTime(_publicAppointmentsList.get(i).getStartTime());
+                    _publicAppointmentsList.add(i, nullStoreAppointment);
 
                     // updating the index
                     i++;
