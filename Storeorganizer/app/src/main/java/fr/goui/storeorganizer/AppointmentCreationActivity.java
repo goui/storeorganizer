@@ -307,6 +307,12 @@ public class AppointmentCreationActivity extends AppCompatActivity {
             // updating the views
             mTextViewStartingTime.setText(mNewAppointment.getFormattedStartTime());
             mTextViewEndingTime.setText(mNewAppointment.getFormattedEndTime());
+
+            // updating the calendars
+            mCalendarStartingTime.set(Calendar.HOUR_OF_DAY, mNewAppointment.getStartTime().get(Calendar.HOUR_OF_DAY));
+            mCalendarStartingTime.set(Calendar.MINUTE, mNewAppointment.getStartTime().get(Calendar.MINUTE));
+            mCalendarEndingTime.set(Calendar.HOUR_OF_DAY, mNewAppointment.getEndTime().get(Calendar.HOUR_OF_DAY));
+            mCalendarEndingTime.set(Calendar.MINUTE, mNewAppointment.getEndTime().get(Calendar.MINUTE));
         }
     }
 

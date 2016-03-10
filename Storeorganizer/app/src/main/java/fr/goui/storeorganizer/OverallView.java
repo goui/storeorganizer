@@ -143,14 +143,16 @@ public class OverallView extends View {
     }
 
     private void drawAppointments(Canvas canvas) {
-        int x1 = mInitialX + 1;
+        int x1 = mInitialX + 2;
         for (int i = 0; i < mNumberOfColumns; i++) {
-            int x2 = x1 + mCellWidth - 2;
+            int x2 = x1 + mCellWidth - 4;
             if (i == mNumberOfColumns - 1) {
-                x2 = mFinalX - 1;
+                x2 = mFinalX - 2;
             }
             for (StoreAppointment currentAppointment : mStoreWorkerModel.getStoreWorker(i).getStoreAppointments()) {
-                if (!(currentAppointment instanceof NullStoreAppointment)) {
+                if (!(currentAppointment instanceof NullStoreAppointment)
+                        && !currentAppointment.getStartTime().before(mStoreModel.getStartingTime())
+                        && !currentAppointment.getEndTime().after(mStoreModel.getEndingTime())) {
                     int startHour = currentAppointment.getStartTime().get(Calendar.HOUR_OF_DAY);
                     int startMinute = currentAppointment.getStartTime().get(Calendar.MINUTE);
                     int endHour = currentAppointment.getEndTime().get(Calendar.HOUR_OF_DAY);
