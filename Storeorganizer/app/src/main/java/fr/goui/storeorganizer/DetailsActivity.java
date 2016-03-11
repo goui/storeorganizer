@@ -115,9 +115,9 @@ public class DetailsActivity extends AppCompatActivity implements Observer {
         }
         if (requestCode == REQUEST_CODE_EDIT_APPOINTMENT) {
             if (resultCode == RESULT_OK) {
-                int oldWorkerPosition = data.getIntExtra(AppointmentEditionActivity.INTENT_EXTRA_OLD_WORKER_POSITION, -1);
-                int newWorkerPosition = data.getIntExtra(AppointmentEditionActivity.INTENT_EXTRA_NEW_WORKER_POSITION, -1);
-                int oldAppointmentPosition = data.getIntExtra(AppointmentEditionActivity.INTENT_EXTRA_OLD_APPOINTMENT_POSITION, -1);
+                int oldWorkerPosition = data.getIntExtra(getString(R.string.intent_appointment_edition_result_old_worker_position), -1);
+                int newWorkerPosition = data.getIntExtra(getString(R.string.intent_appointment_edition_result_new_worker_position), -1);
+                int oldAppointmentPosition = data.getIntExtra(getString(R.string.intent_appointment_edition_result_old_appointment_position), -1);
                 DetailsFragment oldFragment = (DetailsFragment) getSupportFragmentManager()
                         .findFragmentByTag("android:switcher:" + R.id.container + ":" + oldWorkerPosition);
                 if (oldWorkerPosition != newWorkerPosition) {

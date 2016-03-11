@@ -44,7 +44,7 @@ public class AppointmentCreationActivity extends AppCompatActivity {
     /**
      * The chosen {@code StoreTask}.
      */
-    private StoreTask mNewTask;
+    protected StoreTask mNewTask;
 
     /**
      * The newly created {@code StoreAppointment}.
@@ -65,6 +65,11 @@ public class AppointmentCreationActivity extends AppCompatActivity {
      * The {@code Calendar} used to keep a reference on current time.
      */
     protected Calendar mNow = Calendar.getInstance();
+
+    /**
+     * The {@code Calendar} used to copy times.
+     */
+    protected Calendar mTempCalendar = Calendar.getInstance();
 
     /**
      * The client's name {@code EditText}.
@@ -109,12 +114,12 @@ public class AppointmentCreationActivity extends AppCompatActivity {
     /**
      * The {@code Calendar} used to manage starting time.
      */
-    private Calendar mCalendarStartingTime = Calendar.getInstance();
+    protected Calendar mCalendarStartingTime = Calendar.getInstance();
 
     /**
      * The {@code Calendar} used to manage ending time.
      */
-    private Calendar mCalendarEndingTime = Calendar.getInstance();
+    protected Calendar mCalendarEndingTime = Calendar.getInstance();
 
     /**
      * The time picker dialog listener for starting time.
@@ -228,6 +233,8 @@ public class AppointmentCreationActivity extends AppCompatActivity {
         // we don't want to consider seconds and milliseconds
         mNow.set(Calendar.SECOND, 0);
         mNow.set(Calendar.MILLISECOND, 0);
+        mTempCalendar.set(Calendar.SECOND, 0);
+        mTempCalendar.set(Calendar.MILLISECOND, 0);
         mCalendarStartingTime.set(Calendar.SECOND, 0);
         mCalendarStartingTime.set(Calendar.MILLISECOND, 0);
         mCalendarEndingTime.set(Calendar.SECOND, 0);
@@ -281,28 +288,26 @@ public class AppointmentCreationActivity extends AppCompatActivity {
             // setting it to the appointment
             mNewAppointment.setStoreTask(mNewTask);
 
+            // setting the default time
+            mTempCalendar.set(Calendar.HOUR_OF_DAY, mNow.get(Calendar.HOUR_OF_DAY));
+            mTempCalendar.set(Calendar.MINUTE, mNow.get(Calendar.MINUTE));
+
             // getting the next availability
             StoreAppointment appointment = mNewWorker.getNextAvailability();
 
-            // setting the times
-            Calendar calendar = Calendar.getInstance();
-            calendar.set(Calendar.HOUR_OF_DAY, mNow.get(Calendar.HOUR_OF_DAY));
-            calendar.set(Calendar.MINUTE, mNow.get(Calendar.MINUTE));
-            // we don't want to consider seconds and milliseconds
-            calendar.set(Calendar.SECOND, 0);
-            calendar.set(Calendar.MILLISECOND, 0);
+            // if next availability is not null, setting times depending on the type of appointment
             if (appointment != null) {
                 if (appointment instanceof NullStoreAppointment) {
-                    calendar.set(Calendar.HOUR_OF_DAY, appointment.getStartTime().get(Calendar.HOUR_OF_DAY));
-                    calendar.set(Calendar.MINUTE, appointment.getStartTime().get(Calendar.MINUTE));
+                    mTempCalendar.set(Calendar.HOUR_OF_DAY, appointment.getStartTime().get(Calendar.HOUR_OF_DAY));
+                    mTempCalendar.set(Calendar.MINUTE, appointment.getStartTime().get(Calendar.MINUTE));
                 } else {
-                    calendar.set(Calendar.HOUR_OF_DAY, appointment.getEndTime().get(Calendar.HOUR_OF_DAY));
-                    calendar.set(Calendar.MINUTE, appointment.getEndTime().get(Calendar.MINUTE));
+                    mTempCalendar.set(Calendar.HOUR_OF_DAY, appointment.getEndTime().get(Calendar.HOUR_OF_DAY));
+                    mTempCalendar.set(Calendar.MINUTE, appointment.getEndTime().get(Calendar.MINUTE));
                 }
             }
-            mNewAppointment.setStartTime(calendar);
-            calendar.setTimeInMillis(calendar.getTimeInMillis() + mNewAppointment.getDuration() * mConversionMillisecondMinute);
-            mNewAppointment.setEndTime(calendar);
+            mNewAppointment.setStartTime(mTempCalendar);
+            mTempCalendar.setTimeInMillis(mTempCalendar.getTimeInMillis() + mNewAppointment.getDuration() * mConversionMillisecondMinute);
+            mNewAppointment.setEndTime(mTempCalendar);
 
             // updating the views
             mTextViewStartingTime.setText(mNewAppointment.getFormattedStartTime());
