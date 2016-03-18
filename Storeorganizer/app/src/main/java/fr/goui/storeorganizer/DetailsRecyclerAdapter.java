@@ -55,9 +55,9 @@ public class DetailsRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vi
         public AppointmentViewHolder(View itemView_p) {
             super(itemView_p);
             txtStartTime = (TextView) itemView_p.findViewById(R.id.fragment_details_item_appointment_start_time_text_view);
-            txtClientsName = (TextView) itemView_p.findViewById(R.id.fragment_details_item_appointment_clients_name_text_view);
-            txtClientsPhone = (TextView) itemView_p.findViewById(R.id.fragment_details_item_appointment_clients_phone_text_view);
-            txtTaskName = (TextView) itemView_p.findViewById(R.id.fragment_details_item_appointment_task_name_text_view);
+            txtClientsName = (TextView) itemView_p.findViewById(R.id.layout_appointment_information_clients_name_text_view);
+            txtClientsPhone = (TextView) itemView_p.findViewById(R.id.layout_appointment_information_clients_phone_text_view);
+            txtTaskName = (TextView) itemView_p.findViewById(R.id.layout_appointment_information_task_name_text_view);
             txtEndTime = (TextView) itemView_p.findViewById(R.id.fragment_details_item_appointment_end_time_text_view);
             txtState = (TextView) itemView_p.findViewById(R.id.fragment_details_item_appointment_state_text_view);
             timeLayout = (RelativeLayout) itemView_p.findViewById(R.id.fragment_details_item_appointment_time_layout);

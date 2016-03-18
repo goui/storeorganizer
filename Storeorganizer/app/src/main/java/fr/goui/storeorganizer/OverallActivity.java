@@ -15,6 +15,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
@@ -123,12 +124,17 @@ public class OverallActivity extends AppCompatActivity implements Observer, OnAp
 
     @Override
     public void onAppointmentClicked(StoreAppointment storeAppointment_p) {
+        View dialogLayout = getLayoutInflater().inflate(R.layout.layout_appointment_information, null);
         final AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.CustomDialogTheme);
-        String message = storeAppointment_p.getStoreTask().getName()
-                + "\n" + storeAppointment_p.getClientName()
-                + "\n" + storeAppointment_p.getFormattedStartTime();
-        builder.setMessage(message)
-                .setCancelable(true)
+        builder.setView(dialogLayout);
+        TextView txtTaskName = (TextView) dialogLayout.findViewById(R.id.layout_appointment_information_task_name_text_view);
+        txtTaskName.setText(storeAppointment_p.getStoreTask().getName());
+        TextView txtClientName = (TextView) dialogLayout.findViewById(R.id.layout_appointment_information_clients_name_text_view);
+        txtClientName.setText(storeAppointment_p.getClientName());
+        TextView txtPhoneNumber = (TextView) dialogLayout.findViewById(R.id.layout_appointment_information_clients_phone_text_view);
+        txtPhoneNumber.setText(storeAppointment_p.getClientPhoneNumber());
+        builder.setCancelable(true)
+                .setTitle(storeAppointment_p.getFormattedStartTime() + " - " + storeAppointment_p.getFormattedEndTime())
                 .setPositiveButton(getString(R.string.ok), new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         dialog.dismiss();
