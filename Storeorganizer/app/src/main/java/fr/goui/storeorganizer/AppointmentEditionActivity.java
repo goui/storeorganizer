@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.support.v4.content.ContextCompat;
+import android.util.Log;
 import android.view.MenuItem;
 import android.widget.Toast;
 
@@ -26,11 +27,6 @@ public class AppointmentEditionActivity extends AppointmentCreationActivity {
      * The {@code StoreWorker} who was assigned to the old {@code StoreAppointment}.
      */
     private StoreWorker mOldWorker;
-
-    /**
-     * The {@code StoreTask} who was assigned to the old {@code StoreAppointment}.
-     */
-    private StoreTask mOldTask;
 
     /**
      * A {@code boolean} used to know if the {@code StoreWorker} has been changed.
@@ -85,11 +81,14 @@ public class AppointmentEditionActivity extends AppointmentCreationActivity {
                 mNewAppointment = new StoreAppointment();
 
                 // getting the old task
-                mOldTask = mOldAppointment.getStoreTask();
+                StoreTask oldTask = mOldAppointment.getStoreTask();
+
+                // copying the task in the new appointment
+                mNewAppointment.setStoreTask(oldTask);
 
                 // if there is no old task, old appointment is a gap
                 int taskPosition = -1;
-                if (mOldTask == null) {
+                if (oldTask == null) {
                     mIsAGap = true;
                     mHasWorkerChanged = false;
                 }
@@ -100,7 +99,7 @@ public class AppointmentEditionActivity extends AppointmentCreationActivity {
 
                     // searching for the old task position
                     for (int i = 0; i < StoreTaskModel.getInstance().getStoreTaskNumber(); i++) {
-                        if (mOldTask.equals(StoreTaskModel.getInstance().getStoreTask(i))) {
+                        if (oldTask.equals(StoreTaskModel.getInstance().getStoreTask(i))) {
                             taskPosition = i;
                         }
                     }
@@ -180,17 +179,16 @@ public class AppointmentEditionActivity extends AppointmentCreationActivity {
         // if the task has already been selected
         if (mNewTask != null) {
 
-            // if the task has changed, assigning it
-            if (mOldTask == null || !mOldTask.equals(mNewTask)) {
-                mNewAppointment.setStoreTask(mNewTask);
-            }
+            // setting the new task
+            mNewAppointment.setStoreTask(mNewTask);
 
             // if the worker has not changed
             if (mOldWorker.equals(mNewWorker)) {
 
                 // using old appointment's starting and ending times
                 mNewAppointment.setStartTime(mOldAppointment.getStartTime());
-                mNewAppointment.setEndTime(mOldAppointment.getEndTime());
+                mTempCalendar.setTimeInMillis(mOldAppointment.getStartTime().getTimeInMillis() + mNewAppointment.getDuration() * mConversionMillisecondMinute);
+                mNewAppointment.setEndTime(mTempCalendar);
 
                 // keeping this information
                 mHasWorkerChanged = false;
