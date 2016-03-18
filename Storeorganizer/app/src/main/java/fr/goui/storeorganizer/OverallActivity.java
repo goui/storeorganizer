@@ -1,5 +1,8 @@
 package fr.goui.storeorganizer;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.IntentFilter;
 import android.support.v7.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -30,6 +33,15 @@ public class OverallActivity extends AppCompatActivity implements Observer, OnAp
     private OverallView mOverallView;
     private LinearLayout mNamesLayout;
     private Point mScreenSize = new Point();
+
+    private BroadcastReceiver mTimeBroadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent.getAction().compareTo(Intent.ACTION_TIME_TICK) == 0) {
+                mOverallView.invalidate();
+            }
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,6 +79,22 @@ public class OverallActivity extends AppCompatActivity implements Observer, OnAp
                 textView.setText(String.valueOf(name.charAt(0)));
             }
             mNamesLayout.addView(textView);
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        registerReceiver(mTimeBroadcastReceiver, new IntentFilter(Intent.ACTION_TIME_TICK));
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        StoreWorkerModel.getInstance().deleteObserver(this);
+        StoreModel.getInstance().deleteObserver(this);
+        if (mTimeBroadcastReceiver != null) {
+            unregisterReceiver(mTimeBroadcastReceiver);
         }
     }
 

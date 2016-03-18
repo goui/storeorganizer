@@ -6,9 +6,7 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.Rect;
-import android.os.Handler;
 import android.support.v4.content.ContextCompat;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
@@ -60,11 +58,9 @@ public class OverallView extends View {
         mHourMin = mStoreModel.getStartingHour();
         mHourMax = mStoreModel.getEndingMinute() > 0 ? mStoreModel.getEndingHour() + 1 : mStoreModel.getEndingHour();
         mNumberOfRows = mHourMax - mHourMin;
-        Log.d("OVERALL", "mHourMin: " + mHourMin + " mHourMax: " + mHourMax);
         mHoursStrings = new String[mNumberOfRows + 1];
         generateHoursStrings();
         mNumberOfColumns = mStoreWorkerModel.getStoreWorkersNumber();
-        final int timer_period = resources.getInteger(R.integer.conversion_millisecond_minute);
         int blackColor = ContextCompat.getColor(context, R.color.black);
         int greyColor = ContextCompat.getColor(context, R.color.grey_overlay);
         int mainColor = ContextCompat.getColor(context, R.color.colorPrimary);
@@ -90,17 +86,6 @@ public class OverallView extends View {
         mNowPaint.setColor(accentColor);
         mNowPaint.setStrokeWidth(3);
         mNowPaint.setAntiAlias(true);
-
-        final Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                if (mNowLineY != 0) {
-                    invalidate();
-                    handler.postDelayed(this, timer_period);
-                }
-            }
-        }, timer_period);
     }
 
     private void generateHoursStrings() {

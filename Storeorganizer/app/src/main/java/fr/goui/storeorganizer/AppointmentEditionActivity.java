@@ -2,6 +2,8 @@ package fr.goui.storeorganizer;
 
 import android.content.Intent;
 import android.content.res.Resources;
+import android.content.res.TypedArray;
+import android.support.v4.content.ContextCompat;
 import android.view.MenuItem;
 import android.widget.Toast;
 
@@ -34,11 +36,6 @@ public class AppointmentEditionActivity extends AppointmentCreationActivity {
      * A {@code boolean} used to know if the {@code StoreWorker} has been changed.
      */
     private boolean mHasWorkerChanged;
-
-    /**
-     * A {@code boolean} used to know if the {@code StoreTask} has been changed.
-     */
-    private boolean mHasTaskChanged;
 
     /**
      * A {@code boolean} used to know if we are editing a {@code NullStoreAppointment}.
@@ -95,7 +92,6 @@ public class AppointmentEditionActivity extends AppointmentCreationActivity {
                 if (mOldTask == null) {
                     mIsAGap = true;
                     mHasWorkerChanged = false;
-                    mHasTaskChanged = true;
                 }
 
                 // if there is an old task, old appointment is not a gap
@@ -146,14 +142,46 @@ public class AppointmentEditionActivity extends AppointmentCreationActivity {
     }
 
     @Override
+    protected void onCheckboxFromChangeListener(boolean isChecked) {
+        mTextViewStartingTime.setEnabled(!isChecked);
+        if (isChecked) {
+            mTextViewStartingTime.setTextColor(ContextCompat.getColor(this, R.color.grey_overlay));
+            mTextViewStartingTime.setBackgroundResource(R.color.light_grey);
+
+            // updating starting calendar to old appointment starting time
+            mCalendarStartingTime.set(Calendar.HOUR_OF_DAY, mOldAppointment.getStartTime().get(Calendar.HOUR_OF_DAY));
+            mCalendarStartingTime.set(Calendar.MINUTE, mOldAppointment.getStartTime().get(Calendar.MINUTE));
+            updateStartingTime();
+        } else {
+            mTextViewStartingTime.setTextColor(ContextCompat.getColor(this, R.color.black));
+            int[] attrs = new int[]{R.attr.selectableItemBackground};
+            TypedArray typedArray = obtainStyledAttributes(attrs);
+            int backgroundResource = typedArray.getResourceId(0, 0);
+            mTextViewStartingTime.setBackgroundResource(backgroundResource);
+            typedArray.recycle();
+        }
+    }
+
+    @Override
+    protected void registerToTimeTickReceiver() {
+        // do nothing
+        // in edition mode we don't want to be notified every minute
+    }
+
+    @Override
+    protected void unregisterFromTimeTickReceiver() {
+        // do nothing
+        // in edition mode we aren't registered
+    }
+
+    @Override
     protected void updateAppointmentInformation() {
 
         // if the task has already been selected
         if (mNewTask != null) {
 
             // if the task has changed, assigning it
-            mHasTaskChanged = mOldTask == null || !mOldTask.equals(mNewTask);
-            if(mHasTaskChanged) {
+            if (mOldTask == null || !mOldTask.equals(mNewTask)) {
                 mNewAppointment.setStoreTask(mNewTask);
             }
 
@@ -162,8 +190,7 @@ public class AppointmentEditionActivity extends AppointmentCreationActivity {
 
                 // using old appointment's starting and ending times
                 mNewAppointment.setStartTime(mOldAppointment.getStartTime());
-                mTempCalendar.setTimeInMillis(mOldAppointment.getStartTime().getTimeInMillis() + mNewAppointment.getDuration() * mConversionMillisecondMinute);
-                mNewAppointment.setEndTime(mTempCalendar);
+                mNewAppointment.setEndTime(mOldAppointment.getEndTime());
 
                 // keeping this information
                 mHasWorkerChanged = false;
@@ -189,6 +216,8 @@ public class AppointmentEditionActivity extends AppointmentCreationActivity {
                         mTempCalendar.set(Calendar.MINUTE, appointment.getEndTime().get(Calendar.MINUTE));
                     }
                 }
+
+                // updating times
                 mNewAppointment.setStartTime(mTempCalendar);
                 mTempCalendar.setTimeInMillis(mTempCalendar.getTimeInMillis() + mNewAppointment.getDuration() * mConversionMillisecondMinute);
                 mNewAppointment.setEndTime(mTempCalendar);
@@ -197,11 +226,11 @@ public class AppointmentEditionActivity extends AppointmentCreationActivity {
                 mHasWorkerChanged = true;
             }
 
-            // updating the views
+            // updating views
             mTextViewStartingTime.setText(mNewAppointment.getFormattedStartTime());
             mTextViewEndingTime.setText(mNewAppointment.getFormattedEndTime());
 
-            // updating the calendars
+            // updating calendars
             mCalendarStartingTime.set(Calendar.HOUR_OF_DAY, mNewAppointment.getStartTime().get(Calendar.HOUR_OF_DAY));
             mCalendarStartingTime.set(Calendar.MINUTE, mNewAppointment.getStartTime().get(Calendar.MINUTE));
             mCalendarEndingTime.set(Calendar.HOUR_OF_DAY, mNewAppointment.getEndTime().get(Calendar.HOUR_OF_DAY));

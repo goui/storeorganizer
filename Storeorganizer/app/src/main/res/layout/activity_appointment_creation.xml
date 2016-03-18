@@ -2,7 +2,9 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_margin="8dp">
+            android:layout_marginBottom="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -63,44 +65,85 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
 
-        <TextView
-            android:id="@+id/activity_appointment_creation_from_text_view"
-            android:layout_width="wrap_content"
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/light_grey"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="4dp"
-            android:layout_marginTop="16dp"
-            android:text="@string/from"/>
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/activity_appointment_creation_from_text_view"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:text="@string/from"/>
+
+            <CheckBox
+                android:id="@+id/activity_appointment_creation_from_checkbox"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:checked="true"
+                android:text="@string/automatic"/>
+
+        </LinearLayout>
 
         <TextView
             android:id="@+id/activity_appointment_creation_start_text_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="4dp"
-            android:background="?attr/selectableItemBackground"
+            android:background="@color/light_grey"
             android:clickable="true"
             android:paddingBottom="8dp"
             android:paddingTop="8dp"
-            android:textColor="@color/black"
+            android:textColor="@color/grey_overlay"
             android:textSize="18sp"/>
 
-        <TextView
-            android:id="@+id/activity_appointment_creation_to_text_view"
-            android:layout_width="wrap_content"
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_marginTop="8dp"
+            android:background="@color/light_grey"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="4dp"
-            android:layout_marginTop="8dp"
-            android:text="@string/to"/>
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/activity_appointment_creation_to_text_view"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="2"
+                android:text="@string/to"/>
+
+            <CheckBox
+                android:id="@+id/activity_appointment_creation_to_checkbox"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:checked="true"
+                android:text="@string/automatic"/>
+
+        </LinearLayout>
 
         <TextView
             android:id="@+id/activity_appointment_creation_end_text_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="4dp"
-            android:background="?attr/selectableItemBackground"
+            android:background="@color/light_grey"
             android:clickable="true"
             android:paddingBottom="8dp"
             android:paddingTop="8dp"
-            android:textColor="@color/black"
+            android:textColor="@color/grey_overlay"
             android:textSize="18sp"/>
 
     </LinearLayout>

@@ -1,7 +1,10 @@
 package fr.goui.storeorganizer;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.Handler;
@@ -40,24 +43,32 @@ public class DetailsActivity extends AppCompatActivity implements Observer {
     public static final int REQUEST_CODE_EDIT_APPOINTMENT = 2;
 
     /**
-     * The {@link ViewPager} that will host the section contents.
-     */
-    private ViewPager mViewPager;
-
-    /**
      * The tab layout.
      */
     private TabLayout mTabLayout;
 
     private Resources mResources;
 
+    private BroadcastReceiver mTimeBroadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent.getAction().compareTo(Intent.ACTION_TIME_TICK) == 0) {
+                for (int i = 0; i < StoreWorkerModel.getInstance().getStoreWorkersNumber(); i++) {
+                    DetailsFragment fragment = (DetailsFragment) getSupportFragmentManager()
+                            .findFragmentByTag("android:switcher:" + R.id.container + ":" + i);
+                    fragment.updateList();
+                }
+            }
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_details);
 
-        StoreWorkerModel.getInstance().addObserver(this);
         mResources = getResources();
+        StoreWorkerModel.getInstance().addObserver(this);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -66,12 +77,12 @@ public class DetailsActivity extends AppCompatActivity implements Observer {
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
         // Set up the ViewPager with the sections adapter.
-        mViewPager = (ViewPager) findViewById(R.id.container);
-        mViewPager.setAdapter(mSectionsPagerAdapter);
+        ViewPager viewPager = (ViewPager) findViewById(R.id.container);
+        viewPager.setAdapter(mSectionsPagerAdapter);
 
         mTabLayout = (TabLayout) findViewById(R.id.tabs);
         mTabLayout.setTabMode(TabLayout.MODE_SCROLLABLE);
-        mTabLayout.setupWithViewPager(mViewPager);
+        mTabLayout.setupWithViewPager(viewPager);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -82,24 +93,21 @@ public class DetailsActivity extends AppCompatActivity implements Observer {
                 startActivityForResult(intent, REQUEST_CODE_CREATE_APPOINTMENT);
             }
         });
+    }
 
-        // getting the timer period
-        final int timer_period = mResources.getInteger(R.integer.conversion_millisecond_minute);
+    @Override
+    protected void onResume() {
+        super.onResume();
+        registerReceiver(mTimeBroadcastReceiver, new IntentFilter(Intent.ACTION_TIME_TICK));
+    }
 
-        // notifying every fragment every minute
-        final Handler handler = new Handler();
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                for(int i = 0; i < StoreWorkerModel.getInstance().getStoreWorkersNumber(); i++) {
-                    DetailsFragment fragment = (DetailsFragment) getSupportFragmentManager()
-                            .findFragmentByTag("android:switcher:" + R.id.container + ":" + i);
-                    fragment.updateList();
-                }
-                handler.postDelayed(this, timer_period);
-            }
-        }, timer_period);
-
+    @Override
+    protected void onStop() {
+        super.onStop();
+        StoreWorkerModel.getInstance().deleteObserver(this);
+        if (mTimeBroadcastReceiver != null) {
+            unregisterReceiver(mTimeBroadcastReceiver);
+        }
     }
 
     @Override

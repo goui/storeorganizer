@@ -1,16 +1,22 @@
 package fr.goui.storeorganizer;
 
 import android.app.TimePickerDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.res.Resources;
+import android.content.res.TypedArray;
 import android.os.Bundle;
-import android.os.Handler;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -102,6 +108,16 @@ public class AppointmentCreationActivity extends AppCompatActivity {
     protected TextView mTextViewEndingTime;
 
     /**
+     * The {@code CheckBox} used to automatize starting time.
+     */
+    protected CheckBox mCheckboxFrom;
+
+    /**
+     * The {@code CheckBox} used to automatize ending time.
+     */
+    protected CheckBox mCheckboxTo;
+
+    /**
      * The android {@code Resources}.
      */
     private Resources mResources;
@@ -145,6 +161,25 @@ public class AppointmentCreationActivity extends AppCompatActivity {
         }
     };
 
+    /**
+     * The time tick intent receiver to get notified every minute.
+     * Will update the now {@code Calendar} and starting time.
+     */
+    private BroadcastReceiver mTimeTickBroadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent.getAction().compareTo(Intent.ACTION_TIME_TICK) == 0) {
+                mNow.set(Calendar.HOUR_OF_DAY, Calendar.getInstance().get(Calendar.HOUR_OF_DAY));
+                mNow.set(Calendar.MINUTE, Calendar.getInstance().get(Calendar.MINUTE));
+                if (mCheckboxFrom.isChecked() && mNewAppointment.getStartTime().getTimeInMillis() <= mNow.getTimeInMillis()) {
+                    mCalendarStartingTime.set(Calendar.HOUR_OF_DAY, Calendar.getInstance().get(Calendar.HOUR_OF_DAY));
+                    mCalendarStartingTime.set(Calendar.MINUTE, Calendar.getInstance().get(Calendar.MINUTE));
+                    updateStartingTime();
+                }
+            }
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -176,6 +211,8 @@ public class AppointmentCreationActivity extends AppCompatActivity {
         mSpinnerTask.setAdapter(new TaskBaseAdapter(this));
         mTextViewStartingTime = (TextView) findViewById(R.id.activity_appointment_creation_start_text_view);
         mTextViewEndingTime = (TextView) findViewById(R.id.activity_appointment_creation_end_text_view);
+        mCheckboxFrom = (CheckBox) findViewById(R.id.activity_appointment_creation_from_checkbox);
+        mCheckboxTo = (CheckBox) findViewById(R.id.activity_appointment_creation_to_checkbox);
 
         // initialization method
         init();
@@ -230,6 +267,38 @@ public class AppointmentCreationActivity extends AppCompatActivity {
             }
         });
 
+        // enabling / disabling starting text view depending on the checkbox state
+        mCheckboxFrom.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                onCheckboxFromChangeListener(isChecked);
+            }
+        });
+
+        // enabling / disabling ending text view depending on the checkbox state
+        mCheckboxTo.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                mTextViewEndingTime.setEnabled(!isChecked);
+                if (isChecked) {
+                    mTextViewEndingTime.setTextColor(ContextCompat.getColor(AppointmentCreationActivity.this, R.color.grey_overlay));
+                    mTextViewEndingTime.setBackgroundResource(R.color.light_grey);
+                    updateEndingTime();
+                } else {
+                    mTextViewEndingTime.setTextColor(ContextCompat.getColor(AppointmentCreationActivity.this, R.color.black));
+                    int[] attrs = new int[]{R.attr.selectableItemBackground};
+                    TypedArray typedArray = obtainStyledAttributes(attrs);
+                    int backgroundResource = typedArray.getResourceId(0, 0);
+                    mTextViewEndingTime.setBackgroundResource(backgroundResource);
+                    typedArray.recycle();
+                }
+            }
+        });
+
+        // by default times are automatized
+        mTextViewStartingTime.setEnabled(false);
+        mTextViewEndingTime.setEnabled(false);
+
         // we don't want to consider seconds and milliseconds
         mNow.set(Calendar.SECOND, 0);
         mNow.set(Calendar.MILLISECOND, 0);
@@ -239,6 +308,38 @@ public class AppointmentCreationActivity extends AppCompatActivity {
         mCalendarStartingTime.set(Calendar.MILLISECOND, 0);
         mCalendarEndingTime.set(Calendar.SECOND, 0);
         mCalendarEndingTime.set(Calendar.MILLISECOND, 0);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        registerToTimeTickReceiver();
+    }
+
+    /**
+     * Registers to the system time tick intent filter.
+     *
+     * @see Intent#ACTION_TIME_TICK
+     */
+    protected void registerToTimeTickReceiver() {
+        registerReceiver(mTimeTickBroadcastReceiver, new IntentFilter(Intent.ACTION_TIME_TICK));
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        unregisterFromTimeTickReceiver();
+    }
+
+    /**
+     * Unregisters from the system time tick intent filter.
+     *
+     * @see Intent#ACTION_TIME_TICK
+     */
+    protected void unregisterFromTimeTickReceiver() {
+        if (mTimeTickBroadcastReceiver != null) {
+            unregisterReceiver(mTimeTickBroadcastReceiver);
+        }
     }
 
     /**
@@ -254,6 +355,31 @@ public class AppointmentCreationActivity extends AppCompatActivity {
         int workerPosition = getIntent().getIntExtra(mResources.getString(R.string.intent_appointment_creation_worker_position), 0);
         mSpinnerWorker.setSelection(workerPosition);
         mNewWorker = mStoreWorkerModel.getStoreWorker(workerPosition);
+    }
+
+    /**
+     * Enables / disables starting text view depending on the checkbox state.
+     *
+     * @param isChecked the checkbox state
+     */
+    protected void onCheckboxFromChangeListener(boolean isChecked) {
+        mTextViewStartingTime.setEnabled(!isChecked);
+        if (isChecked) {
+            mTextViewStartingTime.setTextColor(ContextCompat.getColor(this, R.color.grey_overlay));
+            mTextViewStartingTime.setBackgroundResource(R.color.light_grey);
+
+            // updating starting calendar to now
+            mCalendarStartingTime.set(Calendar.HOUR_OF_DAY, mNow.get(Calendar.HOUR_OF_DAY));
+            mCalendarStartingTime.set(Calendar.MINUTE, mNow.get(Calendar.MINUTE));
+            updateStartingTime();
+        } else {
+            mTextViewStartingTime.setTextColor(ContextCompat.getColor(this, R.color.black));
+            int[] attrs = new int[]{R.attr.selectableItemBackground};
+            TypedArray typedArray = obtainStyledAttributes(attrs);
+            int backgroundResource = typedArray.getResourceId(0, 0);
+            mTextViewStartingTime.setBackgroundResource(backgroundResource);
+            typedArray.recycle();
+        }
     }
 
     /**
@@ -295,7 +421,7 @@ public class AppointmentCreationActivity extends AppCompatActivity {
             // getting the next availability
             StoreAppointment appointment = mNewWorker.getNextAvailability();
 
-            // if next availability is not null, setting times depending on the type of appointment
+            // if next availability is not null, getting times depending on the type of appointment
             if (appointment != null) {
                 if (appointment instanceof NullStoreAppointment) {
                     mTempCalendar.set(Calendar.HOUR_OF_DAY, appointment.getStartTime().get(Calendar.HOUR_OF_DAY));
@@ -305,15 +431,17 @@ public class AppointmentCreationActivity extends AppCompatActivity {
                     mTempCalendar.set(Calendar.MINUTE, appointment.getEndTime().get(Calendar.MINUTE));
                 }
             }
+
+            // updating times
             mNewAppointment.setStartTime(mTempCalendar);
             mTempCalendar.setTimeInMillis(mTempCalendar.getTimeInMillis() + mNewAppointment.getDuration() * mConversionMillisecondMinute);
             mNewAppointment.setEndTime(mTempCalendar);
 
-            // updating the views
+            // updating views
             mTextViewStartingTime.setText(mNewAppointment.getFormattedStartTime());
             mTextViewEndingTime.setText(mNewAppointment.getFormattedEndTime());
 
-            // updating the calendars
+            // updating calendars
             mCalendarStartingTime.set(Calendar.HOUR_OF_DAY, mNewAppointment.getStartTime().get(Calendar.HOUR_OF_DAY));
             mCalendarStartingTime.set(Calendar.MINUTE, mNewAppointment.getStartTime().get(Calendar.MINUTE));
             mCalendarEndingTime.set(Calendar.HOUR_OF_DAY, mNewAppointment.getEndTime().get(Calendar.HOUR_OF_DAY));
@@ -326,16 +454,19 @@ public class AppointmentCreationActivity extends AppCompatActivity {
      */
     protected void updateStartingTime() {
         mNewAppointment.setStartTime(mCalendarStartingTime);
-        mCalendarEndingTime.setTimeInMillis(mCalendarStartingTime.getTimeInMillis() + mNewAppointment.getDuration() * mConversionMillisecondMinute);
-        mNewAppointment.setEndTime(mCalendarEndingTime);
         mTextViewStartingTime.setText(mNewAppointment.getFormattedStartTime());
-        mTextViewEndingTime.setText(mNewAppointment.getFormattedEndTime());
+        if (mCheckboxTo.isChecked()) {
+            updateEndingTime();
+        }
     }
 
     /**
      * When the user has changed the ending time.
      */
     protected void updateEndingTime() {
+        if (mCheckboxTo.isChecked()) {
+            mCalendarEndingTime.setTimeInMillis(mCalendarStartingTime.getTimeInMillis() + mNewAppointment.getDuration() * mConversionMillisecondMinute);
+        }
         mNewAppointment.setEndTime(mCalendarEndingTime);
         mTextViewEndingTime.setText(mNewAppointment.getFormattedEndTime());
     }
