@@ -11,8 +11,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ProgressBar;
 
-import java.util.Calendar;
-
 /**
  * {@code LauncherActivity} is the first activity started.
  * It is displayed in fullscreen and presents a {@code ProgressBar} followed by a {@code TextView}.
@@ -65,7 +63,7 @@ public class LauncherActivity extends AppCompatActivity {
         mContentView.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                Intent intent = new Intent(LauncherActivity.this, DetailsActivity.class);
+                Intent intent = new Intent(LauncherActivity.this, MainActivity.class);
                 startActivity(intent);
                 finish();
                 return true;

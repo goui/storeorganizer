@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.support.v4.content.ContextCompat;
-import android.util.Log;
 import android.view.MenuItem;
 import android.widget.Toast;
 
@@ -60,10 +59,10 @@ public class AppointmentEditionActivity extends AppointmentCreationActivity {
         mResources = getResources();
 
         // getting the old worker position
-        mOldWorkerPosition = getIntent().getIntExtra(DetailsFragment.INTENT_EXTRA_WORKER_POSITION, -1);
+        mOldWorkerPosition = getIntent().getIntExtra(WorkerFragment.INTENT_EXTRA_WORKER_POSITION, -1);
 
         // getting the old appointment position
-        mOldAppointmentPosition = getIntent().getIntExtra(DetailsFragment.INTENT_EXTRA_APPOINTMENT_POSITION, -1);
+        mOldAppointmentPosition = getIntent().getIntExtra(WorkerFragment.INTENT_EXTRA_APPOINTMENT_POSITION, -1);
 
         // if there has been no problem to get the old worker position
         if (mOldWorkerPosition != -1) {

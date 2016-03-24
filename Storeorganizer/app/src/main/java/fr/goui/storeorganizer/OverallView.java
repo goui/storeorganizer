@@ -7,30 +7,23 @@ import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.Rect;
 import android.support.v4.content.ContextCompat;
+import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 
 import java.util.Calendar;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class OverallView extends View {
 
     private static final int SCROLL_DETECTION_OFFSET_VALUE = 20;
 
-    private final int mDefaultCellHeight;
     private final Paint mBlackPaint = new Paint();
     private final Paint mGreyPaint = new Paint();
     private final Paint mAppointmentPaint = new Paint();
     private final Paint mNowPaint = new Paint();
-    private final int mTextSize;
-    private final int mTopMargin;
-    private final int mLeftMargin;
-    private final int mInitialX;
-    private final int mInitialY;
-    private final int mFinalX;
 
     private OnAppointmentClickListener mOnAppointmentClickListener;
     private Map<Rect, StoreAppointment> items = new HashMap<>();
@@ -43,16 +36,31 @@ public class OverallView extends View {
     private int mNumberOfColumns;
     private int mNumberOfRows;
     private int mCellWidth;
+    private int mDefaultCellHeight;
     private float mScaleFactor = 1.0f;
     private int mCellHeight;
     private int mNowLineY;
     private Point mScreenSize = new Point();
     private StoreWorkerModel mStoreWorkerModel = StoreWorkerModel.getInstance();
     private StoreModel mStoreModel = StoreModel.getInstance();
+    private int mTextSize;
+    private int mTopMargin;
+    private int mLeftMargin;
+    private int mInitialX;
+    private int mInitialY;
+    private int mFinalX;
 
     public OverallView(Context context) {
         super(context);
-        mOnAppointmentClickListener = (OnAppointmentClickListener) context;
+        init(context);
+    }
+
+    public OverallView(Context context, AttributeSet attrs) {
+        super(context, attrs);
+        init(context);
+    }
+
+    private void init(Context context) {
         ((WindowManager) context.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay().getSize(mScreenSize);
         Resources resources = context.getResources();
         mHourMin = mStoreModel.getStartingHour();
@@ -225,6 +233,10 @@ public class OverallView extends View {
                 break;
         }
         return true;
+    }
+
+    public void setOnAppointmentClickListener(OnAppointmentClickListener onAppointmentClickListener) {
+        mOnAppointmentClickListener = onAppointmentClickListener;
     }
 
     private void onClick() {

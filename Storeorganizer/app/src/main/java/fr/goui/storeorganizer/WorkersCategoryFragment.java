@@ -79,7 +79,7 @@ public class WorkersCategoryFragment extends Fragment {
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
         // creating menu
-        inflater.inflate(R.menu.menu_settings_workers, menu);
+        inflater.inflate(R.menu.menu_fragment_settings_workers, menu);
     }
 
     @Override

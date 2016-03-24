@@ -486,7 +486,7 @@ public class AppointmentCreationActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // creating menu
-        getMenuInflater().inflate(R.menu.menu_appointment_creation, menu);
+        getMenuInflater().inflate(R.menu.menu_activity_appointment_creation, menu);
         return true;
     }
 

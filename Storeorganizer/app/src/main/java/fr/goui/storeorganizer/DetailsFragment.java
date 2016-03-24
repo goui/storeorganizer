@@ -1,11 +1,15 @@
 package fr.goui.storeorganizer;
 
-import android.content.Intent;
+import android.content.DialogInterface;
+import android.content.res.Resources;
 import android.os.Bundle;
-import android.os.Handler;
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.view.ViewPager;
+import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -13,27 +17,60 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import java.util.Calendar;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Observable;
+import java.util.Observer;
 
-public class DetailsFragment extends Fragment implements OnAppointmentChangeListener {
+/**
+ * {@code DetailsFragment} displays the tabs of all the workers.
+ * In each tab there is the list of the worker's appointments.
+ */
+public class DetailsFragment extends Fragment implements Observer, OnTimeTickListener, OnAppointmentCreateListener {
 
-    public static final String ARG_SECTION_NUMBER = "section_number";
-    public static final String INTENT_EXTRA_APPOINTMENT_POSITION = "intent_extra_appointment_position";
-    public static final String INTENT_EXTRA_WORKER_POSITION = "intent_extra_worker_position";
+    /**
+     * The adapter that will return a fragment for each worker section.
+     */
+    private SectionsPagerAdapter mSectionsPagerAdapter;
 
-    private int _sectionNumber;
+    /**
+     * The view pager to swipe among sections.
+     */
+    private ViewPager mViewPager;
 
-    private StoreWorker _currentWorker;
+    /**
+     * The layout for all the worker tabs.
+     */
+    private TabLayout mTabLayout;
 
-    private TextView _noAppointmentsTextView;
+    /**
+     * The worker model we are listening to.
+     */
+    private StoreWorkerModel mStoreWorkerModel = StoreWorkerModel.getInstance();
 
-    private RecyclerView _recyclerView;
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        View rootView = inflater.inflate(R.layout.fragment_details, container, false);
+        mViewPager = (ViewPager) rootView.findViewById(R.id.fragment_details_view_pager);
+        mTabLayout = (TabLayout) rootView.findViewById(R.id.fragment_details_tab_layout);
+        return rootView;
+    }
 
-    private DetailsRecyclerAdapter _detailsRecyclerAdapter;
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
 
-    private Calendar _calendar;
+        mSectionsPagerAdapter = new SectionsPagerAdapter(getChildFragmentManager());
+        mViewPager.setAdapter(mSectionsPagerAdapter);
+        mTabLayout.post(new Runnable() {
+            @Override
+            public void run() {
+                mTabLayout.setupWithViewPager(mViewPager);
+            }
+        });
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -42,89 +79,153 @@ public class DetailsFragment extends Fragment implements OnAppointmentChangeList
     }
 
     @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-
-        _sectionNumber = getArguments().getInt(ARG_SECTION_NUMBER);
-        _currentWorker = StoreWorkerModel.getInstance().getStoreWorker(_sectionNumber);
-        _detailsRecyclerAdapter = new DetailsRecyclerAdapter(getActivity(), _currentWorker.getStoreAppointments(), this);
-        _recyclerView.setAdapter(_detailsRecyclerAdapter);
-        _calendar = Calendar.getInstance();
-        // we don't want to consider seconds and milliseconds
-        _calendar.set(Calendar.SECOND, 0);
-        _calendar.set(Calendar.MILLISECOND, 0);
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, final ViewGroup container,
-                             Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_details, container, false);
-        _noAppointmentsTextView = (TextView) rootView.findViewById(R.id.fragment_details_no_appointments_text_view);
-        _recyclerView = (RecyclerView) rootView.findViewById(R.id.fragment_details_recycler_view);
-        _recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        return rootView;
-    }
-
-    @Override
-    public void onAppointmentEdit(int position_p) {
-        Intent intent = new Intent(getActivity(), AppointmentEditionActivity.class);
-        intent.putExtra(INTENT_EXTRA_APPOINTMENT_POSITION, position_p);
-        intent.putExtra(INTENT_EXTRA_WORKER_POSITION, _sectionNumber);
-        getActivity().startActivityForResult(intent, DetailsActivity.REQUEST_CODE_EDIT_APPOINTMENT);
-    }
-
-    @Override
-    public void onAppointmentDelete(int position_p) {
-        notifyDataSetChanged();
-    }
-
-    @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
-        inflater.inflate(R.menu.menu_details_fragment, menu);
+        inflater.inflate(R.menu.menu_fragment_details, menu);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        if (id == R.id.action_scroll_to_current) {
-            scrollToCurrentAppointment();
+        if (id == R.id.action_next_availability) {
+            displayNextAvailabilityDialog();
             return true;
         }
         return super.onOptionsItemSelected(item);
     }
 
-    private void scrollToCurrentAppointment() {
-        if (_currentWorker.getStoreAppointmentsNumber() > 2) {
-            int position = -1;
-            for (int i = 0; i < _currentWorker.getStoreAppointmentsNumber(); i++) {
-                if (_calendar.after(_currentWorker.getStoreAppointments().get(i).getEndTime())) {
-                    position = i + 1;
-                }
+    /**
+     * Method used to display a dialog telling user about workers availability.
+     */
+    private void displayNextAvailabilityDialog() {
+        FragmentActivity activity = getActivity();
+        Resources resources = activity.getResources();
+        AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+        builder.setTitle(resources.getString(R.string.next_availability));
+        View dialogLayout = activity.getLayoutInflater().inflate(R.layout.layout_simple_text_view, null);
+        builder.setView(dialogLayout);
+        TextView textView = (TextView) dialogLayout.findViewById(R.id.layout_simple_text_view);
+        StoreWorker worker = StoreWorkerModel.getInstance().getFirstAvailableWorker();
+        StoreAppointment appointment = worker.getNextAvailability();
+        String availability = new SimpleDateFormat("HH:mm").format(new Date());
+        if (appointment != null) {
+            if (appointment instanceof NullStoreAppointment) {
+                availability = appointment.getFormattedStartTime();
+                availability += " " + resources.getString(R.string.during) + " " + appointment.getDuration() + resources.getString(R.string.minutes);
+            } else {
+                availability = appointment.getFormattedEndTime();
             }
-            ((LinearLayoutManager) _recyclerView.getLayoutManager()).scrollToPositionWithOffset(position + 1, 10);
-            Toast.makeText(getActivity(), getString(R.string.scrolling_to_the_current_appointment), Toast.LENGTH_SHORT).show();
+        }
+        textView.setText(worker.getName() + " " + resources.getString(R.string.at) + " " + availability);
+        builder.setPositiveButton(resources.getString(R.string.ok), new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.cancel();
+            }
+        });
+        builder.show();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        mStoreWorkerModel.addObserver(this);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        mStoreWorkerModel.deleteObserver(this);
+    }
+
+    @Override
+    public void onTimeTick() {
+        for (int i = 0; i < StoreWorkerModel.getInstance().getStoreWorkersNumber(); i++) {
+            WorkerFragment fragment = (WorkerFragment) getChildFragmentManager()
+                    .findFragmentByTag("android:switcher:" + R.id.fragment_details_view_pager + ":" + i);
+            fragment.updateList();
         }
     }
 
-    public void updateList() {
-        if(_currentWorker.getStoreAppointmentsNumber() > 0 && _currentWorker.getStoreAppointment(0) instanceof NullStoreAppointment) {
-            _currentWorker.getStoreAppointment(0).setStartTime(Calendar.getInstance());
+    @Override
+    public void onAppointmentCreate(int workerPosition) {
+        WorkerFragment fragment = (WorkerFragment) getChildFragmentManager()
+                .findFragmentByTag("android:switcher:" + R.id.fragment_details_view_pager + ":" + workerPosition);
+        fragment.notifyDataSetChanged();
+    }
+
+    @Override
+    public void update(Observable observable, Object data) {
+        if (observable instanceof StoreWorkerModel && data instanceof StoreWorkerModel.ObsData) {
+            StoreWorkerModel.ObsData obsData = (StoreWorkerModel.ObsData) data;
+            switch (obsData.updateReason) {
+                case StoreWorkerModel.ObsData.CREATE:
+                    mSectionsPagerAdapter.notifyDataSetChanged();
+                    mTabLayout.addTab(mTabLayout.newTab().setText(obsData.worker.getName()));
+                    mSectionsPagerAdapter.notifyDataSetChanged();
+                    break;
+                case StoreWorkerModel.ObsData.UPDATE:
+                    mSectionsPagerAdapter.notifyDataSetChanged();
+                    mTabLayout.getTabAt(obsData.workersPosition).setText(obsData.worker.getName());
+                    mSectionsPagerAdapter.notifyDataSetChanged();
+                    break;
+                case StoreWorkerModel.ObsData.REMOVE:
+                    mSectionsPagerAdapter.notifyDataSetChanged();
+                    mTabLayout.removeTabAt(obsData.workersPosition);
+                    mSectionsPagerAdapter.notifyDataSetChanged();
+                    break;
+                case StoreWorkerModel.ObsData.REMOVE_ALL:
+                    mSectionsPagerAdapter.notifyDataSetChanged();
+                    mTabLayout.removeAllTabs();
+                    mTabLayout.addTab(mTabLayout.newTab().setText(obsData.worker.getName()));
+                    mSectionsPagerAdapter.notifyDataSetChanged();
+                    break;
+            }
         }
-        notifyDataSetChanged();
     }
 
-    public void notifyDataSetChanged() {
-        _detailsRecyclerAdapter.notifyDataSetChanged();
-        computeNoAppointmentTextViewVisibility();
+    /**
+     * Method used to know which tab is selected.
+     * Useful for appointment creation.
+     *
+     * @return current tab position
+     */
+    public int getSelectedTabPosition() {
+        return mTabLayout.getSelectedTabPosition();
     }
 
-    private void computeNoAppointmentTextViewVisibility() {
-        if (_currentWorker.getStoreAppointmentsNumber() >= 1) {
-            _noAppointmentsTextView.setVisibility(View.GONE);
-        } else {
-            _noAppointmentsTextView.setVisibility(View.VISIBLE);
+    /**
+     * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
+     * one of the sections/tabs/pages.
+     */
+    public class SectionsPagerAdapter extends FragmentPagerAdapter {
+
+        public SectionsPagerAdapter(FragmentManager fm) {
+            super(fm);
+        }
+
+        @Override
+        public Fragment getItem(int position_p) {
+            WorkerFragment fragment = new WorkerFragment();
+            Bundle args = new Bundle();
+            args.putInt(WorkerFragment.ARG_SECTION_NUMBER, position_p);
+            fragment.setArguments(args);
+            return fragment;
+        }
+
+        @Override
+        public int getCount() {
+            return mStoreWorkerModel.getStoreWorkersNumber();
+        }
+
+        @Override
+        public CharSequence getPageTitle(int position_p) {
+            return mStoreWorkerModel.getStoreWorker(position_p).getName();
+        }
+
+        @Override
+        public long getItemId(int position) {
+            return position;
         }
     }
-
 }

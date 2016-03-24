@@ -120,7 +120,7 @@ public class SettingsActivity extends AppCompatActivity implements OnCategoryCli
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // creating menu
-        getMenuInflater().inflate(R.menu.menu_settings, menu);
+        getMenuInflater().inflate(R.menu.menu_activity_settings, menu);
         return true;
     }
 

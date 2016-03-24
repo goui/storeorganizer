@@ -1,0 +1,24 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:paddingLeft="4dp"
+                android:paddingRight="4dp">
+
+    <TextView
+        android:id="@+id/fragment_worker_no_appointments_text_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="16dp"
+        android:text="@string/no_appointments_scheduled"
+        android:textSize="16sp"/>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/fragment_worker_recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="2dp"
+        android:layout_marginTop="6dp"/>
+
+</RelativeLayout>

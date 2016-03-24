@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Resources;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -49,12 +48,15 @@ public class DetailsActivity extends AppCompatActivity implements Observer {
 
     private Resources mResources;
 
+    /**
+     * The broadcast receiver to be notified every minute of the clock.
+     */
     private BroadcastReceiver mTimeBroadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             if (intent.getAction().compareTo(Intent.ACTION_TIME_TICK) == 0) {
                 for (int i = 0; i < StoreWorkerModel.getInstance().getStoreWorkersNumber(); i++) {
-                    DetailsFragment fragment = (DetailsFragment) getSupportFragmentManager()
+                    WorkerFragment fragment = (WorkerFragment) getSupportFragmentManager()
                             .findFragmentByTag("android:switcher:" + R.id.container + ":" + i);
                     fragment.updateList();
                 }
@@ -116,7 +118,7 @@ public class DetailsActivity extends AppCompatActivity implements Observer {
         if (requestCode == REQUEST_CODE_CREATE_APPOINTMENT) {
             if (resultCode == RESULT_OK) {
                 int position = data.getIntExtra(mResources.getString(R.string.intent_appointment_creation_result_worker_position), -1);
-                DetailsFragment fragment = (DetailsFragment) getSupportFragmentManager()
+                WorkerFragment fragment = (WorkerFragment) getSupportFragmentManager()
                         .findFragmentByTag("android:switcher:" + R.id.container + ":" + position);
                 fragment.notifyDataSetChanged();
             }
@@ -126,11 +128,11 @@ public class DetailsActivity extends AppCompatActivity implements Observer {
                 int oldWorkerPosition = data.getIntExtra(getString(R.string.intent_appointment_edition_result_old_worker_position), -1);
                 int newWorkerPosition = data.getIntExtra(getString(R.string.intent_appointment_edition_result_new_worker_position), -1);
                 int oldAppointmentPosition = data.getIntExtra(getString(R.string.intent_appointment_edition_result_old_appointment_position), -1);
-                DetailsFragment oldFragment = (DetailsFragment) getSupportFragmentManager()
+                WorkerFragment oldFragment = (WorkerFragment) getSupportFragmentManager()
                         .findFragmentByTag("android:switcher:" + R.id.container + ":" + oldWorkerPosition);
                 if (oldWorkerPosition != newWorkerPosition) {
                     oldFragment.onAppointmentDelete(oldAppointmentPosition);
-                    DetailsFragment newFragment = (DetailsFragment) getSupportFragmentManager()
+                    WorkerFragment newFragment = (WorkerFragment) getSupportFragmentManager()
                             .findFragmentByTag("android:switcher:" + R.id.container + ":" + newWorkerPosition);
                     newFragment.notifyDataSetChanged();
                 } else {
@@ -143,23 +145,15 @@ public class DetailsActivity extends AppCompatActivity implements Observer {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_details, menu);
+        getMenuInflater().inflate(R.menu.menu_fragment_details, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        if (id == R.id.action_settings) {
-            Intent intent = new Intent(DetailsActivity.this, SettingsActivity.class);
-            startActivity(intent);
-            return true;
-        } else if (id == R.id.action_next_availability) {
+        if (id == R.id.action_next_availability) {
             displayNextAvailabilityDialog();
-            return true;
-        } else if (id == R.id.action_go_to_overall) {
-            Intent intent = new Intent(DetailsActivity.this, OverallActivity.class);
-            startActivity(intent);
             return true;
         }
 
@@ -235,9 +229,9 @@ public class DetailsActivity extends AppCompatActivity implements Observer {
 
         @Override
         public Fragment getItem(int position_p) {
-            DetailsFragment fragment = new DetailsFragment();
+            WorkerFragment fragment = new WorkerFragment();
             Bundle args = new Bundle();
-            args.putInt(DetailsFragment.ARG_SECTION_NUMBER, position_p);
+            args.putInt(WorkerFragment.ARG_SECTION_NUMBER, position_p);
             fragment.setArguments(args);
             return fragment;
         }

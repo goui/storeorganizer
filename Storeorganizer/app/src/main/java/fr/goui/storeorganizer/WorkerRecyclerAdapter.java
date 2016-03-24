@@ -14,7 +14,7 @@ import android.widget.TextView;
 import java.util.Calendar;
 import java.util.List;
 
-public class DetailsRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public class WorkerRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private static final int TYPE_NORMAL_APPOINTMENT = 0;
     private static final int TYPE_NULL_APPOINTMENT = 1;
@@ -30,7 +30,7 @@ public class DetailsRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vi
 
         public NullAppointmentViewHolder(View itemView_p) {
             super(itemView_p);
-            textView = (TextView) itemView_p.findViewById(R.id.fragment_details_item_null_appointment_text_view);
+            textView = (TextView) itemView_p.findViewById(R.id.fragment_worker_item_null_appointment_text_view);
             textView.setOnClickListener(this);
         }
 
@@ -54,14 +54,14 @@ public class DetailsRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vi
 
         public AppointmentViewHolder(View itemView_p) {
             super(itemView_p);
-            txtStartTime = (TextView) itemView_p.findViewById(R.id.fragment_details_item_appointment_start_time_text_view);
+            txtStartTime = (TextView) itemView_p.findViewById(R.id.fragment_worker_item_appointment_start_time_text_view);
             txtClientsName = (TextView) itemView_p.findViewById(R.id.layout_appointment_information_clients_name_text_view);
             txtClientsPhone = (TextView) itemView_p.findViewById(R.id.layout_appointment_information_clients_phone_text_view);
             txtTaskName = (TextView) itemView_p.findViewById(R.id.layout_appointment_information_task_name_text_view);
-            txtEndTime = (TextView) itemView_p.findViewById(R.id.fragment_details_item_appointment_end_time_text_view);
-            txtState = (TextView) itemView_p.findViewById(R.id.fragment_details_item_appointment_state_text_view);
-            timeLayout = (RelativeLayout) itemView_p.findViewById(R.id.fragment_details_item_appointment_time_layout);
-            cardLayout = (RelativeLayout) itemView_p.findViewById(R.id.fragment_details_item_appointment_layout);
+            txtEndTime = (TextView) itemView_p.findViewById(R.id.fragment_worker_item_appointment_end_time_text_view);
+            txtState = (TextView) itemView_p.findViewById(R.id.fragment_worker_item_appointment_state_text_view);
+            timeLayout = (RelativeLayout) itemView_p.findViewById(R.id.fragment_worker_item_appointment_time_layout);
+            cardLayout = (RelativeLayout) itemView_p.findViewById(R.id.fragment_worker_item_appointment_layout);
             cardLayout.setOnClickListener(this);
             cardLayout.setOnLongClickListener(this);
         }
@@ -92,7 +92,7 @@ public class DetailsRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vi
         }
     }
 
-    public DetailsRecyclerAdapter(Context context_p, List<StoreAppointment> appointments_p, OnAppointmentChangeListener onAppointmentChangeListener_p) {
+    public WorkerRecyclerAdapter(Context context_p, List<StoreAppointment> appointments_p, OnAppointmentChangeListener onAppointmentChangeListener_p) {
         _context = context_p;
         _inflater = LayoutInflater.from(context_p);
         _appointments = appointments_p;
@@ -104,10 +104,10 @@ public class DetailsRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vi
         RecyclerView.ViewHolder viewHolder = null;
         switch (viewType_p) {
             case TYPE_NORMAL_APPOINTMENT:
-                viewHolder = new AppointmentViewHolder(_inflater.inflate(R.layout.fragment_details_item_appointment, parent_p, false));
+                viewHolder = new AppointmentViewHolder(_inflater.inflate(R.layout.fragment_worker_item_appointment, parent_p, false));
                 break;
             case TYPE_NULL_APPOINTMENT:
-                viewHolder = new NullAppointmentViewHolder(_inflater.inflate(R.layout.fragment_details_item_null_appointment, parent_p, false));
+                viewHolder = new NullAppointmentViewHolder(_inflater.inflate(R.layout.fragment_worker_item_null_appointment, parent_p, false));
                 break;
         }
         return viewHolder;

@@ -10,4 +10,12 @@
     <integer name="maximum_ending_hour">23</integer>
     <integer name="maximum_ending_minute">59</integer>
     <integer name="conversion_millisecond_minute">60000</integer>
+    <integer name="scale_factor_min_value">1</integer>
+    <integer name="scale_factor_max_value">3</integer>
+    <integer name="invalid_position">-1</integer>
+
+    <!-- For intents results -->
+    <integer name="intent_request_code_appointment_creation">1</integer>
+    <integer name="intent_request_code_appointment_edition">2</integer>
+
 </resources>
