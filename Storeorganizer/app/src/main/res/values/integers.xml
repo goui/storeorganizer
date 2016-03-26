@@ -16,6 +16,5 @@
 
     <!-- For intents results -->
     <integer name="intent_request_code_appointment_creation">1</integer>
-    <integer name="intent_request_code_appointment_edition">2</integer>
 
 </resources>

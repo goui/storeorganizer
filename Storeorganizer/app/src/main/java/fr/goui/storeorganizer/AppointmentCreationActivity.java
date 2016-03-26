@@ -502,7 +502,7 @@ public class AppointmentCreationActivity extends AppCompatActivity {
         }
 
         // trying to validate the appointment creation
-        if (id == R.id.action_validate_prestation) {
+        if (id == R.id.action_validate_appointment) {
 
             // if there is no error
             if (confirmAppointment()) {

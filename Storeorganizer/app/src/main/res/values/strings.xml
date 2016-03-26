@@ -70,9 +70,6 @@
     <!-- For the intents -->
     <string name="intent_appointment_creation_worker_position">intent_appointment_creation_worker_position</string>
     <string name="intent_appointment_creation_result_worker_position">intent_appointment_creation_result_worker_position</string>
-    <string name="intent_appointment_edition_result_old_worker_position">intent_appointment_edition_result_old_worker_position</string>
-    <string name="intent_appointment_edition_result_old_appointment_position">intent_appointment_edition_result_old_appointment_position</string>
-    <string name="intent_appointment_edition_result_new_worker_position">intent_appointment_edition_result_new_worker_position</string>
 
     <!-- For the shared preferences  -->
     <string name="preference_file_key">fr.goui.storeorganizer.PREFERENCE_FILE_KEY</string>
@@ -83,13 +80,7 @@
     <string name="ending_hour">ending_hour</string>
     <string name="ending_minute">ending_minute</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="title_activity_main">MainActivity</string>
-
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
-
-    <string name="action_settings">Settings</string>
 
 </resources>

@@ -1,7 +1,5 @@
 package fr.goui.storeorganizer;
 
-import android.content.Intent;
-import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.support.v4.content.ContextCompat;
 import android.view.MenuItem;
@@ -37,44 +35,26 @@ public class AppointmentEditionActivity extends AppointmentCreationActivity {
      */
     private boolean mIsAGap;
 
-    /**
-     * The position of the old {@code StoreAppointment}.
-     */
-    private int mOldAppointmentPosition;
-
-    /**
-     * The position of the old {@code StoreWorker}.
-     */
-    private int mOldWorkerPosition;
-
-    /**
-     * The android {@code Resources}.
-     */
-    private Resources mResources;
-
     @Override
     protected void init() {
 
-        // getting the resources
-        mResources = getResources();
-
         // getting the old worker position
-        mOldWorkerPosition = getIntent().getIntExtra(WorkerFragment.INTENT_EXTRA_WORKER_POSITION, -1);
+        int oldWorkerPosition = getIntent().getIntExtra(WorkerFragment.INTENT_EXTRA_WORKER_POSITION, -1);
 
         // getting the old appointment position
-        mOldAppointmentPosition = getIntent().getIntExtra(WorkerFragment.INTENT_EXTRA_APPOINTMENT_POSITION, -1);
+        int oldAppointmentPosition = getIntent().getIntExtra(WorkerFragment.INTENT_EXTRA_APPOINTMENT_POSITION, -1);
 
         // if there has been no problem to get the old worker position
-        if (mOldWorkerPosition != -1) {
+        if (oldWorkerPosition != -1) {
 
             // getting the old worker
-            mOldWorker = StoreWorkerModel.getInstance().getStoreWorker(mOldWorkerPosition);
+            mOldWorker = StoreWorkerModel.getInstance().getStoreWorker(oldWorkerPosition);
 
             // if there has been no problem to get the old appointment position
-            if (mOldAppointmentPosition != -1) {
+            if (oldAppointmentPosition != -1) {
 
                 // getting the old appointment
-                mOldAppointment = mOldWorker.getStoreAppointment(mOldAppointmentPosition);
+                mOldAppointment = mOldWorker.getStoreAppointment(oldAppointmentPosition);
 
                 // creating the new appointment
                 mNewAppointment = new StoreAppointment();
@@ -105,7 +85,7 @@ public class AppointmentEditionActivity extends AppointmentCreationActivity {
                 }
 
                 // putting information about the old appointment in the views
-                initViewsInformation(mOldWorkerPosition, taskPosition);
+                initViewsInformation(oldWorkerPosition, taskPosition);
             }
         }
     }
@@ -247,15 +227,9 @@ public class AppointmentEditionActivity extends AppointmentCreationActivity {
         }
 
         // trying to validate the appointment edition
-        else if (id == R.id.action_validate_prestation) {
+        else if (id == R.id.action_validate_appointment) {
             if (confirmAppointment()) {
-
-                // passing the old worker, new worker and old appointment positions, setting the result to ok and finishing this activity
-                Intent intent = new Intent();
-                intent.putExtra(mResources.getString(R.string.intent_appointment_edition_result_old_worker_position), mOldWorkerPosition);
-                intent.putExtra(mResources.getString(R.string.intent_appointment_edition_result_new_worker_position), mNewWorkerPosition);
-                intent.putExtra(mResources.getString(R.string.intent_appointment_edition_result_old_appointment_position), mOldAppointmentPosition);
-                setResult(RESULT_OK, intent);
+                setResult(RESULT_OK);
                 finish();
             }
             ret = true;

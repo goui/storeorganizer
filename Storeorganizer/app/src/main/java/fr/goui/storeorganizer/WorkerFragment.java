@@ -76,7 +76,7 @@ public class WorkerFragment extends Fragment implements OnAppointmentChangeListe
         Intent intent = new Intent(getActivity(), AppointmentEditionActivity.class);
         intent.putExtra(INTENT_EXTRA_APPOINTMENT_POSITION, position_p);
         intent.putExtra(INTENT_EXTRA_WORKER_POSITION, _sectionNumber);
-        getActivity().startActivityForResult(intent, DetailsActivity.REQUEST_CODE_EDIT_APPOINTMENT);
+        startActivity(intent);
     }
 
     @Override

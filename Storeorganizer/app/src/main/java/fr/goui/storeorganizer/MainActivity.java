@@ -139,16 +139,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 }
             }
         }
-
-        // if an appointment has been updated
-        if (requestCode == mResources.getInteger(R.integer.intent_request_code_appointment_edition)) {
-            if (resultCode == RESULT_OK) {
-                int oldWorkerPosition = data.getIntExtra(getString(R.string.intent_appointment_edition_result_old_worker_position), mResources.getInteger(R.integer.invalid_position));
-                int newWorkerPosition = data.getIntExtra(getString(R.string.intent_appointment_edition_result_new_worker_position), mResources.getInteger(R.integer.invalid_position));
-                int oldAppointmentPosition = data.getIntExtra(getString(R.string.intent_appointment_edition_result_old_appointment_position), mResources.getInteger(R.integer.invalid_position));
-                // TODO result from appointment edition
-            }
-        }
     }
 
     @Override
