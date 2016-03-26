@@ -61,6 +61,7 @@ public class WorkerFragment extends Fragment implements OnAppointmentChangeListe
         _noAppointmentsTextView = (TextView) rootView.findViewById(R.id.fragment_worker_no_appointments_text_view);
         _recyclerView = (RecyclerView) rootView.findViewById(R.id.fragment_worker_recycler_view);
         _recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        _recyclerView.setHasFixedSize(true);
         return rootView;
     }
 
@@ -80,6 +81,7 @@ public class WorkerFragment extends Fragment implements OnAppointmentChangeListe
 
     @Override
     public void onAppointmentDelete(int position_p) {
+        _currentWorker.removeStoreAppointment(_currentWorker.getStoreAppointment(position_p));
         notifyDataSetChanged();
     }
 

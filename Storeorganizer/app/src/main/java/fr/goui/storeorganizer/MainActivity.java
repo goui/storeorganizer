@@ -18,9 +18,14 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
+import android.view.ScaleGestureDetector;
 import android.view.View;
 
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+import java.util.Observable;
+import java.util.Observer;
+
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, Observer {
 
     private FragmentManager mFragmentManager;
 
@@ -29,6 +34,36 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private Fragment mCurrentFragment;
 
     private Resources mResources;
+
+    /**
+     * The gesture detector used to track zoom in / zoom out gestures.
+     */
+    private ScaleGestureDetector mScaleGestureDetector;
+
+    /**
+     * The current zoom value.
+     */
+    private float mScaleFactor;
+
+    /**
+     * The min zoom value.
+     */
+    private int mScaleFactorMin;
+
+    /**
+     * The max zoom value
+     */
+    private int mScaleFactorMax;
+
+    /**
+     * The worker model we are listening to.
+     */
+    private StoreWorkerModel mStoreWorkerModel = StoreWorkerModel.getInstance();
+
+    /**
+     * The store model.
+     */
+    private StoreModel mStoreModel = StoreModel.getInstance();
 
     /**
      * The broadcast receiver to be notified every minute of the clock.
@@ -78,6 +113,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.addDrawerListener(toggle);
         toggle.syncState();
+
+        mStoreWorkerModel.addObserver(this);
+        mStoreModel.addObserver(this);
+
+        // getting the zoom values
+        mScaleFactorMin = mResources.getInteger(R.integer.scale_factor_min_value);
+        mScaleFactorMax = mResources.getInteger(R.integer.scale_factor_max_value);
+        mScaleFactor = mScaleFactorMin;
+
+        // creating the zoom gesture listener
+        mScaleGestureDetector = new ScaleGestureDetector(this, new ScaleListener());
     }
 
     @Override
@@ -152,7 +198,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             transaction.replace(R.id.main_content, mCurrentFragment).commit();
             ret = true;
         } else if (id == R.id.nav_settings) {
-            mCurrentFragment = null;
             Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
             startActivity(intent);
             ret = false;
@@ -161,5 +206,36 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return ret;
+    }
+
+    @Override
+    public void update(Observable observable, Object data) {
+        if (mCurrentFragment instanceof DetailsFragment) {
+            ((DetailsFragment) mCurrentFragment).update(observable, data);
+        } else if (mCurrentFragment instanceof OverallFragment) {
+            ((OverallFragment) mCurrentFragment).update(observable, data);
+        }
+    }
+
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent ev) {
+        if (mCurrentFragment instanceof OverallFragment) {
+            mScaleGestureDetector.onTouchEvent(ev);
+        }
+        return super.dispatchTouchEvent(ev);
+    }
+
+    /**
+     * Custom gesture listener used to track pinch zoom gestures.
+     */
+    class ScaleListener extends ScaleGestureDetector.SimpleOnScaleGestureListener {
+
+        @Override
+        public boolean onScale(ScaleGestureDetector detector) {
+            mScaleFactor *= detector.getScaleFactor();
+            mScaleFactor = Math.max(mScaleFactorMin, Math.min(mScaleFactor, mScaleFactorMax));
+            ((OverallFragment) mCurrentFragment).onScaleChanged(mScaleFactor);
+            return true;
+        }
     }
 }

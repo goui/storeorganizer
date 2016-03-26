@@ -21,13 +21,12 @@ import android.widget.TextView;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Observable;
-import java.util.Observer;
 
 /**
  * {@code DetailsFragment} displays the tabs of all the workers.
  * In each tab there is the list of the worker's appointments.
  */
-public class DetailsFragment extends Fragment implements Observer, OnTimeTickListener, OnAppointmentCreateListener {
+public class DetailsFragment extends Fragment implements OnTimeTickListener, OnAppointmentCreateListener {
 
     /**
      * The adapter that will return a fragment for each worker section.
@@ -129,32 +128,25 @@ public class DetailsFragment extends Fragment implements Observer, OnTimeTickLis
     @Override
     public void onResume() {
         super.onResume();
-        mStoreWorkerModel.addObserver(this);
+        mSectionsPagerAdapter.notifyDataSetChanged();
+        notifyAllWorkers();
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        mStoreWorkerModel.deleteObserver(this);
     }
 
     @Override
     public void onTimeTick() {
-        for (int i = 0; i < StoreWorkerModel.getInstance().getStoreWorkersNumber(); i++) {
-            WorkerFragment fragment = (WorkerFragment) getChildFragmentManager()
-                    .findFragmentByTag("android:switcher:" + R.id.fragment_details_view_pager + ":" + i);
-            fragment.updateList();
-        }
+        notifyAllWorkers();
     }
 
     @Override
     public void onAppointmentCreate(int workerPosition) {
-        WorkerFragment fragment = (WorkerFragment) getChildFragmentManager()
-                .findFragmentByTag("android:switcher:" + R.id.fragment_details_view_pager + ":" + workerPosition);
-        fragment.notifyDataSetChanged();
+        notifyWorkerFragmentAt(workerPosition);
     }
 
-    @Override
     public void update(Observable observable, Object data) {
         if (observable instanceof StoreWorkerModel && data instanceof StoreWorkerModel.ObsData) {
             StoreWorkerModel.ObsData obsData = (StoreWorkerModel.ObsData) data;
@@ -169,7 +161,7 @@ public class DetailsFragment extends Fragment implements Observer, OnTimeTickLis
                     mTabLayout.getTabAt(obsData.workersPosition).setText(obsData.worker.getName());
                     mSectionsPagerAdapter.notifyDataSetChanged();
                     break;
-                case StoreWorkerModel.ObsData.REMOVE:
+                case StoreWorkerModel.ObsData.REMOVE: // TODO bug when removing one tab (removed tab is still there)
                     mSectionsPagerAdapter.notifyDataSetChanged();
                     mTabLayout.removeTabAt(obsData.workersPosition);
                     mSectionsPagerAdapter.notifyDataSetChanged();
@@ -181,6 +173,20 @@ public class DetailsFragment extends Fragment implements Observer, OnTimeTickLis
                     mSectionsPagerAdapter.notifyDataSetChanged();
                     break;
             }
+        }
+    }
+
+    private void notifyAllWorkers() {
+        for (int i = 0; i < mStoreWorkerModel.getStoreWorkersNumber(); i++) {
+            notifyWorkerFragmentAt(i);
+        }
+    }
+
+    private void notifyWorkerFragmentAt(int position) {
+        WorkerFragment fragment = (WorkerFragment) getChildFragmentManager()
+                .findFragmentByTag("android:switcher:" + R.id.fragment_details_view_pager + ":" + position);
+        if (fragment != null) {
+            fragment.notifyDataSetChanged();
         }
     }
 

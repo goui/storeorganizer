@@ -1,7 +1,6 @@
 package fr.goui.storeorganizer;
 
 import android.content.DialogInterface;
-import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.Point;
 import android.os.Bundle;
@@ -10,20 +9,18 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AlertDialog;
 import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.ScaleGestureDetector;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.Observable;
-import java.util.Observer;
 
 /**
  * {@code OverallFragment} is the container of the {@link OverallView}.
  * It also contains a layout displaying the workers names.
  */
-public class OverallFragment extends Fragment implements Observer, OnAppointmentClickListener, OnTimeTickListener, OnAppointmentCreateListener {
+public class OverallFragment extends Fragment implements OnAppointmentClickListener, OnTimeTickListener, OnAppointmentCreateListener {
 
     /**
      * The layout displaying the workers names.
@@ -39,36 +36,6 @@ public class OverallFragment extends Fragment implements Observer, OnAppointment
      * The size of the screen.
      */
     private Point mScreenSize = new Point();
-
-    /**
-     * The gesture detector used to track zoom in / zoom out gestures.
-     */
-    private ScaleGestureDetector mScaleGestureDetector;
-
-    /**
-     * The current zoom value.
-     */
-    private float mScaleFactor;
-
-    /**
-     * The min zoom value.
-     */
-    private int mScaleFactorMin;
-
-    /**
-     * The max zoom value
-     */
-    private int mScaleFactorMax;
-
-    /**
-     * The model for all the workers.
-     */
-    private StoreWorkerModel mStoreWorkerModel = StoreWorkerModel.getInstance();
-
-    /**
-     * The store model.
-     */
-    private StoreModel mStoreModel = StoreModel.getInstance();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -92,34 +59,7 @@ public class OverallFragment extends Fragment implements Observer, OnAppointment
         // displaying the workers names
         fillNamesLayout(activity);
 
-        // getting the zoom values
-        Resources resources = activity.getResources();
-        mScaleFactorMin = resources.getInteger(R.integer.scale_factor_min_value);
-        mScaleFactorMax = resources.getInteger(R.integer.scale_factor_max_value);
-        mScaleFactor = mScaleFactorMin;
-
-        // creating the zoom gesture listener
-        mScaleGestureDetector = new ScaleGestureDetector(activity, new ScaleListener());
-
         mOverallView.setOnAppointmentClickListener(this);
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-
-        // subscribing to models
-        mStoreWorkerModel.addObserver(this);
-        mStoreModel.addObserver(this);
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-
-        // unsubscribing from models
-        mStoreWorkerModel.deleteObserver(this);
-        mStoreModel.deleteObserver(this);
     }
 
     /**
@@ -180,7 +120,6 @@ public class OverallFragment extends Fragment implements Observer, OnAppointment
         mOverallView.invalidate();
     }
 
-    @Override
     public void update(Observable observable, Object data) {
 
         // the workers model has changed, resetting the names layout and notifying the overall view
@@ -196,17 +135,7 @@ public class OverallFragment extends Fragment implements Observer, OnAppointment
         }
     }
 
-    /**
-     * Custom gesture listener used to track pinch zoom gestures.
-     */
-    class ScaleListener extends ScaleGestureDetector.SimpleOnScaleGestureListener {
-
-        @Override
-        public boolean onScale(ScaleGestureDetector detector) {
-            mScaleFactor *= detector.getScaleFactor();
-            mScaleFactor = Math.max(mScaleFactorMin, Math.min(mScaleFactor, mScaleFactorMax));
-            mOverallView.onScaleChanged(mScaleFactor);
-            return true;
-        }
+    public void onScaleChanged(float scaleFactor) {
+        mOverallView.onScaleChanged(scaleFactor);
     }
 }
