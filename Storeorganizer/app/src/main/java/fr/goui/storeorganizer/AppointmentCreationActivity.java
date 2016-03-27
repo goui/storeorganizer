@@ -385,21 +385,21 @@ public class AppointmentCreationActivity extends AppCompatActivity {
     /**
      * When a new worker is selected by the user.
      *
-     * @param position_p the position of the worker
+     * @param position the position of the worker
      */
-    protected void onWorkerSelected(int position_p) {
-        mNewWorker = mStoreWorkerModel.getStoreWorker(position_p);
-        mNewWorkerPosition = position_p;
+    protected void onWorkerSelected(int position) {
+        mNewWorker = mStoreWorkerModel.getStoreWorker(position);
+        mNewWorkerPosition = position;
         updateAppointmentInformation();
     }
 
     /**
      * When a new task is selected by the user.
      *
-     * @param position_p the position of the task
+     * @param position the position of the task
      */
-    protected void onTaskSelected(int position_p) {
-        mNewTask = mStoreTaskModel.getStoreTask(position_p);
+    protected void onTaskSelected(int position) {
+        mNewTask = mStoreTaskModel.getStoreTask(position);
         updateAppointmentInformation();
     }
 

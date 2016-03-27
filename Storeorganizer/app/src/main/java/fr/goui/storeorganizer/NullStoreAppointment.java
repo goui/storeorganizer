@@ -11,9 +11,9 @@ import java.util.Calendar;
 public class NullStoreAppointment extends StoreAppointment {
 
     @Override
-    public void setStartTime(int startHour_p, int startMinute_p) {
-        _startTime.set(Calendar.HOUR_OF_DAY, startHour_p);
-        _startTime.set(Calendar.MINUTE, startMinute_p);
+    public void setStartTime(int startHour, int startMinute) {
+        _startTime.set(Calendar.HOUR_OF_DAY, startHour);
+        _startTime.set(Calendar.MINUTE, startMinute);
     }
 
     @Override

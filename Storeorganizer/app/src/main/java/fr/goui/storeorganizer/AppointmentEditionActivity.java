@@ -1,5 +1,6 @@
 package fr.goui.storeorganizer;
 
+import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.support.v4.content.ContextCompat;
 import android.view.MenuItem;
@@ -38,11 +39,14 @@ public class AppointmentEditionActivity extends AppointmentCreationActivity {
     @Override
     protected void init() {
 
+        // getting the resources
+        Resources resources = getResources();
+
         // getting the old worker position
-        int oldWorkerPosition = getIntent().getIntExtra(WorkerFragment.INTENT_EXTRA_WORKER_POSITION, -1);
+        int oldWorkerPosition = getIntent().getIntExtra(resources.getString(R.string.intent_extra_worker_position), -1);
 
         // getting the old appointment position
-        int oldAppointmentPosition = getIntent().getIntExtra(WorkerFragment.INTENT_EXTRA_APPOINTMENT_POSITION, -1);
+        int oldAppointmentPosition = getIntent().getIntExtra(resources.getString(R.string.intent_extra_appointment_position), -1);
 
         // if there has been no problem to get the old worker position
         if (oldWorkerPosition != -1) {
@@ -76,9 +80,12 @@ public class AppointmentEditionActivity extends AppointmentCreationActivity {
                 else {
                     mIsAGap = false;
 
+                    // getting the task model
+                    StoreTaskModel storeTaskModel = StoreTaskModel.getInstance();
+
                     // searching for the old task position
-                    for (int i = 0; i < StoreTaskModel.getInstance().getStoreTaskNumber(); i++) {
-                        if (oldTask.equals(StoreTaskModel.getInstance().getStoreTask(i))) {
+                    for (int i = 0; i < storeTaskModel.getStoreTaskNumber(); i++) {
+                        if (oldTask.equals(storeTaskModel.getStoreTask(i))) {
                             taskPosition = i;
                         }
                     }
@@ -93,15 +100,15 @@ public class AppointmentEditionActivity extends AppointmentCreationActivity {
     /**
      * Method used to initialize views information.
      *
-     * @param workerPosition_p the position of the old worker
-     * @param taskPosition_p   the position of the new task
+     * @param workerPosition the position of the old worker
+     * @param taskPosition   the position of the new task
      */
-    private void initViewsInformation(int workerPosition_p, int taskPosition_p) {
+    private void initViewsInformation(int workerPosition, int taskPosition) {
 
         // putting information about old appointment in the views
         mEditTextClientName.setText(mOldAppointment.getClientName());
         mEditTextClientPhoneNumber.setText(mOldAppointment.getClientPhoneNumber());
-        mSpinnerWorker.setSelection(workerPosition_p);
+        mSpinnerWorker.setSelection(workerPosition);
 
         // if we are editing a gap we don't want to change the worker
         if (mIsAGap) {
@@ -111,7 +118,7 @@ public class AppointmentEditionActivity extends AppointmentCreationActivity {
 
         // if it is not a gap, selecting the old task
         else {
-            mSpinnerTask.setSelection(taskPosition_p);
+            mSpinnerTask.setSelection(taskPosition);
         }
 
         // setting starting and ending times text

@@ -59,6 +59,7 @@ public class OverallFragment extends Fragment implements OnAppointmentClickListe
         // displaying the workers names
         fillNamesLayout(activity);
 
+        // when the overall view is clicked we receive the event
         mOverallView.setOnAppointmentClickListener(this);
     }
 
@@ -87,7 +88,7 @@ public class OverallFragment extends Fragment implements OnAppointmentClickListe
     }
 
     @Override
-    public void onAppointmentClicked(StoreAppointment storeAppointment_p) {
+    public void onAppointmentClicked(StoreAppointment storeAppointment) {
         FragmentActivity activity = getActivity();
 
         // when an appointment is clicked in the overall view, we open a dialog displaying all the information
@@ -95,13 +96,13 @@ public class OverallFragment extends Fragment implements OnAppointmentClickListe
         final AlertDialog.Builder builder = new AlertDialog.Builder(activity, R.style.CustomDialogTheme);
         builder.setView(dialogLayout);
         TextView txtTaskName = (TextView) dialogLayout.findViewById(R.id.layout_appointment_information_task_name_text_view);
-        txtTaskName.setText(storeAppointment_p.getStoreTask().getName());
+        txtTaskName.setText(storeAppointment.getStoreTask().getName());
         TextView txtClientName = (TextView) dialogLayout.findViewById(R.id.layout_appointment_information_clients_name_text_view);
-        txtClientName.setText(storeAppointment_p.getClientName());
+        txtClientName.setText(storeAppointment.getClientName());
         TextView txtPhoneNumber = (TextView) dialogLayout.findViewById(R.id.layout_appointment_information_clients_phone_text_view);
-        txtPhoneNumber.setText(storeAppointment_p.getClientPhoneNumber());
+        txtPhoneNumber.setText(storeAppointment.getClientPhoneNumber());
         builder.setCancelable(true)
-                .setTitle(storeAppointment_p.getFormattedStartTime() + " - " + storeAppointment_p.getFormattedEndTime())
+                .setTitle(storeAppointment.getFormattedStartTime() + " - " + storeAppointment.getFormattedEndTime())
                 .setPositiveButton(getString(R.string.ok), new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         dialog.dismiss();
@@ -135,6 +136,11 @@ public class OverallFragment extends Fragment implements OnAppointmentClickListe
         }
     }
 
+    /**
+     * Redirects the zoom event to {@code OverallView}.
+     *
+     * @param scaleFactor the zoom factor
+     */
     public void onScaleChanged(float scaleFactor) {
         mOverallView.onScaleChanged(scaleFactor);
     }

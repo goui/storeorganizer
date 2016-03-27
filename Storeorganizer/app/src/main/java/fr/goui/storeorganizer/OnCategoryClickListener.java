@@ -8,8 +8,8 @@ public interface OnCategoryClickListener {
     /**
      * Callback used when a category has been clicked.
      *
-     * @param position_p the position of the clicked category
+     * @param position the position of the clicked category
      */
-    void onCategoryClicked(int position_p);
+    void onCategoryClicked(int position);
 
 }

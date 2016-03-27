@@ -1,6 +1,7 @@
 package fr.goui.storeorganizer;
 
 import android.content.Intent;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -16,84 +17,115 @@ import android.widget.Toast;
 
 import java.util.Calendar;
 
+/**
+ * {@code WorkerFragment} is a nested fragment displaying the current worker's list of appointments.
+ * If the worker has no appointments, a text saying so will be displayed.
+ */
 public class WorkerFragment extends Fragment implements OnAppointmentChangeListener {
 
+    /**
+     * The position of the nested fragment.
+     */
     public static final String ARG_SECTION_NUMBER = "section_number";
-    public static final String INTENT_EXTRA_APPOINTMENT_POSITION = "intent_extra_appointment_position";
-    public static final String INTENT_EXTRA_WORKER_POSITION = "intent_extra_worker_position";
 
-    private int _sectionNumber;
+    /**
+     * The position of the current worker.
+     */
+    private int mWorkerPosition;
 
-    private StoreWorker _currentWorker;
+    /**
+     * The current worker.
+     */
+    private StoreWorker mCurrentWorker;
 
-    private TextView _noAppointmentsTextView;
+    /**
+     * The text shown when there is no appointment.
+     */
+    private TextView mNoAppointmentsTextView;
 
-    private RecyclerView _recyclerView;
+    /**
+     * The recycler view displaying the appointments.
+     */
+    private RecyclerView mRecyclerView;
 
-    private WorkerRecyclerAdapter _workerRecyclerAdapter;
+    /**
+     * The recycler view's adapter.
+     */
+    private WorkerRecyclerAdapter mWorkerRecyclerAdapter;
 
-    private Calendar _calendar;
+    /**
+     * The project's resources.
+     */
+    private Resources mResources;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // indicating that this fragment has its own menu
         setHasOptionsMenu(true);
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, final ViewGroup container,
+                             Bundle savedInstanceState) {
+
+        // getting the layout and the views
+        View rootView = inflater.inflate(R.layout.fragment_worker, container, false);
+        mNoAppointmentsTextView = (TextView) rootView.findViewById(R.id.fragment_worker_no_appointments_text_view);
+        mRecyclerView = (RecyclerView) rootView.findViewById(R.id.fragment_worker_recycler_view);
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        mRecyclerView.setHasFixedSize(true);
+        return rootView;
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        _sectionNumber = getArguments().getInt(ARG_SECTION_NUMBER);
-        _currentWorker = StoreWorkerModel.getInstance().getStoreWorker(_sectionNumber);
-        _workerRecyclerAdapter = new WorkerRecyclerAdapter(getActivity(), _currentWorker.getStoreAppointments(), this);
-        _recyclerView.setAdapter(_workerRecyclerAdapter);
-        _calendar = Calendar.getInstance();
-        // we don't want to consider seconds and milliseconds
-        _calendar.set(Calendar.SECOND, 0);
-        _calendar.set(Calendar.MILLISECOND, 0);
-    }
+        // activity has been created, getting information
+        mWorkerPosition = getArguments().getInt(ARG_SECTION_NUMBER);
+        mCurrentWorker = StoreWorkerModel.getInstance().getStoreWorker(mWorkerPosition);
+        mWorkerRecyclerAdapter = new WorkerRecyclerAdapter(getActivity(), mCurrentWorker.getStoreAppointments(), this);
+        mRecyclerView.setAdapter(mWorkerRecyclerAdapter);
 
-    @Override
-    public View onCreateView(LayoutInflater inflater, final ViewGroup container,
-                             Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_worker, container, false);
-        _noAppointmentsTextView = (TextView) rootView.findViewById(R.id.fragment_worker_no_appointments_text_view);
-        _recyclerView = (RecyclerView) rootView.findViewById(R.id.fragment_worker_recycler_view);
-        _recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        _recyclerView.setHasFixedSize(true);
-        return rootView;
+        // getting the resources
+        mResources = getResources();
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        computeNoAppointmentTextViewVisibility();
+        notifyDataSetChanged();
     }
 
     @Override
-    public void onAppointmentEdit(int position_p) {
+    public void onAppointmentEdit(int position) {
+        // going to appointment edition screen
         Intent intent = new Intent(getActivity(), AppointmentEditionActivity.class);
-        intent.putExtra(INTENT_EXTRA_APPOINTMENT_POSITION, position_p);
-        intent.putExtra(INTENT_EXTRA_WORKER_POSITION, _sectionNumber);
+        intent.putExtra(mResources.getString(R.string.intent_extra_appointment_position), position);
+        intent.putExtra(mResources.getString(R.string.intent_extra_worker_position), mWorkerPosition);
         startActivity(intent);
     }
 
     @Override
-    public void onAppointmentDelete(int position_p) {
-        _currentWorker.removeStoreAppointment(_currentWorker.getStoreAppointment(position_p));
+    public void onAppointmentDelete(int position) {
+        // removing the appointment
+        mCurrentWorker.removeStoreAppointment(mCurrentWorker.getStoreAppointment(position));
         notifyDataSetChanged();
     }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
+        // creating the menu
         inflater.inflate(R.menu.menu_fragment_worker, menu);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
+
+        // scrolling to the current appointment
         if (id == R.id.action_scroll_to_current) {
             scrollToCurrentAppointment();
             return true;
@@ -101,36 +133,41 @@ public class WorkerFragment extends Fragment implements OnAppointmentChangeListe
         return super.onOptionsItemSelected(item);
     }
 
+    /**
+     * Method used to scroll to the current appointment.
+     */
     private void scrollToCurrentAppointment() {
-        if (_currentWorker.getStoreAppointmentsNumber() > 2) {
+        if (mCurrentWorker.getStoreAppointmentsNumber() > 2) {
             int position = -1;
-            for (int i = 0; i < _currentWorker.getStoreAppointmentsNumber(); i++) {
-                if (_calendar.after(_currentWorker.getStoreAppointments().get(i).getEndTime())) {
+            for (int i = 0; i < mCurrentWorker.getStoreAppointmentsNumber(); i++) {
+                if (Calendar.getInstance().after(mCurrentWorker.getStoreAppointments().get(i).getEndTime())) {
                     position = i + 1;
                 }
             }
-            ((LinearLayoutManager) _recyclerView.getLayoutManager()).scrollToPositionWithOffset(position + 1, 10);
+            ((LinearLayoutManager) mRecyclerView.getLayoutManager()).scrollToPositionWithOffset(position + 1, 10);
             Toast.makeText(getActivity(), getString(R.string.scrolling_to_the_current_appointment), Toast.LENGTH_SHORT).show();
         }
     }
 
-    public void updateList() {
-        if (_currentWorker.getStoreAppointmentsNumber() > 0 && _currentWorker.getStoreAppointment(0) instanceof NullStoreAppointment) {
-            _currentWorker.getStoreAppointment(0).setStartTime(Calendar.getInstance());
-        }
-        notifyDataSetChanged();
-    }
-
+    /**
+     * Updates the list of appointments.
+     */
     public void notifyDataSetChanged() {
-        _workerRecyclerAdapter.notifyDataSetChanged();
+        if (mCurrentWorker.getStoreAppointmentsNumber() > 0 && mCurrentWorker.getStoreAppointment(0) instanceof NullStoreAppointment) {
+            mCurrentWorker.getStoreAppointment(0).setStartTime(Calendar.getInstance());
+        }
+        mWorkerRecyclerAdapter.notifyDataSetChanged();
         computeNoAppointmentTextViewVisibility();
     }
 
+    /**
+     * Method used to toggle the no appointments text view.
+     */
     private void computeNoAppointmentTextViewVisibility() {
-        if (_currentWorker.getStoreAppointmentsNumber() >= 1) {
-            _noAppointmentsTextView.setVisibility(View.GONE);
+        if (mCurrentWorker.getStoreAppointmentsNumber() >= 1) {
+            mNoAppointmentsTextView.setVisibility(View.GONE);
         } else {
-            _noAppointmentsTextView.setVisibility(View.VISIBLE);
+            mNoAppointmentsTextView.setVisibility(View.VISIBLE);
         }
     }
 

@@ -61,21 +61,21 @@ public class WorkersCategoryRecyclerAdapter extends RecyclerView.Adapter<Recycle
     }
 
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent_p, int viewType_p) {
+    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         // creating the view holder with the inflated layout
-        return new WorkersViewHolder(mLayoutInflater.inflate(R.layout.fragment_settings_item_worker, parent_p, false));
+        return new WorkersViewHolder(mLayoutInflater.inflate(R.layout.fragment_settings_item_worker, parent, false));
     }
 
     @Override
-    public void onBindViewHolder(RecyclerView.ViewHolder holder_p, int position_p) {
+    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
 
         // getting the item at the current position
-        StoreWorker worker = mWorkers.get(position_p);
+        StoreWorker worker = mWorkers.get(position);
         if (worker != null) {
 
             // if not null, displaying its information
-            ((WorkersViewHolder) holder_p).setPosition(position_p);
-            ((WorkersViewHolder) holder_p).mTxtName.setText(worker.getName());
+            ((WorkersViewHolder) holder).setPosition(position);
+            ((WorkersViewHolder) holder).mTxtName.setText(worker.getName());
         }
     }
 

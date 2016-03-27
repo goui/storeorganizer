@@ -28,10 +28,10 @@ public class WorkerBaseAdapter extends BaseAdapter {
     /**
      * Constructor using a {@code Context} to get its {@code LayoutInflater}.
      *
-     * @param context_p the context
+     * @param context the context
      */
-    public WorkerBaseAdapter(Context context_p) {
-        mLayoutInflater = LayoutInflater.from(context_p);
+    public WorkerBaseAdapter(Context context) {
+        mLayoutInflater = LayoutInflater.from(context);
         mWorkers = StoreWorkerModel.getInstance().getStoreWorkers();
     }
 

@@ -14,33 +14,192 @@ import android.widget.TextView;
 import java.util.Calendar;
 import java.util.List;
 
+/**
+ * {@code WorkerRecyclerAdapter} manages the list of a worker's two-type list of appointments.
+ */
 public class WorkerRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
+    /**
+     * Constant for the normal appointment type.
+     */
     private static final int TYPE_NORMAL_APPOINTMENT = 0;
+
+    /**
+     * Constant for the null appointment type.
+     */
     private static final int TYPE_NULL_APPOINTMENT = 1;
 
-    private Context _context;
-    private LayoutInflater _inflater;
-    private List<StoreAppointment> _appointments;
-    private OnAppointmentChangeListener _onAppointmentChangeListener;
+    /**
+     * The context.
+     */
+    private Context mContext;
 
+    /**
+     * The layout inflater.
+     */
+    private LayoutInflater mLayoutInflater;
+
+    /**
+     * The list of appointments.
+     */
+    private List<StoreAppointment> mAppointments;
+
+    /**
+     * The appointment click listener.
+     */
+    private OnAppointmentChangeListener mOnAppointmentChangeListener;
+
+    /**
+     * Constructor.
+     *
+     * @param context                     the context
+     * @param appointments                the list of appointments
+     * @param onAppointmentChangeListener the appointment click listener
+     */
+    public WorkerRecyclerAdapter(Context context, List<StoreAppointment> appointments, OnAppointmentChangeListener onAppointmentChangeListener) {
+        mContext = context;
+        mLayoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        mAppointments = appointments;
+        mOnAppointmentChangeListener = onAppointmentChangeListener;
+    }
+
+    @Override
+    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        RecyclerView.ViewHolder viewHolder = null;
+        switch (viewType) {
+            case TYPE_NORMAL_APPOINTMENT:
+                viewHolder = new AppointmentViewHolder(mLayoutInflater.inflate(R.layout.fragment_worker_item_appointment, parent, false));
+                break;
+            case TYPE_NULL_APPOINTMENT:
+                viewHolder = new NullAppointmentViewHolder(mLayoutInflater.inflate(R.layout.fragment_worker_item_null_appointment, parent, false));
+                break;
+        }
+        return viewHolder;
+    }
+
+    @Override
+    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+        switch (holder.getItemViewType()) {
+            case TYPE_NORMAL_APPOINTMENT:
+                bindNormalAppointment((AppointmentViewHolder) holder, position);
+                break;
+            case TYPE_NULL_APPOINTMENT:
+                bindNullAppointment((NullAppointmentViewHolder) holder, position);
+                break;
+        }
+    }
+
+    /**
+     * Method used to display the data at the specified position for a null appointment.
+     *
+     * @param holder   the view holder
+     * @param position the position
+     */
+    private void bindNullAppointment(NullAppointmentViewHolder holder, int position) {
+        StoreAppointment appointment = mAppointments.get(position);
+        if (appointment != null) {
+            long startTime = appointment.getStartTime().getTimeInMillis();
+            long endTime = appointment.getEndTime().getTimeInMillis();
+            holder.textView.setText(
+                    (endTime - startTime) / 60000 + mContext.getString(R.string.minutes) + " " + mContext.getString(R.string.gap));
+            holder.position = position;
+        }
+    }
+
+    /**
+     * Method used to display the data at the specified position for a normal appointment.
+     *
+     * @param holder   the view holder
+     * @param position the position
+     */
+    private void bindNormalAppointment(AppointmentViewHolder holder, int position) {
+        StoreAppointment appointment = mAppointments.get(position);
+        if (appointment != null) {
+            holder.txtStartTime.setText(appointment.getFormattedStartTime());
+            holder.txtClientsName.setText(appointment.getClientName());
+            holder.txtClientsPhone.setText(appointment.getClientPhoneNumber());
+            holder.txtTaskName.setText(appointment.getStoreTask().getName());
+            holder.txtEndTime.setText(appointment.getFormattedEndTime());
+            holder.position = position;
+
+            Calendar now = Calendar.getInstance();
+            // we don't want to consider seconds and milliseconds
+            now.set(Calendar.SECOND, 0);
+            now.set(Calendar.MILLISECOND, 0);
+
+            // if appointment is in the past
+            if (appointment.isBefore(now)) {
+                holder.cardLayout.setEnabled(false);
+                holder.cardLayout.setBackgroundResource(R.color.light_grey);
+                holder.txtState.setVisibility(View.VISIBLE);
+                holder.txtState.setText(mContext.getString(R.string.ended));
+                holder.timeLayout.setBackgroundResource(R.color.light_grey);
+            }
+
+            // if appointment is in progress
+            else if (appointment.getStartTime().before(now) && appointment.getEndTime().after(now)) {
+                holder.cardLayout.setEnabled(true);
+                int[] attrs = new int[]{R.attr.selectableItemBackground};
+                TypedArray typedArray = mContext.obtainStyledAttributes(attrs);
+                int backgroundResource = typedArray.getResourceId(0, 0);
+                holder.cardLayout.setBackgroundResource(backgroundResource);
+                typedArray.recycle();
+                holder.txtState.setVisibility(View.VISIBLE);
+                holder.txtState.setText(mContext.getString(R.string.now));
+                holder.timeLayout.setBackgroundResource(R.color.colorAccentPale);
+            }
+
+            // if appointment is in the future
+            else {
+                holder.cardLayout.setEnabled(true);
+                int[] attrs = new int[]{R.attr.selectableItemBackground};
+                TypedArray typedArray = mContext.obtainStyledAttributes(attrs);
+                int backgroundResource = typedArray.getResourceId(0, 0);
+                holder.cardLayout.setBackgroundResource(backgroundResource);
+                typedArray.recycle();
+                holder.txtState.setVisibility(View.GONE);
+                holder.timeLayout.setBackgroundResource(android.R.color.transparent);
+            }
+        }
+    }
+
+    @Override
+    public int getItemCount() {
+        return mAppointments.size();
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        int type = TYPE_NORMAL_APPOINTMENT;
+        if (mAppointments.get(position) instanceof NullStoreAppointment) {
+            type = TYPE_NULL_APPOINTMENT;
+        }
+        return type;
+    }
+
+    /**
+     * The view holder for a null appointment.
+     */
     class NullAppointmentViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         TextView textView;
         int position;
 
-        public NullAppointmentViewHolder(View itemView_p) {
-            super(itemView_p);
-            textView = (TextView) itemView_p.findViewById(R.id.fragment_worker_item_null_appointment_text_view);
+        public NullAppointmentViewHolder(View itemView) {
+            super(itemView);
+            textView = (TextView) itemView.findViewById(R.id.fragment_worker_item_null_appointment_text_view);
             textView.setOnClickListener(this);
         }
 
         @Override
         public void onClick(View v) {
-            _onAppointmentChangeListener.onAppointmentEdit(position);
+            mOnAppointmentChangeListener.onAppointmentEdit(position);
         }
 
     }
 
+    /**
+     * The view holder for a normal appointment.
+     */
     class AppointmentViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
         TextView txtStartTime;
         TextView txtClientsName;
@@ -52,36 +211,36 @@ public class WorkerRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vie
         RelativeLayout cardLayout;
         int position;
 
-        public AppointmentViewHolder(View itemView_p) {
-            super(itemView_p);
-            txtStartTime = (TextView) itemView_p.findViewById(R.id.fragment_worker_item_appointment_start_time_text_view);
-            txtClientsName = (TextView) itemView_p.findViewById(R.id.layout_appointment_information_clients_name_text_view);
-            txtClientsPhone = (TextView) itemView_p.findViewById(R.id.layout_appointment_information_clients_phone_text_view);
-            txtTaskName = (TextView) itemView_p.findViewById(R.id.layout_appointment_information_task_name_text_view);
-            txtEndTime = (TextView) itemView_p.findViewById(R.id.fragment_worker_item_appointment_end_time_text_view);
-            txtState = (TextView) itemView_p.findViewById(R.id.fragment_worker_item_appointment_state_text_view);
-            timeLayout = (RelativeLayout) itemView_p.findViewById(R.id.fragment_worker_item_appointment_time_layout);
-            cardLayout = (RelativeLayout) itemView_p.findViewById(R.id.fragment_worker_item_appointment_layout);
+        public AppointmentViewHolder(View itemView) {
+            super(itemView);
+            txtStartTime = (TextView) itemView.findViewById(R.id.fragment_worker_item_appointment_start_time_text_view);
+            txtClientsName = (TextView) itemView.findViewById(R.id.layout_appointment_information_clients_name_text_view);
+            txtClientsPhone = (TextView) itemView.findViewById(R.id.layout_appointment_information_clients_phone_text_view);
+            txtTaskName = (TextView) itemView.findViewById(R.id.layout_appointment_information_task_name_text_view);
+            txtEndTime = (TextView) itemView.findViewById(R.id.fragment_worker_item_appointment_end_time_text_view);
+            txtState = (TextView) itemView.findViewById(R.id.fragment_worker_item_appointment_state_text_view);
+            timeLayout = (RelativeLayout) itemView.findViewById(R.id.fragment_worker_item_appointment_time_layout);
+            cardLayout = (RelativeLayout) itemView.findViewById(R.id.fragment_worker_item_appointment_layout);
             cardLayout.setOnClickListener(this);
             cardLayout.setOnLongClickListener(this);
         }
 
         @Override
         public void onClick(View v) {
-            _onAppointmentChangeListener.onAppointmentEdit(position);
+            mOnAppointmentChangeListener.onAppointmentEdit(position);
         }
 
         @Override
         public boolean onLongClick(View v) {
-            AlertDialog.Builder builder = new AlertDialog.Builder(_context);
-            builder.setTitle(_context.getString(R.string.question_remove_this_appointment));
-            builder.setPositiveButton(_context.getString(R.string.yes), new DialogInterface.OnClickListener() {
+            AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+            builder.setTitle(mContext.getString(R.string.question_remove_this_appointment));
+            builder.setPositiveButton(mContext.getString(R.string.yes), new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    _onAppointmentChangeListener.onAppointmentDelete(position);
+                    mOnAppointmentChangeListener.onAppointmentDelete(position);
                 }
             });
-            builder.setNegativeButton(_context.getString(R.string.no), new DialogInterface.OnClickListener() {
+            builder.setNegativeButton(mContext.getString(R.string.no), new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
                     dialog.cancel();
@@ -90,115 +249,5 @@ public class WorkerRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.Vie
             builder.show();
             return true;
         }
-    }
-
-    public WorkerRecyclerAdapter(Context context_p, List<StoreAppointment> appointments_p, OnAppointmentChangeListener onAppointmentChangeListener_p) {
-        _context = context_p;
-        _inflater = LayoutInflater.from(context_p);
-        _appointments = appointments_p;
-        _onAppointmentChangeListener = onAppointmentChangeListener_p;
-    }
-
-    @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent_p, int viewType_p) {
-        RecyclerView.ViewHolder viewHolder = null;
-        switch (viewType_p) {
-            case TYPE_NORMAL_APPOINTMENT:
-                viewHolder = new AppointmentViewHolder(_inflater.inflate(R.layout.fragment_worker_item_appointment, parent_p, false));
-                break;
-            case TYPE_NULL_APPOINTMENT:
-                viewHolder = new NullAppointmentViewHolder(_inflater.inflate(R.layout.fragment_worker_item_null_appointment, parent_p, false));
-                break;
-        }
-        return viewHolder;
-    }
-
-    @Override
-    public void onBindViewHolder(RecyclerView.ViewHolder holder_p, int position_p) {
-        switch (holder_p.getItemViewType()) {
-            case TYPE_NORMAL_APPOINTMENT:
-                bindNormalAppointment((AppointmentViewHolder) holder_p, position_p);
-                break;
-            case TYPE_NULL_APPOINTMENT:
-                bindNullAppointment((NullAppointmentViewHolder) holder_p, position_p);
-                break;
-        }
-    }
-
-    private void bindNullAppointment(NullAppointmentViewHolder holder_p, int position_p) {
-        StoreAppointment appointment = _appointments.get(position_p);
-        if (appointment != null) {
-            long startTime = appointment.getStartTime().getTimeInMillis();
-            long endTime = appointment.getEndTime().getTimeInMillis();
-            holder_p.textView.setText(
-                    (endTime - startTime) / 60000 + _context.getString(R.string.minutes) + " " + _context.getString(R.string.gap));
-            holder_p.position = position_p;
-        }
-    }
-
-    private void bindNormalAppointment(AppointmentViewHolder holder_p, int position_p) {
-        StoreAppointment appointment = _appointments.get(position_p);
-        if (appointment != null) {
-            holder_p.txtStartTime.setText(appointment.getFormattedStartTime());
-            holder_p.txtClientsName.setText(appointment.getClientName());
-            holder_p.txtClientsPhone.setText(appointment.getClientPhoneNumber());
-            holder_p.txtTaskName.setText(appointment.getStoreTask().getName());
-            holder_p.txtEndTime.setText(appointment.getFormattedEndTime());
-            holder_p.position = position_p;
-
-            Calendar now = Calendar.getInstance();
-            // we don't want to consider seconds and milliseconds
-            now.set(Calendar.SECOND, 0);
-            now.set(Calendar.MILLISECOND, 0);
-
-            // if appointment is in the past
-            if (appointment.isBefore(now)) {
-                holder_p.cardLayout.setEnabled(false);
-                holder_p.cardLayout.setBackgroundResource(R.color.light_grey);
-                holder_p.txtState.setVisibility(View.VISIBLE);
-                holder_p.txtState.setText(_context.getString(R.string.ended));
-                holder_p.timeLayout.setBackgroundResource(R.color.light_grey);
-            }
-
-            // if appointment is in progress
-            else if (appointment.getStartTime().before(now) && appointment.getEndTime().after(now)) {
-                holder_p.cardLayout.setEnabled(true);
-                int[] attrs = new int[]{R.attr.selectableItemBackground};
-                TypedArray typedArray = _context.obtainStyledAttributes(attrs);
-                int backgroundResource = typedArray.getResourceId(0, 0);
-                holder_p.cardLayout.setBackgroundResource(backgroundResource);
-                typedArray.recycle();
-                holder_p.txtState.setVisibility(View.VISIBLE);
-                holder_p.txtState.setText(_context.getString(R.string.now));
-                holder_p.timeLayout.setBackgroundResource(R.color.colorAccentPale);
-            }
-
-            // if appointment is in the future
-            else {
-                holder_p.cardLayout.setEnabled(true);
-                int[] attrs = new int[]{R.attr.selectableItemBackground};
-                TypedArray typedArray = _context.obtainStyledAttributes(attrs);
-                int backgroundResource = typedArray.getResourceId(0, 0);
-                holder_p.cardLayout.setBackgroundResource(backgroundResource);
-                typedArray.recycle();
-                holder_p.txtState.setVisibility(View.GONE);
-                holder_p.timeLayout.setBackgroundResource(android.R.color.transparent);
-            }
-        }
-    }
-
-    @Override
-    public int getItemCount() {
-        return _appointments.size();
-    }
-
-    @Override
-    public int getItemViewType(int position_p) {
-        int type = TYPE_NORMAL_APPOINTMENT;
-        if (_appointments.get(position_p) instanceof NullStoreAppointment) {
-            type = TYPE_NULL_APPOINTMENT;
-        }
-        ;
-        return type;
     }
 }

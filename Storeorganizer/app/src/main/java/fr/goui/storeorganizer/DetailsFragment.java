@@ -51,6 +51,8 @@ public class DetailsFragment extends Fragment implements OnTimeTickListener, OnA
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
+        // getting the views
         View rootView = inflater.inflate(R.layout.fragment_details, container, false);
         mViewPager = (ViewPager) rootView.findViewById(R.id.fragment_details_view_pager);
         mTabLayout = (TabLayout) rootView.findViewById(R.id.fragment_details_tab_layout);
@@ -61,6 +63,7 @@ public class DetailsFragment extends Fragment implements OnTimeTickListener, OnA
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
+        // activity has been created, initializing objects
         mSectionsPagerAdapter = new SectionsPagerAdapter(getChildFragmentManager());
         mViewPager.setAdapter(mSectionsPagerAdapter);
         mTabLayout.post(new Runnable() {
@@ -74,18 +77,22 @@ public class DetailsFragment extends Fragment implements OnTimeTickListener, OnA
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // indicating that this fragment has its own menu
         setHasOptionsMenu(true);
     }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);
+        // creating the menu
         inflater.inflate(R.menu.menu_fragment_details, menu);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
+
+        // displaying a dialog with next availability information
         if (id == R.id.action_next_availability) {
             displayNextAvailabilityDialog();
             return true;
@@ -95,6 +102,7 @@ public class DetailsFragment extends Fragment implements OnTimeTickListener, OnA
 
     /**
      * Method used to display a dialog telling user about workers availability.
+     * The dialog is only composed of a {@code TextView}.
      */
     private void displayNextAvailabilityDialog() {
         FragmentActivity activity = getActivity();
@@ -128,25 +136,30 @@ public class DetailsFragment extends Fragment implements OnTimeTickListener, OnA
     @Override
     public void onResume() {
         super.onResume();
+
+        // updating the tabs and the nested fragments
         mSectionsPagerAdapter.notifyDataSetChanged();
         notifyAllWorkers();
     }
 
     @Override
-    public void onStop() {
-        super.onStop();
-    }
-
-    @Override
     public void onTimeTick() {
+        // updating the nested fragments
         notifyAllWorkers();
     }
 
     @Override
     public void onAppointmentCreate(int workerPosition) {
+        // updating the concerned nested fragment
         notifyWorkerFragmentAt(workerPosition);
     }
 
+    /**
+     * Method used to update the tabs because something about workers has changed.
+     *
+     * @param observable the model we are listening to
+     * @param data       the data containing the information
+     */
     public void update(Observable observable, Object data) {
         if (observable instanceof StoreWorkerModel && data instanceof StoreWorkerModel.ObsData) {
             StoreWorkerModel.ObsData obsData = (StoreWorkerModel.ObsData) data;
@@ -176,12 +189,20 @@ public class DetailsFragment extends Fragment implements OnTimeTickListener, OnA
         }
     }
 
+    /**
+     * Method used to update all the nested fragments.
+     */
     private void notifyAllWorkers() {
         for (int i = 0; i < mStoreWorkerModel.getStoreWorkersNumber(); i++) {
             notifyWorkerFragmentAt(i);
         }
     }
 
+    /**
+     * Method used to update a specific nested fragment.
+     *
+     * @param position the position of the nested fragment
+     */
     private void notifyWorkerFragmentAt(int position) {
         WorkerFragment fragment = (WorkerFragment) getChildFragmentManager()
                 .findFragmentByTag("android:switcher:" + R.id.fragment_details_view_pager + ":" + position);
@@ -211,10 +232,10 @@ public class DetailsFragment extends Fragment implements OnTimeTickListener, OnA
         }
 
         @Override
-        public Fragment getItem(int position_p) {
+        public Fragment getItem(int position) {
             WorkerFragment fragment = new WorkerFragment();
             Bundle args = new Bundle();
-            args.putInt(WorkerFragment.ARG_SECTION_NUMBER, position_p);
+            args.putInt(WorkerFragment.ARG_SECTION_NUMBER, position);
             fragment.setArguments(args);
             return fragment;
         }
@@ -225,8 +246,8 @@ public class DetailsFragment extends Fragment implements OnTimeTickListener, OnA
         }
 
         @Override
-        public CharSequence getPageTitle(int position_p) {
-            return mStoreWorkerModel.getStoreWorker(position_p).getName();
+        public CharSequence getPageTitle(int position) {
+            return mStoreWorkerModel.getStoreWorker(position).getName();
         }
 
         @Override

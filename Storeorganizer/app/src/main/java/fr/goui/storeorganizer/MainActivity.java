@@ -25,14 +25,31 @@ import android.view.View;
 import java.util.Observable;
 import java.util.Observer;
 
+/**
+ * {@code MainActivity} is the main screen of the application. It navigates by means of a navigation drawer.
+ * It can access {@link DetailsFragment}, {@link OverallFragment} and {@link SettingsActivity}.
+ * By default the displayed fragment is {@code DetailsFragment}.
+ */
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, Observer {
 
+    /**
+     * The manager used to display fragments.
+     */
     private FragmentManager mFragmentManager;
 
-    private FloatingActionButton mFloatingActionButton;
+    /**
+     * The layout for the navigation drawer.
+     */
+    private DrawerLayout mDrawerLayout;
 
+    /**
+     * The fragment currently displayed.
+     */
     private Fragment mCurrentFragment;
 
+    /**
+     * Android resources.
+     */
     private Resources mResources;
 
     /**
@@ -56,7 +73,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private int mScaleFactorMax;
 
     /**
-     * The worker model we are listening to.
+     * The worker model.
      */
     private StoreWorkerModel mStoreWorkerModel = StoreWorkerModel.getInstance();
 
@@ -80,17 +97,24 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // setting the layout
         setContentView(R.layout.activity_main);
+
+        // getting the views
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+
+        // linking the toolbar to this activity
         setSupportActionBar(toolbar);
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        mFloatingActionButton = (FloatingActionButton) findViewById(R.id.fab);
-
+        // getting the android resources
         mResources = getResources();
 
-        mFloatingActionButton.setOnClickListener(new View.OnClickListener() {
+        // click listener for the floating action button
+        fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(MainActivity.this, AppointmentCreationActivity.class);
@@ -101,19 +125,24 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         });
 
+        // getting the fragment manager
         mFragmentManager = getSupportFragmentManager();
 
+        // displaying DetailsFragment
         FragmentTransaction transaction = mFragmentManager.beginTransaction();
         mCurrentFragment = new DetailsFragment();
         transaction.replace(R.id.main_content, mCurrentFragment).commit();
 
+        // affecting the navigation drawer listener to this activity
         navigationView.setNavigationItemSelectedListener(this);
 
+        // linking the hamburger menu to the navigation drawer
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.addDrawerListener(toggle);
+                this, mDrawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        mDrawerLayout.addDrawerListener(toggle);
         toggle.syncState();
 
+        // subscribing to the models
         mStoreWorkerModel.addObserver(this);
         mStoreModel.addObserver(this);
 
@@ -130,7 +159,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        // if an appointment has been created
+        // if an appointment has been created, sending the information to the current fragment
         if (requestCode == mResources.getInteger(R.integer.intent_request_code_appointment_creation)) {
             if (resultCode == RESULT_OK) {
                 int position = data.getIntExtra(mResources.getString(R.string.intent_appointment_creation_result_worker_position), mResources.getInteger(R.integer.invalid_position));
@@ -144,12 +173,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     protected void onResume() {
         super.onResume();
+        // registering the time tick broadcast receiver
         registerReceiver(mTimeBroadcastReceiver, new IntentFilter(Intent.ACTION_TIME_TICK));
     }
 
     @Override
     protected void onStop() {
         super.onStop();
+        // unregistering the time tick broadcast receiver
         if (mTimeBroadcastReceiver != null) {
             unregisterReceiver(mTimeBroadcastReceiver);
         }
@@ -157,9 +188,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
+        // if the drawer is open, closing it if the user presses back
+        if (mDrawerLayout.isDrawerOpen(GravityCompat.START)) {
+            mDrawerLayout.closeDrawer(GravityCompat.START);
         } else {
             super.onBackPressed();
         }
@@ -179,27 +210,28 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         // Handle navigation view item clicks here.
         int id = item.getItemId();
-        if (id == R.id.nav_details) {
+        if (id == R.id.nav_details) { // displaying details fragment
             mCurrentFragment = new DetailsFragment();
             transaction.replace(R.id.main_content, mCurrentFragment).commit();
             ret = true;
-        } else if (id == R.id.nav_overall) {
+        } else if (id == R.id.nav_overall) { // displaying overall fragment
             mCurrentFragment = new OverallFragment();
             transaction.replace(R.id.main_content, mCurrentFragment).commit();
             ret = true;
-        } else if (id == R.id.nav_settings) {
+        } else if (id == R.id.nav_settings) { // navigating to the settings activity
             Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
             startActivity(intent);
             ret = false;
         }
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
+        // closing the navigation drawer when a choice has been made
+        mDrawerLayout.closeDrawer(GravityCompat.START);
         return ret;
     }
 
     @Override
     public void update(Observable observable, Object data) {
+        // model update callback
         if (mCurrentFragment instanceof DetailsFragment) {
             ((DetailsFragment) mCurrentFragment).update(observable, data);
         } else if (mCurrentFragment instanceof OverallFragment) {
@@ -209,6 +241,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
+        // intercepting touch events for zoom behavior
         if (mCurrentFragment instanceof OverallFragment) {
             mScaleGestureDetector.onTouchEvent(ev);
         }
@@ -222,6 +255,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         @Override
         public boolean onScale(ScaleGestureDetector detector) {
+            // zooming in a range of 1x to 3x
             mScaleFactor *= detector.getScaleFactor();
             mScaleFactor = Math.max(mScaleFactorMin, Math.min(mScaleFactor, mScaleFactorMax));
             ((OverallFragment) mCurrentFragment).onScaleChanged(mScaleFactor);

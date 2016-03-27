@@ -70,6 +70,8 @@
     <!-- For the intents -->
     <string name="intent_appointment_creation_worker_position">intent_appointment_creation_worker_position</string>
     <string name="intent_appointment_creation_result_worker_position">intent_appointment_creation_result_worker_position</string>
+    <string name="intent_extra_worker_position">intent_extra_worker_position</string>
+    <string name="intent_extra_appointment_position">intent_extra_appointment_position</string>
 
     <!-- For the shared preferences  -->
     <string name="preference_file_key">fr.goui.storeorganizer.PREFERENCE_FILE_KEY</string>

@@ -8,7 +8,7 @@ public interface OnAppointmentClickListener {
     /**
      * Callback used when an appointment has been clicked.
      *
-     * @param storeAppointment_p the clicked {@code StoreAppointment}
+     * @param storeAppointment the clicked {@code StoreAppointment}
      */
-    void onAppointmentClicked(StoreAppointment storeAppointment_p);
+    void onAppointmentClicked(StoreAppointment storeAppointment);
 }

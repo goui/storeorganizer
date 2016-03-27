@@ -16,63 +16,194 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * {@code OverallView} is a custom {@code View} used to display all the workers and all their appointments.
+ * It displays a grid similar to a calendar.
+ * Users can scroll, tap on appointments to see the details and zoom in or out.
+ */
 public class OverallView extends View {
 
+    /**
+     * The number of pixels to detecting a scroll action.
+     */
     private static final int SCROLL_DETECTION_OFFSET_VALUE = 20;
 
+    /**
+     * The painter used for the text and the outer grid.
+     */
     private final Paint mBlackPaint = new Paint();
+
+    /**
+     * The painter used for the past appointments and the inner grid.
+     */
     private final Paint mGreyPaint = new Paint();
+
+    /**
+     * The painter used for current and future appointments.
+     */
     private final Paint mAppointmentPaint = new Paint();
+
+    /**
+     * The painter used for the now line.
+     */
     private final Paint mNowPaint = new Paint();
 
+    /**
+     * The listener we notify when user taps on an appointment.
+     */
     private OnAppointmentClickListener mOnAppointmentClickListener;
+
+    /**
+     * The map storing the appointments location.
+     */
     private Map<Rect, StoreAppointment> items = new HashMap<>();
+
+    /**
+     * Boolean used to know if we are touching the view.
+     */
     private boolean mTouched;
+
+    /**
+     * The x coordinate of the latest touch event.
+     */
     private int mTouchedPositionX;
+
+    /**
+     * The y coordinate of the latest touch event.
+     */
     private int mTouchedPositionY;
+
+    /**
+     * The store's starting hour.
+     */
     private int mHourMin;
+
+    /**
+     * The store's ending hour.
+     */
     private int mHourMax;
+
+    /**
+     * All the hours strings. From starting hour to ending hour.
+     */
     private String[] mHoursStrings;
+
+    /**
+     * The number of columns of the grid.
+     */
     private int mNumberOfColumns;
+
+    /**
+     * The number of rows of the grid.
+     */
     private int mNumberOfRows;
+
+    /**
+     * The width of each cell.
+     */
     private int mCellWidth;
+
+    /**
+     * The width of each cell at 1x zoom.
+     */
     private int mDefaultCellHeight;
+
+    /**
+     * The default zoom factor.
+     */
     private float mScaleFactor = 1.0f;
+
+    /**
+     * The height of each cell.
+     */
     private int mCellHeight;
-    private int mNowLineY;
+
+    /**
+     * The dimensions of the screen.
+     */
     private Point mScreenSize = new Point();
-    private StoreWorkerModel mStoreWorkerModel = StoreWorkerModel.getInstance();
-    private StoreModel mStoreModel = StoreModel.getInstance();
+
+    /**
+     * The size of all the texts.
+     */
     private int mTextSize;
+
+    /**
+     * The height of the margin between the names and the grid.
+     */
     private int mTopMargin;
+
+    /**
+     * The width of the margin between the hours strings and the grid.
+     */
     private int mLeftMargin;
+
+    /**
+     * The initial x position.
+     */
     private int mInitialX;
+
+    /**
+     * The initial y position.
+     */
     private int mInitialY;
+
+    /**
+     * The final x position.
+     */
     private int mFinalX;
 
+    /**
+     * The workers model.
+     */
+    private StoreWorkerModel mStoreWorkerModel = StoreWorkerModel.getInstance();
+
+    /**
+     * The store model.
+     */
+    private StoreModel mStoreModel = StoreModel.getInstance();
+
+    /**
+     * Default constructor.
+     *
+     * @param context the context
+     */
     public OverallView(Context context) {
         super(context);
         init(context);
     }
 
+    /**
+     * Constructor used by xml.
+     *
+     * @param context the context
+     * @param attrs   layout attributes
+     */
     public OverallView(Context context, AttributeSet attrs) {
         super(context, attrs);
         init(context);
     }
 
+    /**
+     * Initialization method used to get all the information we need to draw everything.
+     *
+     * @param context the context
+     */
     private void init(Context context) {
+
+        // getting the dimensions of the screen
         ((WindowManager) context.getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay().getSize(mScreenSize);
+
+        // getting project's resources
         Resources resources = context.getResources();
+
+        // getting all values in resources and models
         mHourMin = mStoreModel.getStartingHour();
         mHourMax = mStoreModel.getEndingMinute() > 0 ? mStoreModel.getEndingHour() + 1 : mStoreModel.getEndingHour();
         mNumberOfRows = mHourMax - mHourMin;
         mHoursStrings = new String[mNumberOfRows + 1];
         generateHoursStrings();
         mNumberOfColumns = mStoreWorkerModel.getStoreWorkersNumber();
-        int blackColor = ContextCompat.getColor(context, R.color.black);
-        int greyColor = ContextCompat.getColor(context, R.color.grey_overlay);
-        int mainColor = ContextCompat.getColor(context, R.color.colorPrimary);
-        int accentColor = ContextCompat.getColor(context, R.color.colorAccent);
         mTopMargin = (int) resources.getDimension(R.dimen.hour_top_margin);
         mLeftMargin = (int) resources.getDimension(R.dimen.hour_left_margin);
         mTextSize = (int) resources.getDimension(R.dimen.hour_text_size);
@@ -83,19 +214,27 @@ public class OverallView extends View {
         mFinalX = mScreenSize.x - mTextSize;
         mCellWidth = (mFinalX - mInitialX) / mNumberOfColumns;
 
+        // initializing the painters
+        int blackColor = ContextCompat.getColor(context, R.color.black);
         mBlackPaint.setColor(blackColor);
         mBlackPaint.setTextSize(mTextSize);
         mBlackPaint.setAntiAlias(true);
+        int greyColor = ContextCompat.getColor(context, R.color.grey_overlay);
         mGreyPaint.setColor(greyColor);
         mGreyPaint.setTextSize(mTextSize);
         mGreyPaint.setAntiAlias(true);
+        int mainColor = ContextCompat.getColor(context, R.color.colorPrimary);
         mAppointmentPaint.setColor(mainColor);
         mAppointmentPaint.setAntiAlias(true);
+        int accentColor = ContextCompat.getColor(context, R.color.colorAccent);
         mNowPaint.setColor(accentColor);
         mNowPaint.setStrokeWidth(3);
         mNowPaint.setAntiAlias(true);
     }
 
+    /**
+     * Method used to fill the hours strings array.
+     */
     private void generateHoursStrings() {
         int counter = 0;
         for (int i = mHourMin; i < mHourMax + 1; i++) {
@@ -107,11 +246,18 @@ public class OverallView extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
+
+        // drawing the grid, the texts, the appointments and the now line
         drawBackground(canvas);
         drawAppointments(canvas);
         drawNowLine(canvas);
     }
 
+    /**
+     * Draws the texts and the grid.
+     *
+     * @param canvas the canvas
+     */
     private void drawBackground(Canvas canvas) {
         mCellWidth = (mFinalX - mInitialX) / mNumberOfColumns;
         int y = mInitialY;
@@ -135,6 +281,11 @@ public class OverallView extends View {
         canvas.drawLine(mFinalX, mInitialY, mFinalX, y, mBlackPaint);
     }
 
+    /**
+     * Draws the appointments
+     *
+     * @param canvas the canvas
+     */
     private void drawAppointments(Canvas canvas) {
         int x1 = mInitialX + 2;
         for (int i = 0; i < mNumberOfColumns; i++) {
@@ -168,6 +319,11 @@ public class OverallView extends View {
         }
     }
 
+    /**
+     * Draws the now line.
+     *
+     * @param canvas the canvas
+     */
     private void drawNowLine(Canvas canvas) {
         Calendar calendar = Calendar.getInstance();
         // we don't want to consider seconds and milliseconds
@@ -175,8 +331,8 @@ public class OverallView extends View {
         calendar.set(Calendar.MILLISECOND, 0);
         int hour = calendar.get(Calendar.HOUR_OF_DAY);
         int minute = calendar.get(Calendar.MINUTE);
-        mNowLineY = mInitialY + mCellHeight * (hour - mHourMin) + (mCellHeight * minute) / 60;
-        canvas.drawLine(mInitialX, mNowLineY, mFinalX, mNowLineY, mNowPaint);
+        int nowLineY = mInitialY + mCellHeight * (hour - mHourMin) + (mCellHeight * minute) / 60;
+        canvas.drawLine(mInitialX, nowLineY, mFinalX, nowLineY, mNowPaint);
     }
 
     @Override
@@ -185,20 +341,31 @@ public class OverallView extends View {
         setMeasuredDimension(mScreenSize.x, maxHeight);
     }
 
-    public void onScaleChanged(float scaleFactor_p) {
-        if (scaleFactor_p != mScaleFactor) {
-            mScaleFactor = scaleFactor_p;
-            mCellHeight = (int) (mDefaultCellHeight * scaleFactor_p);
+    /**
+     * When the user has pinched the view we zoom in or out.
+     *
+     * @param scaleFactor the zoom factor
+     */
+    public void onScaleChanged(float scaleFactor) {
+        if (scaleFactor != mScaleFactor) {
+            mScaleFactor = scaleFactor;
+            mCellHeight = (int) (mDefaultCellHeight * scaleFactor);
             requestLayout();
             invalidate();
         }
     }
 
+    /**
+     * When something about the workers has changed we update our information and redraw everything.
+     */
     public void onWorkersChanged() {
         mNumberOfColumns = mStoreWorkerModel.getStoreWorkersNumber();
         invalidate();
     }
 
+    /**
+     * When working times have changed we update our information and redraw everything.
+     */
     public void onWorkingTimesChanged() {
         mHourMin = mStoreModel.getStartingHour();
         mHourMax = mStoreModel.getEndingMinute() > 0 ? mStoreModel.getEndingHour() + 1 : mStoreModel.getEndingHour();
@@ -213,19 +380,19 @@ public class OverallView extends View {
     public boolean onTouchEvent(MotionEvent event) {
         int action = event.getAction();
         switch (action) {
-            case MotionEvent.ACTION_DOWN:
+            case MotionEvent.ACTION_DOWN: // touch
                 mTouchedPositionX = (int) event.getX();
                 mTouchedPositionY = (int) event.getY();
                 mTouched = true;
                 break;
-            case MotionEvent.ACTION_MOVE:
+            case MotionEvent.ACTION_MOVE: // scroll action
                 int x = (int) event.getX();
                 int y = (int) event.getY();
                 if (Math.abs(x - mTouchedPositionX) > SCROLL_DETECTION_OFFSET_VALUE || Math.abs(y - mTouchedPositionY) > SCROLL_DETECTION_OFFSET_VALUE) {
                     mTouched = false;
                 }
                 break;
-            case MotionEvent.ACTION_UP:
+            case MotionEvent.ACTION_UP: // maybe a tap
                 if (mTouched) {
                     onClick();
                     mTouched = false;
@@ -235,10 +402,18 @@ public class OverallView extends View {
         return true;
     }
 
+    /**
+     * Sets the listener for appointment tap events.
+     *
+     * @param onAppointmentClickListener the listener
+     */
     public void setOnAppointmentClickListener(OnAppointmentClickListener onAppointmentClickListener) {
         mOnAppointmentClickListener = onAppointmentClickListener;
     }
 
+    /**
+     * When the user taps on the screen we check if it was on an appointment. If so we trigger the listener.
+     */
     private void onClick() {
         // getting the appointment clicked based on the touched position
         for (Rect r : items.keySet()) {
