@@ -22,7 +22,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <fr.goui.storeorganizer.OverallView
+            <fr.goui.storeorganizer.view.OverallView
                 android:id="@+id/fragment_overall_view"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"/>

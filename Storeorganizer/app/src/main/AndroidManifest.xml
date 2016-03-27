@@ -10,7 +10,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".LauncherActivity"
+            android:name=".activity.LauncherActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/app_name"
             android:theme="@style/FullscreenTheme">
@@ -21,22 +21,22 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".SettingsActivity"
+            android:name=".activity.SettingsActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:label="@string/settings"
             android:launchMode="singleInstance"/>
         <activity
-            android:name=".AppointmentCreationActivity"
+            android:name=".activity.AppointmentCreationActivity"
             android:label="@string/appointment_creation"
             android:launchMode="singleInstance">
         </activity>
         <activity
-            android:name=".AppointmentEditionActivity"
+            android:name=".activity.AppointmentEditionActivity"
             android:label="@string/appointment_edition"
             android:launchMode="singleInstance">
         </activity>
         <activity
-            android:name=".MainActivity"
+            android:name=".activity.MainActivity"
             android:label="@string/app_name"
             android:launchMode="singleInstance"
             android:theme="@style/AppTheme.NoActionBar">
