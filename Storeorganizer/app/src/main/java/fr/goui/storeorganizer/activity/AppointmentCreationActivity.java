@@ -550,6 +550,7 @@ public class AppointmentCreationActivity extends AppCompatActivity {
 
             // creating the appointment
             mNewWorker.addStoreAppointment(mNewAppointment);
+            // TODO add appointment to the shared prefs
         }
 
         // if there is an error, displaying it

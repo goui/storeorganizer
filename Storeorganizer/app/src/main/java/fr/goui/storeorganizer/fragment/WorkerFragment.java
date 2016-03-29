@@ -119,6 +119,7 @@ public class WorkerFragment extends Fragment implements OnAppointmentChangeListe
     public void onAppointmentDelete(int position) {
         // removing the appointment
         mCurrentWorker.removeStoreAppointment(mCurrentWorker.getStoreAppointment(position));
+        // TODO remove appointment from the shared prefs
         notifyDataSetChanged();
     }
 

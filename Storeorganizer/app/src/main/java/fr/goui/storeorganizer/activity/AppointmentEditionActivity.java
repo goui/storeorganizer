@@ -282,6 +282,7 @@ public class AppointmentEditionActivity extends AppointmentCreationActivity {
                 mOldWorker.removeStoreAppointment(mOldAppointment);
                 mOldWorker.addStoreAppointment(mNewAppointment);
             }
+            // TODO add appointment to the shared prefs
         } else {
             Toast.makeText(this, errorMessage, Toast.LENGTH_LONG).show();
             result = false;

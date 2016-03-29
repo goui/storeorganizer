@@ -127,6 +127,9 @@ public class LauncherActivity extends AppCompatActivity {
             // getting store information in the shared prefs and putting it in the model
             getStoreInfo();
 
+            // getting appointments of the day for all workers in the shared prefs and putting them in the model
+            getAppointmentsOfTheDay();
+
             return null;
         }
 
@@ -218,7 +221,7 @@ public class LauncherActivity extends AppCompatActivity {
     }
 
     /**
-     * Method used to get store information from the store model.
+     * Method used to get information about the store and put it in the corresponding model.
      */
     private void getStoreInfo() {
         StoreModel storeModel = StoreModel.getInstance();
@@ -246,6 +249,15 @@ public class LauncherActivity extends AppCompatActivity {
                     mResources.getInteger(R.integer.default_ending_minute));
             storeModel.setEndingTime(endingHour, endingMinute);
         }
+    }
+
+    /**
+     * Method used to get saved appointments for the current day.
+     * If a new day has come we delete them. If not we put them in the corresponding model.
+     */
+    private void getAppointmentsOfTheDay() {
+        // TODO if saved day is today get appointment info
+        // TODO if not erase info and save present day
     }
 
 }
