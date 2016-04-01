@@ -89,5 +89,6 @@
     <string name="ending_hour">ending_hour</string>
     <string name="ending_minute">ending_minute</string>
     <string name="saved_day">saved_day</string>
+    <string name="number_of_appointments">number_of_appointments</string>
 
 </resources>

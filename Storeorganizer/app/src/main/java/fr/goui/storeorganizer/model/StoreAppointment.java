@@ -14,7 +14,7 @@ public class StoreAppointment implements Comparable<StoreAppointment> {
     /**
      * The {@code String} representing the pattern used to format times.
      */
-    private static final String DATE_FORMAT_PATTERN = "HH:mm";
+    private static final transient String DATE_FORMAT_PATTERN = "HH:mm";
 
     /**
      * The {@code StoreTask} linked to this {@code StoreAppointment}.
@@ -44,7 +44,7 @@ public class StoreAppointment implements Comparable<StoreAppointment> {
     /**
      * The {@code SimpleDateFormat} used to format start and end times.
      */
-    private SimpleDateFormat _simpleDateFormat;
+    private transient SimpleDateFormat _simpleDateFormat;
 
     /**
      * Default constructor instantiating the 2 {@code Calendar} and the {@code SimpleDateFormat}.

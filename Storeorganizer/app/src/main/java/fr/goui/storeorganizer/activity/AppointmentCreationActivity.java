@@ -5,6 +5,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.os.Bundle;
@@ -22,6 +23,8 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
+
+import com.google.gson.Gson;
 
 import java.util.Calendar;
 
@@ -147,6 +150,11 @@ public class AppointmentCreationActivity extends AppCompatActivity {
      * The {@code Calendar} used to manage ending time.
      */
     protected Calendar mCalendarEndingTime = Calendar.getInstance();
+
+    /**
+     * The {@code SharedPreferences}.
+     */
+    protected SharedPreferences mSharedPreferences;
 
     /**
      * The time picker dialog listener for starting time.
@@ -319,6 +327,9 @@ public class AppointmentCreationActivity extends AppCompatActivity {
         mCalendarStartingTime.set(Calendar.MILLISECOND, 0);
         mCalendarEndingTime.set(Calendar.SECOND, 0);
         mCalendarEndingTime.set(Calendar.MILLISECOND, 0);
+
+        // getting the shared prefs
+        mSharedPreferences = getSharedPreferences(mResources.getString(R.string.preference_file_key), MODE_PRIVATE);
     }
 
     @Override
@@ -550,7 +561,18 @@ public class AppointmentCreationActivity extends AppCompatActivity {
 
             // creating the appointment
             mNewWorker.addStoreAppointment(mNewAppointment);
-            // TODO add appointment to the shared prefs
+
+            // adding the appointment in shared prefs
+            Gson gson = new Gson();
+            String json = gson.toJson(mNewAppointment);
+            SharedPreferences.Editor editor = mSharedPreferences.edit();
+            editor.putString(mResources.getString(R.string.worker) + mNewWorker.getId()
+                            + mResources.getString(R.string.appointment) + (mNewWorker.getStoreAppointmentsNumber() - 1),
+                    json);
+            editor.putInt(mResources.getString(R.string.worker) + mNewWorker.getId() + mResources.getString(R.string.number_of_appointments),
+                    mNewWorker.getStoreAppointmentsNumber());
+            editor.apply();
+
         }
 
         // if there is an error, displaying it

@@ -44,17 +44,22 @@ public class AppointmentEditionActivity extends AppointmentCreationActivity {
      */
     private boolean mIsAGap;
 
+    /**
+     * The android {@code Resources}.
+     */
+    private Resources mResources;
+
     @Override
     protected void init() {
 
         // getting the resources
-        Resources resources = getResources();
+        mResources = getResources();
 
         // getting the old worker position
-        int oldWorkerPosition = getIntent().getIntExtra(resources.getString(R.string.intent_extra_worker_position), -1);
+        int oldWorkerPosition = getIntent().getIntExtra(mResources.getString(R.string.intent_extra_worker_position), -1);
 
         // getting the old appointment position
-        int oldAppointmentPosition = getIntent().getIntExtra(resources.getString(R.string.intent_extra_appointment_position), -1);
+        int oldAppointmentPosition = getIntent().getIntExtra(mResources.getString(R.string.intent_extra_appointment_position), -1);
 
         // if there has been no problem to get the old worker position
         if (oldWorkerPosition != -1) {
@@ -262,27 +267,31 @@ public class AppointmentEditionActivity extends AppointmentCreationActivity {
         // if there is no error
         if (errorMessage == null) {
 
-            // setting the client's name and phone number
-            mNewAppointment.setClientName(mEditTextClientName.getText().toString());
-            mNewAppointment.setClientPhoneNumber(mEditTextClientPhoneNumber.getText().toString());
+            // if there is a modification
+            if (!mOldAppointment.equals(mNewAppointment)) {
 
-            // if this was a gap, adding the new appointment to the old worker
-            if (mIsAGap) {
-                mOldWorker.addStoreAppointment(mNewAppointment);
-            }
+                // setting the client's name and phone number
+                mNewAppointment.setClientName(mEditTextClientName.getText().toString());
+                mNewAppointment.setClientPhoneNumber(mEditTextClientPhoneNumber.getText().toString());
 
-            // if it was not a gap and the worker changed, moving the appointment to the new worker
-            else if (mHasWorkerChanged) {
-                mOldWorker.removeStoreAppointment(mOldAppointment);
-                mNewWorker.addStoreAppointment(mNewAppointment);
-            }
+                // if this was a gap, adding the new appointment to the old worker
+                if (mIsAGap) {
+                    mOldWorker.addStoreAppointment(mNewAppointment);
+                }
 
-            // if it was not a gap and the worker is the same, simply updating the appointment
-            else {
-                mOldWorker.removeStoreAppointment(mOldAppointment);
-                mOldWorker.addStoreAppointment(mNewAppointment);
+                // if it was not a gap and the worker changed, moving the appointment to the new worker
+                else if (mHasWorkerChanged) {
+                    mOldWorker.removeStoreAppointment(mOldAppointment);
+                    mNewWorker.addStoreAppointment(mNewAppointment);
+                }
+
+                // if it was not a gap and the worker is the same, simply updating the appointment
+                else {
+                    mOldWorker.removeStoreAppointment(mOldAppointment);
+                    mOldWorker.addStoreAppointment(mNewAppointment);
+                }
+                // TODO add / update appointment to the shared prefs
             }
-            // TODO add appointment to the shared prefs
         } else {
             Toast.makeText(this, errorMessage, Toast.LENGTH_LONG).show();
             result = false;

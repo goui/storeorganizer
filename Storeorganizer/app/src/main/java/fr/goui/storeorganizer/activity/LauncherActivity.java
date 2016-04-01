@@ -11,9 +11,15 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ProgressBar;
 
+import com.google.gson.Gson;
+
+import java.util.Calendar;
+
 import fr.goui.storeorganizer.R;
+import fr.goui.storeorganizer.model.StoreAppointment;
 import fr.goui.storeorganizer.model.StoreModel;
 import fr.goui.storeorganizer.model.StoreTaskModel;
+import fr.goui.storeorganizer.model.StoreWorker;
 import fr.goui.storeorganizer.model.StoreWorkerModel;
 
 /**
@@ -76,7 +82,7 @@ public class LauncherActivity extends AppCompatActivity {
         });
 
         // getting the shared prefs
-        mSharedPreferences = getSharedPreferences(getString(R.string.preference_file_key), MODE_PRIVATE);
+        mSharedPreferences = getSharedPreferences(mResources.getString(R.string.preference_file_key), MODE_PRIVATE);
 
         // launching the shared prefs recuperation in background
         new ProgressTask().execute();
@@ -256,8 +262,48 @@ public class LauncherActivity extends AppCompatActivity {
      * If a new day has come we delete them. If not we put them in the corresponding model.
      */
     private void getAppointmentsOfTheDay() {
-        // TODO if saved day is today get appointment info
-        // TODO if not erase info and save present day
+//        SharedPreferences.Editor editor = mSharedPreferences.edit();
+//        editor.clear();
+//        editor.apply();
+        StoreWorkerModel storeWorkerModel = StoreWorkerModel.getInstance();
+
+        // verifying if the saved day is today
+        // BUG : if the user doesnt launch the app in exactly 1 month (i.e. same day of the month)
+        int savedDay = mSharedPreferences.getInt(mResources.getString(R.string.saved_day), -1);
+        int today = Calendar.getInstance().get(Calendar.DAY_OF_MONTH);
+
+        // if not, removing everything about appointments for all workers
+        if (savedDay != today) {
+            SharedPreferences.Editor editor = mSharedPreferences.edit();
+            for (StoreWorker currentWorker : storeWorkerModel.getStoreWorkers()) {
+                int nbOfAppointments = mSharedPreferences.getInt(mResources.getString(R.string.worker) + currentWorker.getId()
+                        + mResources.getString(R.string.number_of_appointments), 0);
+                for (int i = 0; i < nbOfAppointments; i++) {
+                    editor.remove(mResources.getString(R.string.worker) + currentWorker.getId()
+                            + mResources.getString(R.string.appointment) + i);
+                }
+            }
+            // saving the day
+            editor.putInt(mResources.getString(R.string.saved_day), today);
+            editor.apply();
+        }
+
+        // if so, getting everything about appointments for all workers and putting it in models
+        else {
+            for (StoreWorker currentWorker : storeWorkerModel.getStoreWorkers()) {
+                if (currentWorker.getStoreAppointmentsNumber() == 0) {
+                    int nbOfAppointments = mSharedPreferences.getInt(mResources.getString(R.string.worker) + currentWorker.getId()
+                            + mResources.getString(R.string.number_of_appointments), 0);
+                    for (int i = 0; i < nbOfAppointments; i++) {
+                        String json = mSharedPreferences.getString(mResources.getString(R.string.worker) + currentWorker.getId()
+                                + mResources.getString(R.string.appointment) + i, "");
+                        Gson gson = new Gson();
+                        StoreAppointment storeAppointment = gson.fromJson(json, StoreAppointment.class);
+                        currentWorker.addStoreAppointment(storeAppointment);
+                    }
+                }
+            }
+        }
     }
 
 }
