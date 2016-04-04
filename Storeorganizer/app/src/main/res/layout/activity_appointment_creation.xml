@@ -11,33 +11,23 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <android.support.design.widget.TextInputLayout
+        <EditText
+            android:id="@+id/activity_appointment_creation_clients_name_edit_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp">
+            android:layout_marginTop="8dp"
+            android:hint="@string/clients_name"
+            android:inputType="textPersonName|textCapSentences"
+            android:textColor="@color/black"/>
 
-            <EditText
-                android:id="@+id/activity_appointment_creation_clients_name_edit_text"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/clients_name"
-                android:inputType="textPersonName|textCapSentences"
-                android:textColor="@color/black"/>
-        </android.support.design.widget.TextInputLayout>
-
-        <android.support.design.widget.TextInputLayout
+        <EditText
+            android:id="@+id/activity_appointment_creation_clients_phone_number_edit_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp">
-
-            <EditText
-                android:id="@+id/activity_appointment_creation_clients_phone_number_edit_text"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="@string/clients_phone_number"
-                android:inputType="phone"
-                android:textColor="@color/black"/>
-        </android.support.design.widget.TextInputLayout>
+            android:layout_marginTop="8dp"
+            android:hint="@string/clients_phone_number"
+            android:inputType="phone"
+            android:textColor="@color/black"/>
 
         <TextView
             android:id="@+id/activity_appointment_creation_worker_text_view"
@@ -93,23 +83,25 @@
 
         </LinearLayout>
 
-        <TextView
-            android:id="@+id/activity_appointment_creation_start_text_view"
-            android:layout_width="match_parent"
+        <android.support.v7.widget.CardView
+            xmlns:card_view="http://schemas.android.com/apk/res-auto"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="4dp"
-            android:background="@color/light_grey"
-            android:clickable="true"
-            android:paddingBottom="8dp"
-            android:paddingTop="8dp"
-            android:textColor="@color/grey_overlay"
-            android:textSize="18sp"/>
+            card_view:cardCornerRadius="2dp"
+            card_view:cardElevation="2dp"
+            card_view:cardUseCompatPadding="true">
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:layout_marginTop="8dp"
-            android:background="@color/light_grey"/>
+            <TextView
+                android:id="@+id/activity_appointment_creation_start_text_view"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/light_grey"
+                android:clickable="true"
+                android:padding="8dp"
+                android:text="16:05"
+                android:textColor="@color/grey_overlay"
+                android:textSize="18sp"/>
+        </android.support.v7.widget.CardView>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -134,17 +126,25 @@
 
         </LinearLayout>
 
-        <TextView
-            android:id="@+id/activity_appointment_creation_end_text_view"
-            android:layout_width="match_parent"
+        <android.support.v7.widget.CardView
+            xmlns:card_view="http://schemas.android.com/apk/res-auto"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="4dp"
-            android:background="@color/light_grey"
-            android:clickable="true"
-            android:paddingBottom="8dp"
-            android:paddingTop="8dp"
-            android:textColor="@color/grey_overlay"
-            android:textSize="18sp"/>
+            card_view:cardCornerRadius="2dp"
+            card_view:cardElevation="2dp"
+            card_view:cardUseCompatPadding="true">
+
+            <TextView
+                android:id="@+id/activity_appointment_creation_end_text_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/light_grey"
+                android:clickable="true"
+                android:padding="8dp"
+                android:text="16:35"
+                android:textColor="@color/grey_overlay"
+                android:textSize="18sp"/>
+        </android.support.v7.widget.CardView>
 
     </LinearLayout>
 
