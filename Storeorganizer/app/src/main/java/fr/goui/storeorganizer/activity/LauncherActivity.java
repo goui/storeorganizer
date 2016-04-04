@@ -282,6 +282,10 @@ public class LauncherActivity extends AppCompatActivity {
                     editor.remove(mResources.getString(R.string.worker) + currentWorker.getId()
                             + mResources.getString(R.string.appointment) + i);
                 }
+                if (nbOfAppointments > 0) {
+                    editor.putInt(mResources.getString(R.string.worker) + currentWorker.getId()
+                            + mResources.getString(R.string.number_of_appointments), 0);
+                }
             }
             // saving the day
             editor.putInt(mResources.getString(R.string.saved_day), today);

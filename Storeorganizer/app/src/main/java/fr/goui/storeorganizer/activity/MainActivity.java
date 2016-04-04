@@ -147,7 +147,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         // linking the hamburger menu to the navigation drawer
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, mDrawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        mDrawerLayout.addDrawerListener(toggle);
+        mDrawerLayout.setDrawerListener(toggle);
         toggle.syncState();
 
         // subscribing to the models

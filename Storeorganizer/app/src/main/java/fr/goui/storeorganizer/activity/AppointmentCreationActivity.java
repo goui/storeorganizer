@@ -327,9 +327,6 @@ public class AppointmentCreationActivity extends AppCompatActivity {
         mCalendarStartingTime.set(Calendar.MILLISECOND, 0);
         mCalendarEndingTime.set(Calendar.SECOND, 0);
         mCalendarEndingTime.set(Calendar.MILLISECOND, 0);
-
-        // getting the shared prefs
-        mSharedPreferences = getSharedPreferences(mResources.getString(R.string.preference_file_key), MODE_PRIVATE);
     }
 
     @Override
@@ -377,6 +374,9 @@ public class AppointmentCreationActivity extends AppCompatActivity {
         int workerPosition = getIntent().getIntExtra(mResources.getString(R.string.intent_appointment_creation_worker_position), 0);
         mSpinnerWorker.setSelection(workerPosition);
         mNewWorker = mStoreWorkerModel.getStoreWorker(workerPosition);
+
+        // getting the shared prefs
+        mSharedPreferences = getSharedPreferences(mResources.getString(R.string.preference_file_key), MODE_PRIVATE);
     }
 
     /**
@@ -563,16 +563,7 @@ public class AppointmentCreationActivity extends AppCompatActivity {
             mNewWorker.addStoreAppointment(mNewAppointment);
 
             // adding the appointment in shared prefs
-            Gson gson = new Gson();
-            String json = gson.toJson(mNewAppointment);
-            SharedPreferences.Editor editor = mSharedPreferences.edit();
-            editor.putString(mResources.getString(R.string.worker) + mNewWorker.getId()
-                            + mResources.getString(R.string.appointment) + (mNewWorker.getStoreAppointmentsNumber() - 1),
-                    json);
-            editor.putInt(mResources.getString(R.string.worker) + mNewWorker.getId() + mResources.getString(R.string.number_of_appointments),
-                    mNewWorker.getStoreAppointmentsNumber());
-            editor.apply();
-
+            updateAppointmentsInSharedPrefs(mNewWorker);
         }
 
         // if there is an error, displaying it
@@ -581,6 +572,29 @@ public class AppointmentCreationActivity extends AppCompatActivity {
             result = false;
         }
         return result;
+    }
+
+    /**
+     * Method used to rewrite everything about appointments in the shared prefs for the specified worker.
+     * It is simpler than saving information about every appointments' position.
+     *
+     * @param storeWorker the {@code StoreWorker}
+     */
+    protected void updateAppointmentsInSharedPrefs(StoreWorker storeWorker) {
+        SharedPreferences.Editor editor = mSharedPreferences.edit();
+        editor.putInt(mResources.getString(R.string.worker) + storeWorker.getId() + mResources.getString(R.string.number_of_appointments),
+                storeWorker.getStoreAppointmentsNumber());
+        Gson gson = new Gson();
+        String json;
+        int counter = 0;
+        for (StoreAppointment currentAppointment : storeWorker.getStoreAppointments()) {
+            if (!(currentAppointment instanceof NullStoreAppointment)) {
+                json = gson.toJson(currentAppointment);
+                editor.putString(mResources.getString(R.string.worker) + storeWorker.getId()
+                        + mResources.getString(R.string.appointment) + counter++, json);
+            }
+        }
+        editor.apply();
     }
 
     /**

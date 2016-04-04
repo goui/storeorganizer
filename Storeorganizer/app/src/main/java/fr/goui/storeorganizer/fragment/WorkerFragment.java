@@ -1,6 +1,8 @@
 package fr.goui.storeorganizer.fragment;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -15,15 +17,18 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
+
 import java.util.Calendar;
 
-import fr.goui.storeorganizer.model.NullStoreAppointment;
-import fr.goui.storeorganizer.listener.OnAppointmentChangeListener;
 import fr.goui.storeorganizer.R;
+import fr.goui.storeorganizer.activity.AppointmentEditionActivity;
+import fr.goui.storeorganizer.adapter.WorkerRecyclerAdapter;
+import fr.goui.storeorganizer.listener.OnAppointmentChangeListener;
+import fr.goui.storeorganizer.model.NullStoreAppointment;
+import fr.goui.storeorganizer.model.StoreAppointment;
 import fr.goui.storeorganizer.model.StoreWorker;
 import fr.goui.storeorganizer.model.StoreWorkerModel;
-import fr.goui.storeorganizer.adapter.WorkerRecyclerAdapter;
-import fr.goui.storeorganizer.activity.AppointmentEditionActivity;
 
 /**
  * {@code WorkerFragment} is a nested fragment displaying the current worker's list of appointments.
@@ -66,6 +71,16 @@ public class WorkerFragment extends Fragment implements OnAppointmentChangeListe
      */
     private Resources mResources;
 
+    /**
+     * The {@code SharedPreferences}.
+     */
+    private SharedPreferences mSharedPreferences;
+
+    /**
+     * The model for all the {@code StoreWorker}s.
+     */
+    private StoreWorkerModel mStoreWorkerModel = StoreWorkerModel.getInstance();
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -92,12 +107,15 @@ public class WorkerFragment extends Fragment implements OnAppointmentChangeListe
 
         // activity has been created, getting information
         mWorkerPosition = getArguments().getInt(ARG_SECTION_NUMBER);
-        mCurrentWorker = StoreWorkerModel.getInstance().getStoreWorker(mWorkerPosition);
+        mCurrentWorker = mStoreWorkerModel.getStoreWorker(mWorkerPosition);
         mWorkerRecyclerAdapter = new WorkerRecyclerAdapter(getActivity(), mCurrentWorker.getStoreAppointments(), this);
         mRecyclerView.setAdapter(mWorkerRecyclerAdapter);
 
         // getting the resources
         mResources = getResources();
+
+        // getting the shared prefs
+        mSharedPreferences = getActivity().getSharedPreferences(mResources.getString(R.string.preference_file_key), Context.MODE_PRIVATE);
     }
 
     @Override
@@ -119,8 +137,25 @@ public class WorkerFragment extends Fragment implements OnAppointmentChangeListe
     public void onAppointmentDelete(int position) {
         // removing the appointment
         mCurrentWorker.removeStoreAppointment(mCurrentWorker.getStoreAppointment(position));
-        // TODO remove appointment from the shared prefs
         notifyDataSetChanged();
+
+        // removing it in the shared preferences
+        // NOTE : as we don't know which one it is in the shared prefs, we rewrite everything
+        int nbOfAppointments = mCurrentWorker.getStoreAppointmentsNumber();
+        SharedPreferences.Editor editor = mSharedPreferences.edit();
+        editor.putInt(mResources.getString(R.string.worker) + mCurrentWorker.getId() + mResources.getString(R.string.number_of_appointments),
+                nbOfAppointments);
+        Gson gson = new Gson();
+        String json;
+        for (int i = 0; i < nbOfAppointments; i++) {
+            StoreAppointment currentAppointment = mCurrentWorker.getStoreAppointment(i);
+            if (!(currentAppointment instanceof NullStoreAppointment)) {
+                json = gson.toJson(currentAppointment);
+                editor.putString(mResources.getString(R.string.worker) + mCurrentWorker.getId()
+                        + mResources.getString(R.string.appointment) + i, json);
+            }
+        }
+        editor.apply();
     }
 
     @Override

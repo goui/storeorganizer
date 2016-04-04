@@ -10,6 +10,8 @@ import java.util.Calendar;
  */
 public class NullStoreAppointment extends StoreAppointment {
 
+    private static final String GAP = "gap";
+
     @Override
     public void setStartTime(int startHour, int startMinute) {
         _startTime.set(Calendar.HOUR_OF_DAY, startHour);
@@ -24,5 +26,10 @@ public class NullStoreAppointment extends StoreAppointment {
     @Override
     public int getDuration() {
         return (int) (_endTime.getTimeInMillis() - _startTime.getTimeInMillis()) / 60000;
+    }
+
+    @Override
+    public String toString() {
+        return GAP + " - " + getFormattedStartTime() + " - " + getFormattedEndTime();
     }
 }

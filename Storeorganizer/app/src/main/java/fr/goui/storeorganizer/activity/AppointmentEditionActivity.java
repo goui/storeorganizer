@@ -8,8 +8,8 @@ import android.widget.Toast;
 
 import java.util.Calendar;
 
-import fr.goui.storeorganizer.model.NullStoreAppointment;
 import fr.goui.storeorganizer.R;
+import fr.goui.storeorganizer.model.NullStoreAppointment;
 import fr.goui.storeorganizer.model.StoreAppointment;
 import fr.goui.storeorganizer.model.StoreTask;
 import fr.goui.storeorganizer.model.StoreTaskModel;
@@ -73,14 +73,16 @@ public class AppointmentEditionActivity extends AppointmentCreationActivity {
                 // getting the old appointment
                 mOldAppointment = mOldWorker.getStoreAppointment(oldAppointmentPosition);
 
-                // creating the new appointment
-                mNewAppointment = new StoreAppointment();
-
                 // getting the old task
                 StoreTask oldTask = mOldAppointment.getStoreTask();
 
-                // copying the task in the new appointment
+                // creating the new appointment
+                mNewAppointment = new StoreAppointment();
+                mNewAppointment.setClientName(mOldAppointment.getClientName());
+                mNewAppointment.setClientPhoneNumber(mOldAppointment.getClientPhoneNumber());
                 mNewAppointment.setStoreTask(oldTask);
+                mNewAppointment.setStartTime(mOldAppointment.getStartTime());
+                mNewAppointment.setEndTime(mOldAppointment.getStartTime());
 
                 // if there is no old task, old appointment is a gap
                 int taskPosition = -1;
@@ -108,6 +110,9 @@ public class AppointmentEditionActivity extends AppointmentCreationActivity {
                 initViewsInformation(oldWorkerPosition, taskPosition);
             }
         }
+
+        // getting the shared prefs
+        mSharedPreferences = getSharedPreferences(mResources.getString(R.string.preference_file_key), MODE_PRIVATE);
     }
 
     /**
@@ -277,20 +282,29 @@ public class AppointmentEditionActivity extends AppointmentCreationActivity {
                 // if this was a gap, adding the new appointment to the old worker
                 if (mIsAGap) {
                     mOldWorker.addStoreAppointment(mNewAppointment);
+
+                    // adding the new appointment in shared prefs
+                    updateAppointmentsInSharedPrefs(mOldWorker);
                 }
 
                 // if it was not a gap and the worker changed, moving the appointment to the new worker
                 else if (mHasWorkerChanged) {
                     mOldWorker.removeStoreAppointment(mOldAppointment);
                     mNewWorker.addStoreAppointment(mNewAppointment);
+
+                    // removing the old appointment and adding the new appointment in shared prefs
+                    updateAppointmentsInSharedPrefs(mOldWorker);
+                    updateAppointmentsInSharedPrefs(mNewWorker);
                 }
 
                 // if it was not a gap and the worker is the same, simply updating the appointment
                 else {
                     mOldWorker.removeStoreAppointment(mOldAppointment);
                     mOldWorker.addStoreAppointment(mNewAppointment);
+
+                    // removing the old appointment and adding the new appointment in shared prefs
+                    updateAppointmentsInSharedPrefs(mOldWorker);
                 }
-                // TODO add / update appointment to the shared prefs
             }
         } else {
             Toast.makeText(this, errorMessage, Toast.LENGTH_LONG).show();
