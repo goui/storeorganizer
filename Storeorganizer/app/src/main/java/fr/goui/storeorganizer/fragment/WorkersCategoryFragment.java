@@ -68,6 +68,7 @@ public class WorkersCategoryFragment extends Fragment {
         TextView textView = (TextView) rootView.findViewById(R.id.fragment_settings_generic_category_text_view);
         textView.setText(mResources.getString(R.string.workers));
         RecyclerView recyclerView = (RecyclerView) rootView.findViewById(R.id.fragment_settings_generic_category_recycler_view);
+        recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
         // creating the adapter for the recycler view

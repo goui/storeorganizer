@@ -21,6 +21,7 @@
         android:id="@+id/fragment_settings_generic_category_recycler_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
         android:layout_below="@id/fragment_settings_generic_category_separator"
         android:layout_marginTop="8dp"/>
 

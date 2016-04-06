@@ -303,7 +303,9 @@ public class LauncherActivity extends AppCompatActivity {
                                 + mResources.getString(R.string.appointment) + i, "");
                         Gson gson = new Gson();
                         StoreAppointment storeAppointment = gson.fromJson(json, StoreAppointment.class);
-                        currentWorker.addStoreAppointment(storeAppointment);
+                        if(storeAppointment != null) {
+                            currentWorker.addStoreAppointment(storeAppointment);
+                        }
                     }
                 }
             }

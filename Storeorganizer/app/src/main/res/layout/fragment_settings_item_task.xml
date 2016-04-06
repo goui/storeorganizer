@@ -15,7 +15,6 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="?attr/selectableItemBackground"
             android:padding="4dp">
 
             <TextView
@@ -24,6 +23,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="4dp"
+                android:textColor="@color/black"
                 android:textSize="20sp"/>
 
             <TextView
@@ -34,6 +34,7 @@
                 android:layout_marginBottom="8dp"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="4dp"
+                android:textColor="@color/black"
                 android:textSize="16sp"/>
 
             <ImageButton
@@ -43,7 +44,9 @@
                 android:layout_alignParentEnd="true"
                 android:layout_centerVertical="true"
                 android:layout_marginEnd="4dp"
+                android:background="?attr/selectableItemBackground"
                 android:contentDescription="@string/delete"
+                android:padding="4dp"
                 android:src="@drawable/ic_action_delete_black"/>
 
             <ImageButton
@@ -51,9 +54,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
-                android:layout_marginEnd="4dp"
+                android:layout_marginEnd="16dp"
                 android:layout_toStartOf="@id/fragment_settings_item_task_delete_button"
+                android:background="?attr/selectableItemBackground"
                 android:contentDescription="@string/edit"
+                android:padding="4dp"
                 android:src="@drawable/ic_action_edit_black"/>
 
         </RelativeLayout>
