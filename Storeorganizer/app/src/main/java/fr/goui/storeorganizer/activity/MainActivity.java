@@ -2,10 +2,13 @@ package fr.goui.storeorganizer.activity;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Resources;
 import android.os.Bundle;
+import android.support.design.widget.BottomSheetBehavior;
+import android.support.design.widget.BottomSheetDialog;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
@@ -15,18 +18,25 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
+import fr.goui.storeorganizer.adapter.BottomSheetRecyclerAdapter;
 import fr.goui.storeorganizer.fragment.DetailsFragment;
 import fr.goui.storeorganizer.listener.OnAppointmentCreateListener;
+import fr.goui.storeorganizer.listener.OnBottomSheetItemClickListener;
 import fr.goui.storeorganizer.listener.OnTimeTickListener;
 import fr.goui.storeorganizer.fragment.OverallFragment;
 import fr.goui.storeorganizer.R;
@@ -38,7 +48,17 @@ import fr.goui.storeorganizer.model.StoreWorkerModel;
  * It can access {@link DetailsFragment}, {@link OverallFragment} and {@link SettingsActivity}.
  * By default the displayed fragment is {@code DetailsFragment}.
  */
-public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, Observer {
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener, Observer, OnBottomSheetItemClickListener {
+
+    /**
+     * Constant for the bottom sheet add appointment item.
+     */
+    private static final int BOTTOM_SHEET_ADD_APPOINTMENT = 0;
+
+    /**
+     * Constant for the bottom sheet add lunch break item.
+     */
+    private static final int BOTTOM_SHEET_LUNCH_BREAK = 1;
 
     /**
      * The manager used to display fragments.
@@ -91,6 +111,31 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private StoreModel mStoreModel = StoreModel.getInstance();
 
     /**
+     * The bottom sheet dialog.
+     */
+    private BottomSheetDialog mBottomSheetDialog;
+
+    /**
+     * The bottom sheet behavior used to extend or collapse the bottom sheet dialog.
+     */
+    private BottomSheetBehavior mBottomSheetBehavior;
+
+    /**
+     * The window layout inflater.
+     */
+    private LayoutInflater mLayoutInflater;
+
+    /**
+     * The list of bottom sheet string items.
+     */
+    private List<String> mBottomSheetItemsTexts;
+
+    /**
+     * The list of bottom sheet integer icon items.
+     */
+    private List<Integer> mBottomSheetItemsIcons;
+
+    /**
      * The broadcast receiver to be notified every minute of the clock.
      */
     private BroadcastReceiver mTimeBroadcastReceiver = new BroadcastReceiver() {
@@ -125,11 +170,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(MainActivity.this, AppointmentCreationActivity.class);
-                if (mCurrentFragment instanceof DetailsFragment) {
-                    intent.putExtra(mResources.getString(R.string.intent_appointment_creation_worker_position), ((DetailsFragment) mCurrentFragment).getSelectedTabPosition());
-                }
-                startActivityForResult(intent, mResources.getInteger(R.integer.intent_request_code_appointment_creation));
+                showBottomSheetDialog();
             }
         });
 
@@ -147,7 +188,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         // linking the hamburger menu to the navigation drawer
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, mDrawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        mDrawerLayout.setDrawerListener(toggle);
+        mDrawerLayout.addDrawerListener(toggle);
         toggle.syncState();
 
         // subscribing to the models
@@ -161,6 +202,21 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         // creating the zoom gesture listener
         mScaleGestureDetector = new ScaleGestureDetector(this, new ScaleListener());
+
+        // getting the layout inflater
+        mLayoutInflater = getLayoutInflater();
+
+        // adding items for the bottom sheet
+        mBottomSheetItemsTexts = new ArrayList<>();
+        mBottomSheetItemsTexts.add(mResources.getString(R.string.add_appointment));
+        mBottomSheetItemsTexts.add(mResources.getString(R.string.add_lunch_break));
+        mBottomSheetItemsIcons = new ArrayList<>();
+        mBottomSheetItemsIcons.add(R.drawable.ic_vector_appointment);
+        mBottomSheetItemsIcons.add(R.drawable.ic_vector_lunch_break);
+
+        // the bottom sheet
+        View bottomSheet = findViewById(R.id.bottom_sheet);
+        mBottomSheetBehavior = BottomSheetBehavior.from(bottomSheet);
     }
 
     @Override
@@ -177,6 +233,51 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             }
         }
     }
+
+    /**
+     * Method used to expand the bottom sheet dialog.
+     */
+    private void showBottomSheetDialog() {
+        mBottomSheetDialog = new BottomSheetDialog(this);
+        View view = mLayoutInflater.inflate(R.layout.layout_bottom_sheet, null);
+        int peekHeight = view.getMeasuredHeight();
+        mBottomSheetBehavior.setPeekHeight(peekHeight);
+        RecyclerView recyclerView = (RecyclerView) view.findViewById(R.id.layout_bottom_sheet_recyclerView);
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setAdapter(new BottomSheetRecyclerAdapter(this, mBottomSheetItemsTexts, mBottomSheetItemsIcons, this));
+
+        mBottomSheetDialog.setContentView(view);
+        mBottomSheetDialog.show();
+        mBottomSheetDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialog) {
+                mBottomSheetDialog = null;
+            }
+        });
+    }
+
+    @Override
+    public void onBottomSheetItemClick(int position) {
+
+        // adding whatever the user has chosen
+        switch (position) {
+            case BOTTOM_SHEET_ADD_APPOINTMENT:
+                Intent intent = new Intent(MainActivity.this, AppointmentCreationActivity.class);
+                if (mCurrentFragment instanceof DetailsFragment) {
+                    intent.putExtra(mResources.getString(R.string.intent_appointment_creation_worker_position), ((DetailsFragment) mCurrentFragment).getSelectedTabPosition());
+                }
+                startActivityForResult(intent, mResources.getInteger(R.integer.intent_request_code_appointment_creation));
+                break;
+            case BOTTOM_SHEET_LUNCH_BREAK:
+                // TODO lunch break
+                break;
+        }
+
+        // collapsing and dismissing the bottom sheet dialog
+        mBottomSheetDialog.dismiss();
+    }
+
 
     @Override
     protected void onResume() {
@@ -199,6 +300,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         // if the drawer is open, closing it if the user presses back
         if (mDrawerLayout.isDrawerOpen(GravityCompat.START)) {
             mDrawerLayout.closeDrawer(GravityCompat.START);
+        } else if (mBottomSheetBehavior.getState() == BottomSheetBehavior.STATE_EXPANDED) {
+            mBottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
         } else {
             super.onBackPressed();
         }

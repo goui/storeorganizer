@@ -4,7 +4,9 @@
     <string name="package_name">fr.goui.storeorganizer</string>
 
     <!-- Used in the application -->
+    <string name="add">Add</string>
     <string name="add_appointment">Add appointment</string>
+    <string name="add_lunch_break">Add lunch break</string>
     <string name="add_task">Add task</string>
     <string name="add_worker">Add worker</string>
     <string name="appointment">appointment</string>
