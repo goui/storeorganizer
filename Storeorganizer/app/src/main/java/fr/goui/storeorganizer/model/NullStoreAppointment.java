@@ -10,13 +10,7 @@ import java.util.Calendar;
  */
 public class NullStoreAppointment extends StoreAppointment {
 
-    private static final String GAP = "gap";
-
-    @Override
-    public void setStartTime(int startHour, int startMinute) {
-        _startTime.set(Calendar.HOUR_OF_DAY, startHour);
-        _startTime.set(Calendar.MINUTE, startMinute);
-    }
+    private static final String GAP = "Gap";
 
     @Override
     public StoreTask getStoreTask() {

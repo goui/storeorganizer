@@ -41,6 +41,8 @@
             android:launchMode="singleInstance"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
+        <activity android:name=".activity.LunchBreakCreationActivity">
+        </activity>
     </application>
 
 </manifest>

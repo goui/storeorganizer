@@ -278,7 +278,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         mBottomSheetDialog.dismiss();
     }
 
-
     @Override
     protected void onResume() {
         super.onResume();
